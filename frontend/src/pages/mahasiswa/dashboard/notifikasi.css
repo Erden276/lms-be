@@ -1,0 +1,144 @@
+/* notificationDropdown.css */
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  width: 22rem;
+  max-height: 28rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+  animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--slate-50);
+}
+
+.notif-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.notif-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.notif-close:hover {
+  color: var(--color-secondary);
+}
+
+.notif-close .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.notif-list {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: var(--slate-50);
+}
+
+.notif-unread {
+  background: var(--blue-50);
+}
+
+.notif-unread:hover {
+  background: var(--blue-100);
+}
+
+.notif-read {
+  background: white;
+}
+
+.notif-icon {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slate-100);
+  color: var(--color-secondary);
+}
+
+.notif-icon .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-desc {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.notif-time {
+  font-size: 0.6875rem;
+  color: var(--slate-400);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .notif-dropdown {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    max-height: 70vh;
+  }
+}

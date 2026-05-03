@@ -1,0 +1,90 @@
+/* videoModal.css */
+.mk-video-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.mk-video-modal-content {
+  background: #0a1628;
+  border-radius: 1rem;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.mk-video-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.mk-video-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mk-video-modal-close .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.mk-video-modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  color: white;
+}
+
+.mk-video-modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.mk-video-modal-header p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mk-video-player-wrapper {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.mk-video-player {
+  width: 100%;
+  border-radius: 0.5rem;
+  background: #000;
+  max-height: 70vh;
+}
+
+@media (max-width: 768px) {
+  .mk-video-modal {
+    padding: 1rem;
+  }
+  .mk-video-modal-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+  .mk-video-player-wrapper {
+    padding: 0 1.25rem 1.25rem;
+  }
+  .mk-video-modal-header h3 {
+    font-size: 1rem;
+  }
+}

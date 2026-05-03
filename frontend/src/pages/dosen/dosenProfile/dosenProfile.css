@@ -1,0 +1,173 @@
+/* dosenProfile.css — Dosen-specific profile overrides */
+
+.dprf-identity-card {
+  background: linear-gradient(
+    135deg,
+    rgba(75, 83, 188, 0.07) 0%,
+    rgba(47, 150, 150, 0.06) 100%
+  );
+  border: 1.5px solid rgba(75, 83, 188, 0.14);
+}
+
+.dprf-nidn-badge {
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary) 0%,
+    #2f9696 100%
+  ) !important;
+  color: white !important;
+}
+
+.dprf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.dprf-tag {
+  padding: 0.225rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--blue-50);
+  color: var(--color-secondary);
+}
+.dprf-tag--teal {
+  background: var(--teal-50);
+  color: var(--teal-700);
+}
+
+/* Mata Kuliah Card */
+.dprf-matkul-card {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.dprf-matkul-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #2f9696 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.dprf-matkul-icon .material-symbols-outlined {
+  font-size: 1.5rem !important;
+  color: white;
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+.dprf-matkul-title {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.dprf-matkul-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+.dprf-matkul-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--slate-50);
+  border: 1px solid var(--color-border);
+}
+.dprf-mk-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+.dprf-mk-code {
+  font-size: 0.6875rem;
+  color: var(--slate-500);
+  font-weight: 600;
+  margin-top: 0.125rem;
+}
+.dprf-mk-badge {
+  padding: 0.2rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+/* Stats Card */
+.dprf-stats-card {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.dprf-stats-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, var(--color-amber) 0%, #e07b00 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.dprf-stats-icon .material-symbols-outlined {
+  font-size: 1.5rem !important;
+  color: white;
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+.dprf-stats-title {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.dprf-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: var(--slate-50);
+  margin-bottom: 0.625rem;
+}
+.dprf-stat-icon {
+  font-size: 1.25rem !important;
+  color: var(--color-secondary);
+}
+.dprf-stat-lbl {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--slate-500);
+  margin-bottom: 0.125rem;
+}
+.dprf-stat-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--color-secondary);
+}

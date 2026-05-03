@@ -1,0 +1,442 @@
+/* ── Profile Page Styles ── */
+
+/* Toast */
+.prf-toast {
+  position: fixed;
+  top: 5rem;
+  right: 1.5rem;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  animation: prf-slide-in 0.3s ease;
+}
+.prf-toast--success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.prf-toast--error   { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
+@keyframes prf-slide-in {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Modal Overlay */
+.prf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: prf-fade-in 0.2s ease;
+}
+@keyframes prf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.prf-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 90%;
+  max-width: 26rem;
+  box-shadow: var(--shadow-lg);
+  animation: prf-scale-in 0.22s ease;
+}
+@keyframes prf-scale-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.prf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.prf-modal-header h3 {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+}
+.prf-modal-close {
+  background: none;
+  border: none;
+  color: var(--slate-500);
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.prf-modal-close:hover { background: var(--slate-100); color: var(--slate-700); }
+
+.prf-modal-body { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.prf-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/* Shared form elements */
+.prf-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.prf-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--slate-500);
+  text-transform: uppercase;
+}
+.prf-input {
+  padding: 0.625rem 0.875rem;
+  border: 1.5px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-on-surface);
+  background: var(--slate-50);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.prf-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(75,83,188,0.12);
+}
+
+/* Buttons */
+.prf-btn-cancel, .prf-btn-cancel-sm {
+  padding: 0.5rem 1.25rem;
+  border: 1.5px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--slate-600);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+.prf-btn-cancel:hover, .prf-btn-cancel-sm:hover { background: var(--slate-50); }
+.prf-btn-save, .prf-btn-save-sm {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-secondary);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+.prf-btn-save:hover, .prf-btn-save-sm:hover { opacity: 0.88; }
+
+/* ── Identity Card ── */
+.prf-identity-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  margin-bottom: 1.5rem;
+}
+
+.prf-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.prf-avatar {
+  width: 6rem;
+  height: 6rem;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.prf-avatar-edit {
+  position: absolute;
+  bottom: -0.375rem;
+  right: -0.375rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--color-secondary);
+  color: white;
+  border: 2.5px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.prf-avatar-edit:hover { opacity: 0.85; transform: scale(1.08); }
+.prf-avatar-edit .material-symbols-outlined { font-size: 0.9rem; }
+
+.prf-identity-info { flex: 1; }
+.prf-name {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--color-secondary);
+  margin-bottom: 0.5rem;
+}
+.prf-identity-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.prf-nim-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.875rem;
+  background: var(--slate-800);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.prf-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+/* ── Main Two-Column Row ── */
+.prf-main-row {
+  display: grid;
+  grid-template-columns: 1fr 18rem;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+@media (max-width: 860px) {
+  .prf-main-row { grid-template-columns: 1fr; }
+}
+
+/* Data Pribadi Card */
+.prf-data-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.prf-data-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.prf-data-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+.prf-data-title h2 {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--color-secondary);
+}
+.prf-sunting-btn {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  background: none;
+  border: none;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.prf-sunting-btn:hover { background: rgba(75,83,188,0.08); }
+.prf-edit-actions { display: flex; gap: 0.5rem; }
+
+.prf-data-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.prf-data-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 600px) {
+  .prf-data-grid, .prf-data-grid--3 { grid-template-columns: 1fr; }
+}
+.prf-fullwidth { width: 100%; }
+
+.prf-data-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.prf-field-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--slate-400);
+  text-transform: uppercase;
+}
+.prf-field-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+.prf-prodi { color: var(--color-secondary); font-weight: 700; }
+.prf-reguler-badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  background: var(--teal-50);
+  color: var(--teal-700);
+  border: 1px solid var(--teal-600);
+  border-radius: var(--radius-full);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+/* Security Card */
+.prf-security-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.prf-security-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+.prf-security-header h2 {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+}
+.prf-shield-icon {
+  color: var(--red-500);
+  font-size: 1.25rem;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.prf-security-desc {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  line-height: 1.6;
+}
+.prf-pw-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-amber);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.15s;
+}
+.prf-pw-btn:hover { background: var(--color-amber-dark); transform: translateY(-1px); }
+.prf-pw-btn:active { transform: scale(0.97); }
+.prf-last-changed {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  text-align: center;
+}
+
+/* ── Bottom Row ── */
+.prf-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 640px) {
+  .prf-bottom-row { grid-template-columns: 1fr; }
+}
+
+/* Status Akademik Card */
+.prf-status-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #5b63d3 0%, #7c84ec 100%);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+.prf-status-bg-icon {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -0.75rem;
+  opacity: 0.12;
+}
+.prf-status-bg-icon .material-symbols-outlined {
+  font-size: 7rem;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.prf-status-title { font-size: 1.125rem; font-weight: 800; }
+.prf-status-desc  { font-size: 0.875rem; opacity: 0.88; line-height: 1.55; }
+.prf-status-bar-track {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(255,255,255,0.25);
+  border-radius: var(--radius-full);
+  margin-top: 0.25rem;
+}
+.prf-status-bar-fill {
+  height: 100%;
+  background: white;
+  border-radius: var(--radius-full);
+  transition: width 0.8s ease;
+}
+.prf-status-pct { font-size: 0.8125rem; font-weight: 700; opacity: 0.88; }
+
+/* Notifikasi Card */
+.prf-notif-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f2135 0%, #1a3a52 100%);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+.prf-notif-bg-icon {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -0.75rem;
+  opacity: 0.1;
+}
+.prf-notif-bg-icon .material-symbols-outlined {
+  font-size: 7rem;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.prf-notif-title { font-size: 1.125rem; font-weight: 800; }
+.prf-notif-desc  { font-size: 0.875rem; opacity: 0.78; line-height: 1.55; }
+.prf-notif-link {
+  background: none;
+  border: none;
+  color: var(--color-teal);
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 0.25rem;
+}
+.prf-notif-link:hover { opacity: 0.8; }

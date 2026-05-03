@@ -1,0 +1,321 @@
+/* dashboard.css — Page-specific styles only (shared layout via shared.css) */
+
+/* ─── Page layout ─── */
+.db-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .db-grid { flex-direction: row; }
+}
+
+.db-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.db-right {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .db-right { width: 20rem; }
+}
+
+/* Page header */
+.db-page-header h1 {
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: var(--blue-900);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.25rem;
+}
+.db-page-header p {
+  color: var(--slate-500);
+  font-weight: 500;
+}
+
+/* ─── Hero Card ─── */
+.db-hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background-color: var(--color-secondary);
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 20px 40px -10px rgba(75, 83, 188, 0.30);
+}
+
+.db-hero-circle-1 {
+  position: absolute;
+  top: -5rem; right: -5rem;
+  width: 16rem; height: 16rem;
+  background: rgba(255,255,255,0.08);
+  border-radius: 9999px;
+  filter: blur(48px);
+}
+.db-hero-circle-2 {
+  position: absolute;
+  bottom: -2.5rem; left: -2.5rem;
+  width: 8rem; height: 8rem;
+  background: rgba(137,145,254,0.18);
+  border-radius: 9999px;
+  filter: blur(24px);
+}
+
+.db-hero-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+@media (min-width: 768px) {
+  .db-hero-body { flex-direction: row; align-items: center; }
+}
+
+.db-hero-avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+}
+.db-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.db-hero-info { flex: 1; }
+
+.db-badge {
+  display: inline-block;
+  padding: 0.2rem 0.75rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 9999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  -webkit-backdrop-filter: ; 
+}
+
+.db-hero-name {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+@media (min-width: 768px) { .db-hero-name { font-size: 1.75rem; } }
+
+.db-hero-sub { color: rgba(255,255,255,0.75); font-weight: 500; }
+
+.db-hero-stats { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.db-stat-box {
+  background: rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: ; 
+  padding: 0.875rem 1.25rem;
+  border-radius: 1rem;
+  text-align: center;
+  min-width: 4.5rem;
+}
+.db-stat-val { font-size: 1.5rem; font-weight: 900; margin: 0; }
+.db-stat-lbl { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; opacity: 0.65; margin: 0; }
+
+/* ─── Glass Card ─── */
+.db-glass-card {
+  background: rgba(255,255,255,0.75);
+  -webkit-backdrop-filter: ; 
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow: var(--shadow-sm);
+}
+
+.db-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.db-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.db-card-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background-color: #93f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000d0d;
+}
+
+.db-card-title h3 { font-size: 1.125rem; font-weight: 700; color: var(--slate-900); }
+
+.db-link-btn {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  background: none;
+  border: none;
+}
+.db-link-btn:hover { text-decoration: underline; }
+
+/* Progress list */
+.db-progress-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.db-progress-item { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.db-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.db-progress-title { font-size: 0.875rem; font-weight: 700; color: var(--slate-800); }
+.db-progress-sub   { font-size: 0.75rem; color: var(--slate-500); }
+.db-progress-pct   { font-size: 0.875rem; font-weight: 900; white-space: nowrap; }
+
+.db-bar-track {
+  height: 0.625rem;
+  background-color: var(--slate-100);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.db-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
+
+/* ─── Presensi Card ─── */
+.db-presensi-card {
+  background-color: white;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  box-shadow: 0 8px 24px rgba(226,232,240,0.55);
+  border: 1px solid var(--slate-100);
+  text-align: center;
+}
+
+.db-qr-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: rgba(255,221,183,0.3);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+.db-qr-icon .material-symbols-outlined { color: #be7a00; font-size: 1.75rem; }
+
+.db-presensi-card h3 { font-size: 1.0625rem; font-weight: 700; color: var(--slate-900); margin-bottom: 0.375rem; }
+.db-presensi-card p  { font-size: 0.875rem; color: var(--slate-500); margin-bottom: 1.25rem; line-height: 1.6; }
+
+.db-scan-btn {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background-color: #be7a00;
+  color: white;
+  border-radius: 0.75rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  box-shadow: 0 8px 16px rgba(190,122,0,0.2);
+  transition: transform 0.15s;
+}
+.db-scan-btn:hover  { transform: scale(1.02); }
+.db-scan-btn:active { transform: scale(0.96); }
+
+.db-schedule-row {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--slate-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+.db-sched-lbl  { font-size: 0.625rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; }
+.db-sched-time { font-size: 0.75rem; font-weight: 700; color: var(--slate-700); }
+
+.db-pulse-dot {
+  width: 0.5rem; height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #22c55e;
+  animation: dbPulse 2s ease infinite;
+}
+@keyframes dbPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* ─── Class Card ─── */
+.db-class-card {
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background: rgba(255,255,255,0.75);
+  -webkit-backdrop-filter: ; 
+  border: 1px solid rgba(255,255,255,0.4);
+}
+.db-class-img { height: 6rem; position: relative; }
+.db-class-img img { width: 100%; height: 100%; object-fit: cover; }
+.db-class-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55), transparent); }
+.db-class-badge { position: absolute; bottom: 0.625rem; left: 1rem; color: white; font-size: 0.75rem; font-weight: 700; }
+
+.db-class-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; }
+
+.db-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+.db-info-item .material-symbols-outlined { color: var(--color-secondary); margin-top: 1px; }
+
+/* ─── Discussion Card ─── */
+.db-discussion-card {
+  background: rgba(255,255,255,0.75);
+  -webkit-backdrop-filter: ; 
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: var(--shadow-sm);
+}
+
+.db-disc-header { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1rem; }
+.db-disc-header .material-symbols-outlined { color: var(--color-secondary); }
+.db-disc-header h3 { font-size: 1rem; font-weight: 700; color: var(--slate-900); }
+
+.db-disc-box {
+  background: var(--slate-50);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.db-disc-author { font-size: 0.75rem; font-weight: 700; color: var(--color-secondary); margin-bottom: 0.25rem; }
+.db-disc-text   { font-size: 0.8125rem; color: var(--slate-600); line-height: 1.5; }
+
+.db-disc-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+.db-disc-btn:hover { text-decoration: underline; }

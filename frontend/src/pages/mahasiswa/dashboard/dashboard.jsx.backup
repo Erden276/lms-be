@@ -1,0 +1,345 @@
+import React, { useState } from "react";
+import "../../shared.css";
+import "./dashboard.css";
+import "./notificationDropdown.css";
+import Sidebar from "../../Sidebar";
+
+const AVATAR_MAHASISWA =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBLlRblArhYvkrSWfEx3UWaIaP5bdg8OpReWzF-sc4sB_2K3sC4IYv7Q4-lWy6VUtGhc5esYpVi12_HYjLZdjx6ILoT60xad1GfsEtHStVQIigk44gnAXnpEAjWrPWVYNa_AKdaDPqXQwdlJDbcccdQ96CZrZ6btx50rBBy3LvfY-eINJ1MtiJWLJpWBAo2nnbaNr3i-_Yn3B_BsVkOxpG3hVSKt38J2-NxnAah9LFYcNLvZARv4lzr86P24cdV4haCMW80Nudw5Lku";
+
+const AVATAR_HERO =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBjoXu55KCdSSPl-2t0t7d2EH6gux6Xz8nZaCdXHePrj-gGn1ZWZyBoOucWc2yVgrhmNFyy8cKbxWH8i9Wm5VKkpqX9jraXjkHTr8PVU1oN3V4nkzLWUUm6nyAIS3hGDic_uY0YoNLNNZluKTKqFwJb2gYlRl9eATGdlXClTx6IXpYvk-2u1qqvfUGTzs-QJPlXTouWTyNYzTe8j8mS09evVA_aHTYfHxneVwUsb2jUygYzuAIDU5KwqO2kISzLvnzaTentePscoGoo";
+
+const notifications = [
+  { id: 1, title: "Tugas PBO - Praktikum 7", desc: "Tenggat waktu besok, 23:59", time: "1 jam lalu", read: false, type: "tugas" },
+  { id: 2, title: "Kuis Algoritma", desc: "Kuis akan dibuka dalam 3 hari", time: "2 jam lalu", read: false, type: "kuis" },
+  { id: 3, title: "Materi Baru", desc: "Modul 5 telah diupload", time: "5 jam lalu", read: true, type: "materi" },
+  { id: 4, title: "Presensi", desc: "Jangan lupa presensi kelas hari ini", time: "1 hari lalu", read: true, type: "presensi" },
+];
+
+export default function Dashboard({ onNavigate, onLogout }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  return (
+    <div className="page-shell">
+      {/* ─── Sidebar ─── */}
+      <Sidebar
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+        activePage="dashboard"
+        mobileOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* ─── Main ─── */}
+      <main className="page-main">
+        {/* Navbar */}
+        <header className="navbar">
+          <div className="navbar__left">
+            <button className="navbar__hamburger" onClick={() => setSidebarOpen(true)}>
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+            <div className="navbar__search">
+              <span className="material-symbols-outlined navbar__search-icon">search</span>
+              <input
+                className="navbar__search-input"
+                placeholder="Cari materi atau tugas..."
+                type="text"
+              />
+            </div>
+          </div>
+          <div className="navbar__right">
+            <button className="navbar__bell" onClick={() => setNotifOpen(!notifOpen)} style={{ position: "relative" }}>
+              <span className="material-symbols-outlined">notifications</span>
+              <span className="navbar__bell-dot"></span>
+            </button>
+
+            {notifOpen && (
+              <div className="notif-dropdown">
+                <div className="notif-header">
+                  <h3>Notifikasi</h3>
+                  <button className="notif-close" onClick={() => setNotifOpen(false)}>
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                <div className="notif-list">
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className={`notif-item ${notif.read ? "notif-read" : "notif-unread"}`}
+                      onClick={() => {
+                        if (notif.type === "tugas") onNavigate("daftarTugas");
+                        else if (notif.type === "kuis") onNavigate("daftarTugas");
+                        else if (notif.type === "materi") onNavigate("daftarMataKuliah");
+                        else if (notif.type === "presensi") onNavigate("presensiMahasiswa");
+                        setNotifOpen(false);
+                      }}
+                    >
+                      <div className="notif-icon">
+                        <span className="material-symbols-outlined">
+                          {notif.type === "tugas" ? "assignment" :
+                           notif.type === "kuis" ? "quiz" :
+                           notif.type === "materi" ? "menu_book" : "qr_code_scanner"}
+                        </span>
+                      </div>
+                      <div className="notif-content">
+                        <p className="notif-title">{notif.title}</p>
+                        <p className="notif-desc">{notif.desc}</p>
+                        <p className="notif-time">{notif.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="navbar__divider"></div>
+            <div
+              className="navbar__profile"
+              style={{ cursor: "pointer" }}
+              onClick={() => onNavigate && onNavigate("profile")}
+              title="Lihat Profil"
+            >
+              <div className="navbar__profile-info">
+                <p className="navbar__profile-name">Halo, Budi</p>
+                <p className="navbar__profile-role">Mahasiswa</p>
+              </div>
+              <div className="navbar__avatar">
+                <img alt="Foto profil Budi" src={AVATAR_MAHASISWA} />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="page-content">
+          <div className="db-grid">
+            {/* ── Left Column ── */}
+            <div className="db-left">
+              <div className="db-page-header">
+                <h1>Dashboard Mahasiswa</h1>
+                <p>Selamat datang kembali di ekosistem pembelajaran Anda.</p>
+              </div>
+
+              {/* Hero Card — clickable to profile */}
+              <div
+                className="db-hero-card"
+                style={{ cursor: "pointer" }}
+                onClick={() => onNavigate && onNavigate("profile")}
+                title="Lihat Profil"
+              >
+                <div className="db-hero-circle-1"></div>
+                <div className="db-hero-circle-2"></div>
+                <div className="db-hero-body">
+                  <div className="db-hero-avatar">
+                    <img alt="Profile" src={AVATAR_HERO} />
+                  </div>
+                  <div className="db-hero-info">
+                    <span className="db-badge">Profil Mahasiswa</span>
+                    <h2 className="db-hero-name">Halo, Budi (IF-48-08)</h2>
+                    <p className="db-hero-sub">S1 Informatika • Semester 4</p>
+                  </div>
+                  <div className="db-hero-stats">
+                    <div className="db-stat-box">
+                      <p className="db-stat-val">3.82</p>
+                      <p className="db-stat-lbl">IPK</p>
+                    </div>
+                    <div className="db-stat-box">
+                      <p className="db-stat-val">18</p>
+                      <p className="db-stat-lbl">SKS</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Tugas Card */}
+              <div className="db-glass-card">
+                <div className="db-card-header">
+                  <div className="db-card-title">
+                    <div className="db-card-icon">
+                      <span className="material-symbols-outlined">analytics</span>
+                    </div>
+                    <h3>Progress Tugas</h3>
+                  </div>
+                  <button
+                    className="db-link-btn"
+                    onClick={() => onNavigate && onNavigate("daftarTugas")}
+                  >
+                    Lihat Semua
+                  </button>
+                </div>
+
+                <div className="db-progress-list">
+                  {/* Item 1 */}
+                  <div
+                    className="db-progress-item"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onNavigate && onNavigate("daftarTugas")}
+                  >
+                    <div className="db-progress-row">
+                      <div>
+                        <p className="db-progress-title">Tugas PBO - Praktikum 7</p>
+                        <p className="db-progress-sub">Tenggat: Besok, 23:59</p>
+                      </div>
+                      <p className="db-progress-pct" style={{ color: "var(--color-secondary)" }}>
+                        50% Selesai
+                      </p>
+                    </div>
+                    <div className="db-bar-track">
+                      <div
+                        className="db-bar-fill"
+                        style={{ width: "50%", backgroundColor: "var(--color-secondary)" }}
+                      ></div>
+                    </div>
+                  </div>
+                  {/* Item 2 */}
+                  <div
+                    className="db-progress-item"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onNavigate && onNavigate("daftarTugas")}
+                  >
+                    <div className="db-progress-row">
+                      <div>
+                        <p className="db-progress-title">Kuis Algoritma - Struktur Data</p>
+                        <p className="db-progress-sub">Tenggat: 3 Hari lagi</p>
+                      </div>
+                      <p className="db-progress-pct" style={{ color: "var(--slate-400)" }}>
+                        Belum Dikerjakan
+                      </p>
+                    </div>
+                    <div className="db-bar-track">
+                      <div
+                        className="db-bar-fill"
+                        style={{ width: "0%", backgroundColor: "var(--slate-300)" }}
+                      ></div>
+                    </div>
+                  </div>
+                  {/* Item 3 */}
+                  <div
+                    className="db-progress-item"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onNavigate && onNavigate("daftarTugas")}
+                  >
+                    <div className="db-progress-row">
+                      <div>
+                        <p className="db-progress-title">Laporan Basis Data - Modul 4</p>
+                        <p className="db-progress-sub">Tenggat: Selesai</p>
+                      </div>
+                      <p className="db-progress-pct" style={{ color: "var(--color-teal)" }}>
+                        100% Selesai
+                      </p>
+                    </div>
+                    <div className="db-bar-track">
+                      <div
+                        className="db-bar-fill"
+                        style={{ width: "100%", backgroundColor: "#76d6d5" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Right Column ── */}
+            <div className="db-right">
+              {/* Presensi Card */}
+              <div className="db-presensi-card">
+                <div className="db-qr-icon">
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    qr_code_scanner
+                  </span>
+                </div>
+                <h3>Presensi Hari Ini</h3>
+                <p>
+                  Pindai kode QR yang diberikan dosen untuk mencatat kehadiran
+                  Anda di kelas.
+                </p>
+                <button
+                  className="db-scan-btn"
+                  onClick={() => onNavigate && onNavigate("presensiMahasiswa")}
+                >
+                  <span className="material-symbols-outlined">qr_code_2</span>
+                  Pindai QR Kehadiran
+                </button>
+                <div className="db-schedule-row">
+                  <div>
+                    <p className="db-sched-lbl">Jadwal Terdekat</p>
+                    <p className="db-sched-time">13:30 - Matematika Diskrit</p>
+                  </div>
+                  <span className="db-pulse-dot"></span>
+                </div>
+              </div>
+
+              {/* Class Card — clickable to mata kuliah */}
+              <div
+                className="db-class-card"
+                style={{ cursor: "pointer" }}
+                onClick={() => onNavigate && onNavigate("daftarMataKuliah")}
+                title="Lihat Mata Kuliah"
+              >
+                <div className="db-class-img">
+                  <img
+                    alt="Class background"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtNpKwFZav3hPQNROHLqMB2o394QiCKTzXnWGCA4jQ7vjp7HqGSQN1LcHB27MYQDXJtAnwr6pxoWFEZUFBNlyz6A9kW7VQIi3yLc3P1xhc5ew1NbdfZVyomgzxCksrpp7DXTeJpYdGB27okVcjUXadgSq5YAmxYsrvM5D9yN7W--tqRwIjK9Nz_rIFQCVabhwmUzxA0w2iAhs9vSmapoqQG8z9eo5-2fU7RMBqgnYsB7t_sB-HrTlex3xESSk8gcEfA3wn66kKpVX6"
+                  />
+                  <div className="db-class-overlay"></div>
+                  <span className="db-class-badge">Mata Kuliah Aktif</span>
+                </div>
+                <div className="db-class-body">
+                  <div className="db-info-item">
+                    <span className="material-symbols-outlined">schedule</span>
+                    <div>
+                      <p style={{ fontSize: "0.8125rem", fontWeight: 700 }}>
+                        Senin, 08:00 - 10:30
+                      </p>
+                      <p style={{ fontSize: "0.75rem", color: "var(--slate-500)" }}>
+                        Pemrograman Berorientasi Objek
+                      </p>
+                    </div>
+                  </div>
+                  <div className="db-info-item">
+                    <span className="material-symbols-outlined">location_on</span>
+                    <div>
+                      <p style={{ fontSize: "0.8125rem", fontWeight: 700 }}>Ruang GKU-102</p>
+                      <p style={{ fontSize: "0.75rem", color: "var(--slate-500)" }}>
+                        Gedung Kuliah Umum
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Discussion Card */}
+              <div className="db-discussion-card">
+                <div className="db-disc-header">
+                  <span className="material-symbols-outlined">forum</span>
+                  <h3>Diskusi Terbaru</h3>
+                </div>
+                <div
+                  className="db-disc-box"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => onNavigate && onNavigate("forumDiskusi")}
+                >
+                  <p className="db-disc-author">Dosen: Dr. Satria</p>
+                  <p className="db-disc-text">
+                    "Silakan diskusikan materi polymorphism di forum..."
+                  </p>
+                </div>
+                <button
+                  className="db-disc-btn"
+                  onClick={() => onNavigate && onNavigate("forumDiskusi")}
+                >
+                  Lihat Semua Diskusi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
