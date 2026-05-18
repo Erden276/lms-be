@@ -25,7 +25,7 @@ import profileRoutes from './src/interfaces/routes/profileRoutes.js';
 import notifikasiRoutes from './src/interfaces/routes/notifikasiRoutes.js';
 
 const app = express();
-const PORT = process.env["PORT_APP"];
+const PORT = process.env.PORT_APP || process.env.PORT || 8080;
 
 const userRepository = new PrismaUserRepository();
 const authUseCase = new AuthUseCase(userRepository);
