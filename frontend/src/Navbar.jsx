@@ -15,6 +15,24 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  useEffect(() => {
+    const isClosed = localStorage.getItem("sidebarClosed") === "true";
+    if (isClosed) {
+      document.body.classList.add("sidebar-closed");
+    } else {
+      document.body.classList.remove("sidebar-closed");
+    }
+  }, []);
+
+  const handleHamburgerClick = () => {
+    if (window.innerWidth < 768) {
+      if (onOpenSidebar) onOpenSidebar();
+    } else {
+      const isClosed = document.body.classList.toggle("sidebar-closed");
+      localStorage.setItem("sidebarClosed", String(isClosed));
+    }
+  };
+
   const isDosen = role === "Dosen";
   const isMahasiswa = role === "Mahasiswa";
   const defaultAvatar = isDosen ? AVATAR_DOSEN : AVATAR_MAHASISWA;
@@ -34,7 +52,23 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
     }
   }, [storedUser.fotoUrl, API_BASE, defaultAvatar]);
 
+  const DOSEN_NOTIFICATIONS = [
+    { id: 'd1', title: 'Jadwal UTS Semester Genap', desc: 'UTS akan dilaksanakan pada tanggal 2–6 Juni 2026. Pastikan materi sudah diunggah sebelum pelaksanaan.', time: '1 jam lalu', read: false, type: 'akademik' },
+    { id: 'd2', title: 'Pengumuman Libur Nasional', desc: 'Perkuliahan diliburkan pada Kamis, 29 Mei 2026 dalam rangka Hari Raya Waisak. Jadwal dapat disesuaikan.', time: '3 jam lalu', read: false, type: 'akademik' },
+    { id: 'd3', title: 'Jadwal UAS Semester Genap', desc: 'UAS dijadwalkan pada tanggal 30 Juni – 4 Juli 2026. Dosen dimohon mengumpulkan soal maksimal 2 minggu sebelumnya.', time: '5 jam lalu', read: false, type: 'akademik' },
+    { id: 'd4', title: 'Batas Input Nilai UTS', desc: 'Batas akhir pengisian nilai UTS adalah 13 Juni 2026. Harap segera mengisi nilai setelah pelaksanaan ujian.', time: 'Kemarin', read: true, type: 'akademik' },
+    { id: 'd5', title: 'Rapat Koordinasi Akademik', desc: 'Rapat koordinasi semester genap akan diadakan pada Jumat, 23 Mei 2026 pukul 09.00 WIB di Ruang Rapat Utama.', time: 'Kemarin', read: true, type: 'akademik' },
+    { id: 'd6', title: 'Revisi Kalender Akademik', desc: 'Kalender akademik 2025/2026 telah diperbarui. Silakan unduh versi terbaru melalui portal akademik kampus.', time: '2 hari lalu', read: true, type: 'akademik' },
+    { id: 'd7', title: 'Pengisian KRS Mahasiswa', desc: 'Periode pengisian KRS semester ganjil 2026/2027 dibuka 1–15 Juli 2026. Dosen wali dimohon melakukan persetujuan tepat waktu.', time: '3 hari lalu', read: true, type: 'akademik' },
+  ];
+
   useEffect(() => {
+    if (isDosen) {
+      setNotifications(DOSEN_NOTIFICATIONS);
+      setUnreadCount(DOSEN_NOTIFICATIONS.filter(n => !n.read).length);
+      return;
+    }
+
     if (!isMahasiswa) return;
 
     const fetchNotifications = async () => {
@@ -62,7 +96,7 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
     
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [isMahasiswa]);
+  }, [isMahasiswa, isDosen]);
 
   const name = isDosen ? `Halo, ${userName}` : `Halo, ${userName}`;
   const subtitle = isDosen ? "Dosen" : "Mahasiswa";
@@ -114,15 +148,10 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
   return (
     <header className="navbar">
       <div className="navbar__left">
-        <button className="navbar__hamburger" onClick={onOpenSidebar}>
+        <button className="navbar__hamburger" onClick={handleHamburgerClick}>
           <span className="material-symbols-outlined">menu</span>
         </button>
-        {isDosen && (
-          <span className="navbar__title" style={{ marginRight: '1rem', display: window.innerWidth > 768 ? 'none' : 'none' }}>
-            Dasbor
-          </span>
-        )}
-        <div className="navbar__search" style={{ position: "relative" }}>
+        {!isDosen && <div className="navbar__search" style={{ position: "relative" }}>
           <span className="material-symbols-outlined navbar__search-icon">search</span>
           <input
             className="navbar__search-input"
@@ -177,7 +206,7 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
               )}
             </div>
           )}
-        </div>
+        </div>}
       </div>
       <div className="navbar__right">
         <button className="navbar__bell" onClick={() => setNotifOpen(!notifOpen)} style={{ position: "relative" }}>
@@ -199,7 +228,7 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
             <div className="notif-header">
               <h3>Notifikasi</h3>
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                {isMahasiswa && notifications.length > 0 && (
+                {isMahasiswa && notifications.length > 0 && (  
                   <button className="notif-close" onClick={async () => {
                     try {
                       await apiClient.put('/api/notifikasi/read-all');
@@ -251,7 +280,10 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
                       {notif.type === "tugas" ? "assignment" :
                        notif.type === "kuis" ? "quiz" :
                        notif.type === "materi" ? "menu_book" :
-                       notif.type === "forum" ? "forum" : "qr_code_scanner"}
+                       notif.type === "forum" ? "forum" :
+                       notif.type === "presensi" ? "qr_code_scanner" :
+                       notif.type === "nilai" ? "grade" :
+                       notif.type === "akademik" ? "school" : "notifications"}
                     </span>
                   </div>
                   <div className="notif-content">

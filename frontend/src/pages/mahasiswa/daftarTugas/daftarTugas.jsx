@@ -119,39 +119,54 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
         };
       });
 
-      const allKuis = [];
+const allKuis = [];
       for (const course of courses) {
         try {
           const kuisRes = await apiClient.get(`/api/kuis/mata-kuliah/${course.idMataKuliah}`);
           const kuisList = Array.isArray(kuisRes) ? kuisRes : (kuisRes.data || []);
-          allKuis.push(...kuisList.map(k => {
-            const deadlineKuis = k.deadlineKuis ? new Date(k.deadlineKuis) : null;
-            const now = new Date();
-            let kuisStatus = "belum_dikerjakan";
-            let kuisProgress = 0;
-            if (deadlineKuis && deadlineKuis < now) {
-              kuisStatus = "belum_dikerjakan";
-            } else if (deadlineKuis && deadlineKuis > now) {
-              kuisStatus = "sedang_berjalan";
-              const totalMs = deadlineKuis - now;
-              const maxMs = 7 * 24 * 60 * 60 * 1000;
-               kuisProgress = Math.min(90, Math.max(0, Math.round((1 - totalMs / maxMs) * 100)));
+          for (const k of kuisList) {
+            try {
+              const statusRes = await apiClient.get(`/api/kuis/${k.id}/status`);
+              const sudahDikerjakan = statusRes?.sudahDikerjakan || false;
+              const deadlineKuis = k.deadlineKuis ? new Date(k.deadlineKuis) : null;
+              const now = new Date();
+              const kuisStatus = sudahDikerjakan ? "selesai" : "belum_dikerjakan";
+              allKuis.push({
+                id: k.id,
+                idMataKuliah: k.idMataKuliah || course.idMataKuliah,
+                course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
+                deadline: deadlineKuis,
+                deadlineLabel: formatDeadlineLabel(k.deadlineKuis, sudahDikerjakan),
+                deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
+                name: k.judul,
+                status: kuisStatus,
+                sudahKumpul: sudahDikerjakan,
+                action: sudahDikerjakan ? "lihat" : "kerjakan",
+                isQuiz: true,
+                jumlahSoal: k.jumlahSoal || 0,
+                jumlahPengerjaan: k.jumlahPengerjaan || 0,
+                totalMahasiswa: k.totalMahasiswa || 0
+              });
+            } catch (statusErr) {
+              console.error("Error fetching kuis status for kuis", k.id, statusErr);
+              allKuis.push({
+                id: k.id,
+                idMataKuliah: k.idMataKuliah || course.idMataKuliah,
+                course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
+                deadline: k.deadlineKuis ? new Date(k.deadlineKuis) : null,
+                deadlineLabel: formatDeadlineLabel(k.deadlineKuis, false),
+                deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
+                name: k.judul,
+                status: "belum_dikerjakan",
+                sudahKumpul: false,
+                action: "kerjakan",
+                isQuiz: true,
+                jumlahSoal: k.jumlahSoal || 0,
+                jumlahPengerjaan: k.jumlahPengerjaan || 0,
+                totalMahasiswa: k.totalMahasiswa || 0
+              });
             }
-            return {
-              id: k.id,
-              idMataKuliah: k.idMataKuliah,
-              course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
-              deadline: k.deadlineKuis ? new Date(k.deadlineKuis) : null,
-              deadlineLabel: k.deadlineKuis ? formatDeadlineLabel(k.deadlineKuis, false) : "Tanpa deadline",
-              deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
-              name: k.judul,
-              status: "belum_dikerjakan", // Kuis selalu belum dikerjakan sampai dikerjakan
-              sudahKumpul: false,
-              action: "kerjakan",
-              isQuiz: true,
-              jumlahSoal: k.jumlahSoal || 0
-            };
-          }));
+          }
         } catch (e) {
           console.error("Error fetching kuis for course", course.idMataKuliah, e);
         }
@@ -331,13 +346,17 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
                         className="dt-btn dt-btn--primary"
                         onClick={() => {
                           if (task.isQuiz) {
-                            onNavigate && onNavigate({ page: "kuis", idKuis: task.id });
+                            if (task.sudahKumpul) {
+                              onNavigate && onNavigate({ page: "hasilKuis", idKuis: task.id });
+                            } else {
+                              onNavigate && onNavigate({ page: "kuis", idKuis: task.id });
+                            }
                           } else {
                             onNavigate && onNavigate({ page: "pengumpulanTugas", taskId: task.id });
                           }
                         }}
                       >
-                        {task.isQuiz ? "Kerjakan Kuis" : (task.sudahKumpul ? "Lihat Pengumpulan" : "Kumpulkan")}
+                        {task.isQuiz ? (task.sudahKumpul ? "Lihat Nilai Kuis" : "Kerjakan Kuis") : (task.sudahKumpul ? "Lihat Pengumpulan" : "Kumpulkan")}
                       </button>
                     )}
                   </div>

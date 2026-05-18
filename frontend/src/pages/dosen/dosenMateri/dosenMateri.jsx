@@ -310,13 +310,6 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     <p className="dm-pi-val">{previewItem.tanggal}</p>
                   </div>
                 </div>
-                <div className="dm-preview-info-item">
-                  <span className="material-symbols-outlined">download</span>
-                  <div>
-                    <p className="dm-pi-label">Total Diunduh</p>
-                    <p className="dm-pi-val">{previewItem.diunduh}×</p>
-                  </div>
-                </div>
                 {previewItem.ukuran && (
                   <div className="dm-preview-info-item">
                     <span className="material-symbols-outlined">folder</span>
@@ -443,12 +436,6 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     value: materi.filter((m) => !m.canDownload).length,
                     icon: "play_circle",
                     color: "#7c3aed",
-                  },
-                  {
-                    label: "Total Unduhan",
-                    value: materi.reduce((a, m) => a + m.diunduh, 0),
-                    icon: "trending_up",
-                    color: "#c47f17",
                   },
                 ].map((s) => (
                   <div key={s.label} className="dm-stat-mini">
@@ -608,12 +595,6 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                             calendar_today
                           </span>
                           {item.tanggal}
-                        </div>
-                        <div className="dm-card-meta">
-                          <span className="material-symbols-outlined">
-                            download
-                          </span>
-                          {item.diunduh}× diunduh
                         </div>
                         <button
                           className="dm-dl-btn"

@@ -20,7 +20,7 @@ function getColor(str) {
   return MEMBER_COLORS[Math.abs(hash) % MEMBER_COLORS.length];
 }
 
-export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
+export default function DosenNilaiIndividu({ onNavigate, onLogout, idMataKuliah, idTugas, tipe }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [selectedMk, setSelectedMk] = useState("");
@@ -33,6 +33,24 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
   const [toast, setToast] = useState(null);
   const [nilaiModal, setNilaiModal] = useState(null);
   const [nilaiInput, setNilaiInput] = useState("");
+
+  useEffect(() => {
+    if (idMataKuliah) {
+      setSelectedMk(String(idMataKuliah));
+    }
+  }, [idMataKuliah]);
+
+  useEffect(() => {
+    if (idTugas && tugasList.length > 0) {
+      const found = tugasList.find(t => 
+        String(t.idTugas) === String(idTugas) && 
+        (!tipe || t.tipe === tipe)
+      );
+      if (found) {
+        setSelectedTugas(found);
+      }
+    }
+  }, [idTugas, tugasList, tipe]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -82,7 +100,7 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
     setLoadingMhs(true);
     setMahasiswaList([]);
     try {
-      const res = await apiClient.get(`/api/nilai/submissions/tugas/${selectedTugas.idTugas}?idMataKuliah=${selectedMk}`);
+      const res = await apiClient.get(`/api/nilai/submissions/tugas/${selectedTugas.idTugas}?idMataKuliah=${selectedMk}&tipe=${selectedTugas.tipe || 'Tugas'}`);
       const data = res?.data || res;
       const list = Array.isArray(data) ? data : (data?.data || []);
       setMahasiswaList(list);
@@ -218,8 +236,12 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
         <div className="page-content">
           <div className="dni-header">
             <div>
-              <h2 className="dni-title">Nilai Tugas Individu</h2>
-              <p className="dni-subtitle">Pilih mata kuliah dan tugas untuk memberi penilaian</p>
+              <h2 className="dni-title">{selectedTugas?.tipe === 'Kuis' ? 'Nilai Kuis Mahasiswa' : 'Nilai Tugas Individu'}</h2>
+              <p className="dni-subtitle">
+                {selectedTugas?.tipe === 'Kuis' 
+                  ? 'Hasil dan nilai kuis mahasiswa yang bersifat permanen' 
+                  : 'Pilih mata kuliah dan tugas untuk memberi penilaian'}
+              </p>
             </div>
           </div>
 
@@ -267,7 +289,21 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
               <div className="dni-tugas-info-left">
                 <span className="material-symbols-outlined">assignment</span>
                 <div>
-                  <p className="dni-tugas-name">{selectedTugas.judul}</p>
+                  <p className="dni-tugas-name">
+                    <span style={{ 
+                      padding: "0.25rem 0.5rem", 
+                      fontSize: "0.75rem", 
+                      borderRadius: "4px", 
+                      background: selectedTugas.tipe === 'Kuis' ? 'var(--blue-50)' : 'var(--slate-100)', 
+                      color: selectedTugas.tipe === 'Kuis' ? 'var(--blue-700)' : 'var(--slate-700)', 
+                      fontWeight: 600,
+                      marginRight: "0.5rem",
+                      display: "inline-block"
+                    }}>
+                      {selectedTugas.tipe || 'Tugas'}
+                    </span>
+                    {selectedTugas.judul}
+                  </p>
                   <p className="dni-tugas-deadline">
                     Deadline: {selectedTugas.deadlineTugas ? formatDate(selectedTugas.deadlineTugas) : "Tanpa deadline"}
                   </p>
@@ -328,7 +364,7 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
                     <th>Mahasiswa</th>
                     <th>Status</th>
                     <th>Tanggal Kumpul</th>
-                    <th>File Jawaban</th>
+                    <th>{selectedTugas?.tipe === 'Kuis' ? 'Pengerjaan' : 'File Jawaban'}</th>
                     <th>Nilai</th>
                     <th>Aksi</th>
                   </tr>
@@ -361,13 +397,23 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
                       </td>
                       <td>{m.sudahKumpul ? formatDate(m.tanggalKumpul) : "-"}</td>
                       <td>
-                        {m.fileJawaban ? (
-                          <a href={`${API_BASE}${m.fileJawaban}`} target="_blank" rel="noopener noreferrer" className="dni-file-link">
-                            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>description</span>
-                            Lihat File
-                          </a>
+                        {selectedTugas?.tipe === 'Kuis' ? (
+                          m.sudahKumpul ? (
+                            <span style={{ color: "var(--emerald-600)", fontWeight: 500, fontSize: "0.875rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>check_circle</span> Kuis Selesai
+                            </span>
+                          ) : (
+                            <span style={{ color: "var(--slate-400)", fontSize: "0.875rem" }}>-</span>
+                          )
                         ) : (
-                          <span style={{ color: "var(--slate-400)", fontSize: "0.875rem" }}>-</span>
+                          m.fileJawaban ? (
+                            <a href={`${API_BASE}${m.fileJawaban}`} target="_blank" rel="noopener noreferrer" className="dni-file-link">
+                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>description</span>
+                              Lihat File
+                            </a>
+                          ) : (
+                            <span style={{ color: "var(--slate-400)", fontSize: "0.875rem" }}>-</span>
+                          )
                         )}
                       </td>
                       <td>
@@ -380,7 +426,15 @@ export default function DosenNilaiIndividu({ onNavigate, onLogout }) {
                         )}
                       </td>
                       <td>
-                        {m.sudahKumpul ? (
+                        {selectedTugas?.tipe === 'Kuis' ? (
+                          m.sudahKumpul ? (
+                            <span style={{ color: "var(--slate-500)", fontSize: "0.875rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>lock</span> Permanen
+                            </span>
+                          ) : (
+                            <span style={{ color: "var(--slate-400)", fontSize: "0.8rem" }}>—</span>
+                          )
+                        ) : m.sudahKumpul ? (
                           <button className="dni-btn-nilai" onClick={() => openNilaiModal(m)}>
                             <span className="material-symbols-outlined">edit</span>
                             {m.nilai !== null ? "Edit" : "Nilai"}

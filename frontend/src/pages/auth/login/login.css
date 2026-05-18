@@ -70,16 +70,20 @@
   text-align: center;
 }
 
+.login-logo {
+  width: auto;
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 1rem;
+  mix-blend-mode: multiply;
+  background: transparent;
+}
+
 .logo-box {
   display: inline-block;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 0.5rem 1.5rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .logo-text {

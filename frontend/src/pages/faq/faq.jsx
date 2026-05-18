@@ -123,6 +123,23 @@ const FAQ_DATA = {
           </>
         ),
       },
+      {
+        icon: "quiz",
+        question: "Bagaimana cara mengerjakan Kuis Online?",
+        answer: (
+          <>
+            <p>Untuk mengerjakan kuis online yang ditugaskan dosen:</p>
+            <ol>
+              <li>Masuk ke menu <strong>Tugas</strong>.</li>
+              <li>Pilih kuis di tab <strong>Belum Dikerjakan</strong>.</li>
+              <li>Klik tombol <strong>Kerjakan Kuis</strong> (tombol ini hanya aktif jika deadline belum terlewati).</li>
+              <li>Jawab semua pertanyaan pilihan ganda yang tersedia dengan teliti.</li>
+              <li>Klik <strong>Kumpulkan</strong> setelah selesai sebelum waktu pengerjaan habis.</li>
+            </ol>
+            <p>Setelah mengumpulkan, kuis akan berpindah ke tab <strong>Sudah Dikerjakan</strong>. Kamu dapat melihat rekap hasil kuis Anda secara langsung beserta skor Anda, dan nilainya bersifat permanen tidak dapat diubah.</p>
+          </>
+        ),
+      },
     ],
   },
   dosen: {
@@ -187,6 +204,39 @@ const FAQ_DATA = {
               <li>Masukkan nilai (0–100) lalu klik <strong>Simpan</strong>.</li>
             </ol>
             <p>Kamu bisa filter mahasiswa berdasarkan status: <strong>Semua</strong>, <strong>Sudah Kumpul</strong>, atau <strong>Belum Kumpul</strong>. Tombol nilai hanya aktif untuk mahasiswa yang sudah mengumpulkan.</p>
+          </>
+        ),
+      },
+      {
+        icon: "group_remove",
+        question: "Bagaimana cara menghapus kelompok kelas?",
+        answer: (
+          <>
+            <p>Untuk menghapus kelompok yang sudah dibuat:</p>
+            <ol>
+              <li>Masuk ke menu <strong>Kelompok</strong>.</li>
+              <li>Pilih mata kuliah yang sesuai.</li>
+              <li>Temukan kelompok yang ingin dihapus pada daftar kartu kelompok.</li>
+              <li>Klik ikon <strong>Tong Sampah Merah (Hapus Kelompok)</strong> di sebelah kanan status kelompok pada header kartu kelompok.</li>
+              <li>Akan muncul modal konfirmasi danger berwarna merah lembut. Konfirmasi tindakan dengan mengklik <strong>Hapus Kelompok</strong>.</li>
+            </ol>
+            <p><strong>Peringatan:</strong> Menghapus kelompok bersifat permanen dan akan menghapus seluruh data keanggotaan mahasiswa di dalam kelompok tersebut (Cascade Delete) secara bersih dari database.</p>
+          </>
+        ),
+      },
+      {
+        icon: "quiz",
+        question: "Bagaimana cara melihat nilai kuis online mahasiswa?",
+        answer: (
+          <>
+            <p>Untuk memantau skor kuis online mahasiswa:</p>
+            <ol>
+              <li>Masuk ke menu <strong>Tugas</strong>.</li>
+              <li>Cari tugas kuis yang ingin dipantau.</li>
+              <li>Klik tombol <strong>Lihat Nilai</strong> (tombol ini khusus tampil untuk tipe tugas kuis setelah mahasiswa mengerjakan).</li>
+              <li>Anda akan langsung diarahkan ke halaman <strong>Nilai Individu</strong> yang menyajikan rekap skor kuis mahasiswa secara otomatis.</li>
+            </ol>
+            <p><strong>Catatan:</strong> Nilai kuis ini dihitung otomatis oleh sistem berdasarkan jawaban pilihan ganda yang benar, dan bersifat 🔒 <strong>Permanen / Read-only</strong> (tidak dapat diedit secara manual oleh dosen demi menjaga keaslian nilai kuis).</p>
           </>
         ),
       },

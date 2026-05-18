@@ -1,4 +1,4 @@
-import React from "react";
+import logoImg from "./assets/logo.png";
 import "./shared.css";
 
 export default function Sidebar({ onNavigate, activePage, presensiRoute, onLogout, mobileOpen, onClose }) {
@@ -37,8 +37,8 @@ export default function Sidebar({ onNavigate, activePage, presensiRoute, onLogou
         </button>
 
         <div className="sidebar__brand">
-          <div className="sidebar__logo">
-            <span className="material-symbols-outlined">auto_stories</span>
+          <div className="sidebar__logo" style={{ background: 'transparent', boxShadow: 'none', width: 'auto', height: 'auto' }}>
+            <img src={logoImg} alt="LeMaS" style={{ width: '52px', height: '52px', objectFit: 'contain' }} />
           </div>
           <div>
             <p className="sidebar__app-name">LeMaS</p>

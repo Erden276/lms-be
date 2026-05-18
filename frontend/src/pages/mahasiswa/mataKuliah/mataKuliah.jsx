@@ -17,6 +17,61 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ pdf: 0, video: 0, tugas: 0, kuis: 0 });
 
+  const getRawMaterialType = (item) => {
+    return String(item?.tipe_modul || item?.tipe || item?.type || "").trim();
+  };
+
+  const getMaterialTypeCategory = (rawType) => {
+    const normalized = String(rawType || "").trim().toLowerCase();
+    if (normalized === "video") return "video";
+    if (normalized === "link") return "link";
+    if (normalized === "presentasi") return "presentasi";
+    if (normalized === "dokumen") return "dokumen";
+    if (normalized === "spreadsheet") return "spreadsheet";
+    if (normalized === "pdf") return "pdf";
+    return "file";
+  };
+
+  const getTypeIcon = (rawType) => {
+    const normalized = String(rawType || "").trim().toLowerCase();
+    const icons = {
+      pdf: "picture_as_pdf",
+      video: "play_circle",
+      link: "link",
+      presentasi: "slideshow",
+      dokumen: "description",
+      spreadsheet: "table_chart",
+    };
+    return icons[normalized] || "insert_drive_file";
+  };
+
+  const getMaterialAction = (typeCategory) => {
+    if (typeCategory === "video") return "play";
+    if (typeCategory === "link") return "open";
+    return "download";
+  };
+
+  const isYouTubeUrl = (url) => {
+    if (!url) return false;
+    return /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)/i.test(url);
+  };
+
+  const getYouTubeVideoId = (url) => {
+    if (!url) return null;
+    const matches = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
+    return matches ? matches[1] : null;
+  };
+
+  const getYouTubeEmbedUrl = (url) => {
+    const videoId = getYouTubeVideoId(url);
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : url;
+  };
+
+  const getYouTubeThumbnail = (url) => {
+    const videoId = getYouTubeVideoId(url);
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop";
+  };
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const nim = user.nomorInduk || "";
 
@@ -32,17 +87,22 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
         const materiRes = await apiClient.get(`/api/materi/mata-kuliah/${idMataKuliah}?nim=${nim}`);
         const materiData = Array.isArray(materiRes) ? materiRes : (materiRes.data || []);
         
-        const formattedModules = materiData.map((m, index) => ({
-          id: m.id || index + 1,
-          title: m.judul || "Materi Tanpa Judul",
-          meta: m.tipe === "Video" ? "Video Pembelajaran" : "Dokumen PDF",
-          type: m.tipe?.toLowerCase() === "video" ? "video" : "pdf",
-          action: m.tipe?.toLowerCase() === "video" ? "play" : "download",
-          status: "active",
-          url: m.url || m.fileUrl || "",
-          deskripsi: m.deskripsi || "Tidak ada deskripsi untuk modul ini.",
-          sudahAkses: m.sudahAkses || false
-        }));
+        const formattedModules = materiData.map((m, index) => {
+          const rawType = getRawMaterialType(m);
+          const typeCategory = getMaterialTypeCategory(rawType);
+          const materialLabel = rawType || (typeCategory === "video" ? "Video" : "Dokumen");
+          return {
+            id: m.id || index + 1,
+            title: m.judul || m.namaFile || "Materi Tanpa Judul",
+            meta: materialLabel,
+            type: typeCategory,
+            action: getMaterialAction(typeCategory),
+            status: "active",
+            url: m.url || m.fileUrl || m.link || "",
+            deskripsi: m.deskripsi || "Tidak ada deskripsi untuk modul ini.",
+            sudahAkses: m.sudahAkses || false
+          };
+        });
 
         setModules(formattedModules.length > 0 ? formattedModules : [
           { id: 1, title: "Belum ada materi", meta: "-", type: "pdf", action: "none", status: "", deskripsi: "Dosen belum mengunggah materi.", sudahAkses: false }
@@ -116,15 +176,34 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
               <p>{modules.find(m => m.id === activeModule)?.meta || "Materi Video"}</p>
             </div>
             <div className="mk-video-player-wrapper">
-              <video
-                className="mk-video-player"
-                controls
-                autoPlay
-                src={modules.find(m => m.id === activeModule)?.url || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
-                poster="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
-              >
-                Browser Anda tidak mendukung tag video.
-              </video>
+              {(() => {
+                const activeVideo = modules.find(m => m.id === activeModule) || {};
+                if (isYouTubeUrl(activeVideo.url)) {
+                  return (
+                    <div className="mk-video-embed">
+                      <iframe
+                        className="mk-video-player"
+                        src={getYouTubeEmbedUrl(activeVideo.url)}
+                        title={activeVideo.title || "Video Pembelajaran"}
+                        frameBorder="0"
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <video
+                    className="mk-video-player"
+                    controls
+                    autoPlay
+                    src={activeVideo.url || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+                    poster={getYouTubeThumbnail(activeVideo.url)}
+                  >
+                    Browser Anda tidak mendukung tag video.
+                  </video>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -164,15 +243,18 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                     <div className="mk-video-card">
                       <div className="mk-video-thumb">
                         <img
-                          src={activeData?.type === "video" ? "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop" : "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&auto=format&fit=crop"}
+                          src={activeData?.type === "video" && isYouTubeUrl(activeData?.url)
+                            ? getYouTubeThumbnail(activeData.url)
+                            : activeData?.type === "video"
+                              ? "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
+                              : "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&auto=format&fit=crop"
+                          }
                           alt={activeData?.title}
                         />
                         <div className="mk-video-overlay" onClick={async () => {
                           if (activeData?.action === "play") {
-                            // Mark video as accessed
                             try {
                               await apiClient.post(`/api/materi/${activeData.id}/access`, { nim });
-                              // Update local state
                               setModules(prev => prev.map(mod => 
                                 mod.id === activeData.id ? { ...mod, sudahAkses: true } : mod
                               ));
@@ -180,13 +262,21 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                               console.error("Failed to mark video access:", err);
                             }
                             setVideoOpen(true);
+                          } else if (activeData?.action === "open") {
+                            window.open(activeData.url, '_blank');
+                          } else if (activeData?.action === "download") {
+                            const fileUrl = activeData.url?.startsWith('http') ? activeData.url : `http://localhost:3000${activeData.url}`;
+                            window.open(fileUrl, '_blank');
                           }
-                          else if (activeData?.action === "download") window.open(`http://localhost:3000${activeData.url}`, '_blank');
                         }} style={{ cursor: "pointer" }}>
                           <button className="mk-play-btn">
-                            <span className="material-symbols-outlined">{activeData?.action === "play" ? "play_arrow" : "download"}</span>
+                            <span className="material-symbols-outlined">
+                              {activeData?.action === "play" ? "play_arrow" : activeData?.action === "open" ? "open_in_new" : "download"}
+                            </span>
                           </button>
-                          <span className="mk-video-lbl">{activeData?.action === "play" ? "Putar Video" : "Unduh Materi"}</span>
+                          <span className="mk-video-lbl">
+                            {activeData?.action === "play" ? "Putar Video" : activeData?.action === "open" ? "Buka Link" : "Unduh Materi"}
+                          </span>
                         </div>
                         <div className="mk-video-info">
                           <p className="mk-video-title">{activeData?.title}</p>
@@ -250,9 +340,9 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                           }
                         }}
                       >
-                        <div className={`mk-mod-icon ${m.type === "video" ? "mk-icon-video" : "mk-icon-pdf"} ${isActive ? "mk-icon-on" : ""}`}>
+                        <div className={`mk-mod-icon mk-icon-${m.type} ${isActive ? "mk-icon-on" : ""}`}>
                           <span className="material-symbols-outlined">
-                            {m.type === "video" ? "play_circle" : "picture_as_pdf"}
+                            {getTypeIcon(m.meta)}
                           </span>
                         </div>
                         <div className="mk-mod-info">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./login.css";
 import { apiClient } from "../../../utils/apiClient";
+import logoImg from "../../../assets/logo.png";
 
 function Login({ onLogin, onFaq }) {
   const [role, setRole] = useState("Mahasiswa");
@@ -104,9 +105,12 @@ function Login({ onLogin, onFaq }) {
         <div className="login-card">
           {/* Logo & Branding */}
           <div className="brand-header">
-            <h2 className="welcome-text">Selamat Datang!!</h2>
+            <div className="logo-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
+              <img src={logoImg} alt="LeMaS Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+            </div>
+            <h2 className="welcome-text">LeMaS</h2>
             <p className="welcome-subtext">
-              Learning Management System Kelompok 8.
+              Learning Management System
             </p>
           </div>
 

@@ -130,6 +130,7 @@ img { display: block; }
   flex: 1;
   min-height: 100vh;
   background-color: var(--color-surface);
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (min-width: 768px) {
@@ -148,10 +149,12 @@ img { display: block; }
   display: flex;
   flex-direction: column;
   background-color: rgba(248, 250, 252, 0.80);
-  -webkit-backdrop-filter: ; 
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   border-right: 1px solid rgba(255, 255, 255, 0.18);
   z-index: 40;
   padding: 0 0 1.25rem 0;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Mobile: slide in from left */
@@ -173,7 +176,8 @@ img { display: block; }
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   z-index: 39;
-  -webkit-backdrop-filter: ; 
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   animation: sb-fade-in 0.2s ease;
 }
 @keyframes sb-fade-in {
@@ -243,6 +247,16 @@ img { display: block; }
   letter-spacing: 0.10em;
   color: var(--slate-500);
   font-weight: 700;
+}
+
+.sidebar__logo-img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  mix-blend-mode: multiply;
+  background: transparent;
 }
 
 /* Navigation */
@@ -348,8 +362,10 @@ img { display: block; }
   align-items: center;
   padding: 0 2rem;
   background: rgba(255, 255, 255, 0.68);
-  -webkit-backdrop-filter: ; 
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.06);
+  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (min-width: 768px) {
@@ -375,7 +391,7 @@ img { display: block; }
 }
 
 @media (min-width: 768px) {
-  .navbar__hamburger { display: none; }
+  .navbar__hamburger { display: flex; cursor: pointer; }
 }
 
 /* Page title in navbar */
@@ -531,7 +547,8 @@ img { display: block; }
 ══════════════════════════════════════════ */
 .u-glass {
   background: rgba(255, 255, 255, 0.65);
-  -webkit-backdrop-filter: ; 
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 /* ══════════════════════════════════════════
@@ -592,5 +609,18 @@ img { display: block; }
   .navbar__bell {
     width: 2rem;
     height: 2rem;
+  }
+}
+
+/* Collapsible Desktop Sidebar Styles */
+@media (min-width: 768px) {
+  body.sidebar-closed .sidebar {
+    transform: translateX(-100%);
+  }
+  body.sidebar-closed .page-main {
+    margin-left: 0 !important;
+  }
+  body.sidebar-closed .navbar {
+    left: 0 !important;
   }
 }

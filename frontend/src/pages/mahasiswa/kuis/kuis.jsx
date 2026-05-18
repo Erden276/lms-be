@@ -58,9 +58,11 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
   const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [quizTitle, setQuizTitle] = useState("Kuis");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -80,7 +82,20 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
         setLoading(false);
       }
     };
+    
+    const checkStatus = async () => {
+      try {
+        const statusRes = await apiClient.get(`/api/kuis/${idKuis}/status`);
+        if (statusRes?.sudahDikerjakan) {
+          onNavigate && onNavigate({ page: "hasilKuis", idKuis });
+        }
+      } catch (error) {
+        console.error("Gagal cek status kuis:", error);
+      }
+    };
+    
     fetchQuiz();
+    checkStatus();
   }, [idKuis]);
 
   useEffect(() => {
@@ -107,17 +122,17 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     try {
-      // API call ke backend untuk submit kuis
       const response = await apiClient.post(`/api/kuis/${idKuis}/submit`, {
         answers
       });
       
-      // Gunakan skor dari backend jika tersedia
       if (response && response.score !== undefined) {
         setScore(response.score);
       } else {
-        // Fallback jika API gagal mengembalikan skor (kalkulasi lokal)
         let correctCount = 0;
         questions.forEach((q, index) => {
           if (answers[index] === q.correct) {
@@ -127,19 +142,12 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
         const finalScore = Math.round((correctCount / questions.length) * 100);
         setScore(finalScore);
       }
+      setIsSubmitted(true);
+      onNavigate && onNavigate({ page: "hasilKuis", idKuis });
     } catch (error) {
       console.error("Gagal mengirim kuis", error);
-      // Kalkulasi lokal sebagai fallback jika offline/gagal
-      let correctCount = 0;
-      questions.forEach((q, index) => {
-        if (answers[index] === q.correct) {
-          correctCount++;
-        }
-      });
-      const finalScore = Math.round((correctCount / questions.length) * 100);
-      setScore(finalScore);
-    } finally {
-      setIsSubmitted(true);
+      setError("Gagal mengumpulkan kuis: " + (error.message || error.error || "Unknown error"));
+      setIsSubmitting(false);
     }
   };
 
@@ -206,9 +214,228 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
                   </div>
                 </div>
 
+                <div style={{
+                  marginTop: "2rem",
+                  padding: "1.5rem",
+                  backgroundColor: "var(--slate-50)",
+                  borderRadius: "var(--radius-lg)",
+                  border: "1px solid var(--color-border)"
+                }}>
+                  <h3 style={{
+                    margin: "0 0 1rem 0",
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "var(--slate-800)"
+                  }}>
+                    <span className="material-symbols-outlined" style={{
+                      fontSize: "1.25rem",
+                      marginRight: "0.5rem",
+                      verticalAlign: "middle"
+                    }}>
+                      assessment
+                    </span>
+                    Detail Jawaban
+                  </h3>
+
+                  <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1rem"
+                  }}>
+                    {questions.map((q, idx) => {
+                      const userAnswer = answers[idx];
+                      const correctAnswer = q.correct;
+                      const isCorrect = userAnswer === correctAnswer;
+                      const notAnswered = userAnswer === null;
+
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            padding: "1rem",
+                            backgroundColor: "white",
+                            borderRadius: "var(--radius-md)",
+                            border: `2px solid ${isCorrect ? "var(--emerald-200)" : notAnswered ? "var(--slate-200)" : "var(--red-200)"}`,
+                            boxShadow: "var(--shadow-sm)"
+                          }}
+                        >
+                          <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            marginBottom: "0.75rem"
+                          }}>
+                            <div style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: "0.75rem",
+                              flex: 1
+                            }}>
+                              <span style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "1.75rem",
+                                height: "1.75rem",
+                                borderRadius: "50%",
+                                backgroundColor: isCorrect ? "var(--emerald-100)" : notAnswered ? "var(--slate-100)" : "var(--red-100)",
+                                color: isCorrect ? "var(--emerald-600)" : notAnswered ? "var(--slate-600)" : "var(--red-600)",
+                                fontWeight: 600,
+                                fontSize: "0.875rem"
+                              }}>
+                                {idx + 1}
+                              </span>
+                              <div style={{ flex: 1 }}>
+                                <p style={{
+                                  margin: "0 0 0.5rem 0",
+                                  fontSize: "0.95rem",
+                                  fontWeight: 500,
+                                  color: "var(--slate-800)"
+                                }}>
+                                  {q.question}
+                                </p>
+                              </div>
+                            </div>
+                            <span style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                              padding: "0.35rem 0.75rem",
+                              borderRadius: "var(--radius-full)",
+                              fontSize: "0.8rem",
+                              fontWeight: 600,
+                              backgroundColor: isCorrect ? "var(--emerald-100)" : notAnswered ? "var(--slate-100)" : "var(--red-100)",
+                              color: isCorrect ? "var(--emerald-700)" : notAnswered ? "var(--slate-600)" : "var(--red-700)"
+                            }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+                                {isCorrect ? "check_circle" : notAnswered ? "help" : "cancel"}
+                              </span>
+                              {isCorrect ? "BENAR" : notAnswered ? "TIDAK DIJAWAB" : "SALAH"}
+                            </span>
+                          </div>
+
+                          <div style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: "0.75rem"
+                          }}>
+                            {/* Jawaban Mahasiswa */}
+                            <div>
+                              <p style={{
+                                margin: "0 0 0.5rem 0",
+                                fontSize: "0.8rem",
+                                fontWeight: 600,
+                                color: "var(--slate-600)",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px"
+                              }}>
+                                Jawaban Anda
+                              </p>
+                              <div style={{
+                                padding: "0.75rem",
+                                backgroundColor: notAnswered ? "var(--slate-50)" : "var(--slate-100)",
+                                borderRadius: "var(--radius-md)",
+                                border: `1px solid ${notAnswered ? "var(--slate-200)" : "var(--slate-300)"}`,
+                                minHeight: "2.5rem",
+                                display: "flex",
+                                alignItems: "center"
+                              }}>
+                                <span style={{
+                                  fontSize: "0.875rem",
+                                  color: notAnswered ? "var(--slate-400)" : "var(--slate-700)",
+                                  fontWeight: notAnswered ? 400 : 500
+                                }}>
+                                  {notAnswered ? "Tidak dijawab" : String.fromCharCode(65 + userAnswer)}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Jawaban Benar */}
+                            <div>
+                              <p style={{
+                                margin: "0 0 0.5rem 0",
+                                fontSize: "0.8rem",
+                                fontWeight: 600,
+                                color: "var(--slate-600)",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px"
+                              }}>
+                                Jawaban Benar
+                              </p>
+                              <div style={{
+                                padding: "0.75rem",
+                                backgroundColor: "var(--emerald-50)",
+                                borderRadius: "var(--radius-md)",
+                                border: "1px solid var(--emerald-200)",
+                                minHeight: "2.5rem",
+                                display: "flex",
+                                alignItems: "center"
+                              }}>
+                                <span style={{
+                                  fontSize: "0.875rem",
+                                  color: "var(--emerald-700)",
+                                  fontWeight: 500
+                                }}>
+                                  {String.fromCharCode(65 + correctAnswer)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Detail Pilihan Jawaban */}
+                          <div style={{ marginTop: "0.75rem" }}>
+                            <p style={{
+                              margin: "0 0 0.5rem 0",
+                              fontSize: "0.8rem",
+                              fontWeight: 600,
+                              color: "var(--slate-600)"
+                            }}>
+                              Pilihan Jawaban:
+                            </p>
+                            <div style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.35rem"
+                            }}>
+                              {q.options.map((option, optIdx) => (
+                                <div
+                                  key={optIdx}
+                                  style={{
+                                    padding: "0.5rem 0.75rem",
+                                    backgroundColor: optIdx === correctAnswer ? "var(--emerald-50)" : "var(--slate-50)",
+                                    borderRadius: "var(--radius-sm)",
+                                    border: `1px solid ${optIdx === correctAnswer ? "var(--emerald-200)" : "var(--slate-200)"}`,
+                                    fontSize: "0.8rem",
+                                    color: optIdx === correctAnswer ? "var(--emerald-700)" : "var(--slate-600)"
+                                  }}
+                                >
+                                  <span style={{ fontWeight: 600, marginRight: "0.5rem" }}>
+                                    {String.fromCharCode(65 + optIdx)}.
+                                  </span>
+                                  {option}
+                                  {optIdx === correctAnswer && (
+                                    <span className="material-symbols-outlined" style={{
+                                      fontSize: "0.9rem",
+                                      marginLeft: "0.5rem",
+                                      verticalAlign: "middle"
+                                    }}>
+                                      check_circle
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <button
                   className="quiz-back-btn"
                   onClick={() => onNavigate && onNavigate("daftarTugas")}
+                  style={{ marginTop: "2rem" }}
                 >
                   <span className="material-symbols-outlined">arrow_back</span>
                   Kembali ke Daftar Tugas
@@ -332,8 +559,9 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
                 <button
                   className="quiz-nav-btn quiz-nav-btn--submit"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                 >
-                  Kumpulkan Jawaban
+                  {isSubmitting ? "Mengumpulkan..." : "Kumpulkan Jawaban"}
                   <span className="material-symbols-outlined">check</span>
                 </button>
               ) : (

@@ -6,6 +6,7 @@ import DaftarMataKuliah from "./pages/mahasiswa/daftarMataKuliah/daftarMataKulia
 import MataKuliah from "./pages/mahasiswa/mataKuliah/mataKuliah";
 import DaftarTugas from "./pages/mahasiswa/daftarTugas/daftarTugas";
 import Kuis from "./pages/mahasiswa/kuis/kuis";
+import HasilKuis from "./pages/mahasiswa/kuis/hasilKuis";
 import PresensiMahasiswa from "./pages/mahasiswa/presensiMahasiswa/presensiMahasiswa";
 import ForumDiskusi from "./pages/mahasiswa/forumDiskusi/forumDiskusi";
 import Profile from "./pages/mahasiswa/profile/profile";
@@ -76,6 +77,7 @@ function App() {
     if (pageName === "mataKuliah") return <MataKuliah {...sharedProps} />;
     if (pageName === "daftarTugas") return <DaftarTugas {...sharedProps} />;
     if (pageName === "kuis") return <Kuis {...sharedProps} idKuis={currentPage.idKuis} />;
+    if (pageName === "hasilKuis") return <HasilKuis {...sharedProps} idKuis={currentPage.idKuis} />;
     if (pageName === "presensiMahasiswa")
       return <PresensiMahasiswa {...sharedProps} />;
     if (pageName === "forumDiskusi") return <ForumDiskusi {...sharedProps} />;

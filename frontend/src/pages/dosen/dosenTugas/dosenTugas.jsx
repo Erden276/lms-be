@@ -47,6 +47,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   const [view, setView] = useState("list"); // "list" | "create" | "edit"
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [deleteTipe, setDeleteTipe] = useState(null);
   const [filter, setFilter] = useState("Semua");
 
   const [form, setForm] = useState({
@@ -78,6 +79,15 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   const [quizQuestions, setQuizQuestions] = useState(0);
   const [quizData, setQuizData] = useState([]);
 
+  const handleDeleteSoal = (soalToDelete) => {
+    if (quizData.length <= 1) {
+      setToast({ msg: "Minimal harus ada 1 soal", type: "error" });
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
+    setQuizData(quizData.filter(item => item.id === soalToDelete.id));
+  };
+
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3500);
@@ -89,13 +99,12 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       const raw = res.data || res;
       if (Array.isArray(raw)) {
         const formatted = raw.map(t => {
-          // Format dari TugasDosenUseCase menggunakan: id, tipe, title, matkul, deadline, status
           const dl = t.deadline ? new Date(t.deadline) : null;
           const now = new Date();
           const status = t.status || (dl && dl < now ? "Selesai" : "Aktif");
           return {
             id: t.id,
-            tipe: t.tipe || 'Tugas', // 'Tugas' atau 'Kuis'
+            tipe: t.tipe || 'Tugas',
             title: t.title || t.judul || '',
             matkul: t.matkul || t.mataKuliah?.namaMataKuliah || 'Mata Kuliah',
             matkulId: t.idMataKuliah,
@@ -105,7 +114,9 @@ export default function DosenTugas({ onNavigate, onLogout }) {
             createdAt: t.createdAt || '',
             submitted: t.submitted || 0,
             total: t.total || 41,
-            status
+            status,
+            jumlahPengerjaan: t.jumlahPengerjaan || 0,
+            totalMahasiswa: t.totalMahasiswa || 0
           };
         });
         setTasks(formatted);
@@ -177,19 +188,30 @@ export default function DosenTugas({ onNavigate, onLogout }) {
     }
   };
 
-  const handleEdit = (task) => {
-    // Extract date and time from deadline (format: YYYY-MM-DD or ISO string)
-    const deadlineDate = task.deadline ? task.deadline.split('T')[0] : "";
-    const deadlineTime = task.deadline && task.deadline.includes('T')
-      ? task.deadline.split('T')[1].substring(0, 5)
-      : "23:59";
+  const handleEdit = async (task) => {
+    let deadlineDate = "";
+    let deadlineTime = "23:59";
+    
+    if (task.deadline) {
+      try {
+        const d = new Date(task.deadline);
+        if (!isNaN(d.getTime())) {
+          deadlineDate = d.toISOString().split('T')[0];
+          deadlineTime = d.toTimeString().slice(0, 5);
+        }
+      } catch (e) {
+        deadlineDate = "";
+      }
+    }
 
+    const isKuis = task.tipe === 'Kuis';
+    
     setForm({
-      title: task.title,
-      matkulId: task.matkulId,
-      matkulName: task.matkul,
-      desc: task.desc,
-      type: task.type,
+      title: task.title || "",
+      matkulId: task.matkulId || "",
+      matkulName: task.matkul || "",
+      desc: task.desc || "",
+      type: isKuis ? 'Kuis' : (task.type || 'Individu'),
       deadline: deadlineDate,
       deadlineTime: deadlineTime,
       existingFile: task.fileTugas ? {
@@ -198,8 +220,33 @@ export default function DosenTugas({ onNavigate, onLogout }) {
         size: task.ukuranFile
       } : null
     });
-    setFileTugas(null); // Reset file upload saat edit
+    setFileTugas(null);
     setEditId(task.id);
+    
+    if (isKuis) {
+      try {
+        const res = await apiClient.get(`/api/kuis/${task.id}/detail`);
+        if (res && res.soal) {
+          const transformedSoal = res.soal.map(s => ({
+            id: s.id,
+            text: s.text,
+            options: s.options,
+            correctIndex: s.correctIndex
+          }));
+          setQuizData(transformedSoal);
+          setQuizQuestions(transformedSoal.length);
+        }
+      } catch (error) {
+        console.error('Gagal fetch soal kuis:', error);
+        showToast("Gagal memuat soal kuis", "error");
+        setQuizData([]);
+        setQuizQuestions(0);
+      }
+    } else {
+      setQuizData([]);
+      setQuizQuestions(0);
+    }
+    
     setView("edit");
   };
 
@@ -210,47 +257,90 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       return;
     }
     try {
-      // Update dengan FormData untuk support file upload
-      const formData = new FormData();
-      formData.append('judul', form.title);
-      formData.append('idMataKuliah', parseInt(form.matkulId));
-      formData.append('deskripsi', form.desc);
-      formData.append('tipeTugas', form.type);
-      formData.append('deadlineTugas', new Date(`${form.deadline}T${form.deadlineTime || "23:59"}:00`).toISOString());
-      if (fileTugas) {
-        formData.append('fileTugas', fileTugas);
+      if (form.type === "Kuis") {
+        // Update kuis dengan soal-soal baru
+        await apiClient.put(`/api/kuis/${editId}`, {
+          idMataKuliah: parseInt(form.matkulId),
+          judul: form.title,
+          deadlineKuis: new Date(`${form.deadline}T${form.deadlineTime || "23:59"}:00`).toISOString(),
+          soal: quizData.map(q => ({
+            pertanyaan: q.text,
+            kunciJawaban: ['A','B','C','D'][q.correctIndex] || 'A',
+            skor: 1,
+            pilihanJawaban: q.options.map(opt => ({ teksJawaban: opt }))
+          }))
+        });
+      } else {
+        // Update tugas dengan FormData untuk support file upload
+        const formData = new FormData();
+        formData.append('judul', form.title);
+        formData.append('idMataKuliah', parseInt(form.matkulId));
+        formData.append('deskripsi', form.desc);
+        formData.append('tipeTugas', form.type);
+        formData.append('deadlineTugas', new Date(`${form.deadline}T${form.deadlineTime || "23:59"}:00`).toISOString());
+        if (fileTugas) {
+          formData.append('fileTugas', fileTugas);
+        }
+
+        await apiClient.put(`/api/dosen/tugas/${editId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
       }
 
-      await apiClient.put(`/api/dosen/tugas/${editId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
       setFileTugas(null);
+      setQuizData([]);
+      setQuizQuestions(0);
       setView("list");
-      showToast("Tugas berhasil diperbarui!");
+      showToast(form.type === "Kuis" ? "Kuis berhasil diperbarui!" : "Tugas berhasil diperbarui!");
       fetchTasks();
     } catch (error) {
-      showToast("Gagal memperbarui tugas", "error");
+      showToast("Gagal memperbarui " + (form.type === "Kuis" ? "kuis" : "tugas"), "error");
     }
   };
 
-  const confirmDelete = (id) => setDeleteId(id);
+  const confirmDelete = (task) => {
+    setDeleteId(task.id);
+    setDeleteTipe(task.tipe);
+  };
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await apiClient.delete(`/api/dosen/tugas/${deleteId}`);
-      showToast("Tugas dihapus.");
+      if (deleteTipe === 'Kuis') {
+        await apiClient.delete(`/api/kuis/${deleteId}`);
+        showToast("Kuis dihapus.");
+      } else {
+        await apiClient.delete(`/api/dosen/tugas/${deleteId}`);
+        showToast("Tugas dihapus.");
+      }
       fetchTasks();
     } catch (error) {
-      showToast("Gagal menghapus", "error");
+      showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
     }
     setDeleteId(null);
+    setDeleteTipe(null);
   };
 
   const handleViewSubmissions = (task) => {
-    if (task.type === "Kelompok") {
+    if (task.tipe === "Kuis") {
+      if (onNavigate) {
+        onNavigate({
+          page: "dosenNilaiIndividu",
+          idMataKuliah: task.matkulId,
+          idTugas: task.id,
+          tipe: "Kuis"
+        });
+      }
+    } else if (task.type === "Kelompok") {
       if (onNavigate) onNavigate("dosenKelompok");
     } else {
-      if (onNavigate) onNavigate("dosenNilaiIndividu");
+      if (onNavigate) {
+        onNavigate({
+          page: "dosenNilaiIndividu",
+          idMataKuliah: task.matkulId,
+          idTugas: task.id,
+          tipe: "Tugas"
+        });
+      }
     }
   };
 
@@ -535,11 +625,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              setQuizData(
-                                quizData.filter((item) => item.id !== q.id),
-                              )
-                            }
+                            onClick={() => handleDeleteSoal(q)}
                             style={{
                               background: "none",
                               border: "none",
@@ -744,7 +830,9 @@ export default function DosenTugas({ onNavigate, onLogout }) {
             <button
               type="button"
               className="dt-btn-cancel"
-              onClick={() => setView("list")}
+              onClick={() => { 
+                setView("list"); 
+              }}
             >
               Batal
             </button>
@@ -775,20 +863,21 @@ export default function DosenTugas({ onNavigate, onLogout }) {
 
       {/* Delete Confirm Modal */}
       {deleteId && (
-        <div className="dt-modal-overlay" onClick={() => setDeleteId(null)}>
+        <div className="dt-modal-overlay" onClick={() => { setDeleteId(null); setDeleteTipe(null); }}>
           <div className="dt-modal" onClick={(e) => e.stopPropagation()}>
             <div className="dt-modal-icon">
               <span className="material-symbols-outlined">delete_forever</span>
             </div>
-            <h3>Hapus Tugas?</h3>
+            <h3>Hapus {deleteTipe === 'Kuis' ? 'Kuis' : 'Tugas'}?</h3>
             <p>
-              Tindakan ini tidak dapat dibatalkan. Semua data pengumpulan
-              mahasiswa untuk tugas ini akan ikut terhapus.
+              Tindakan ini tidak dapat dibatalkan. {deleteTipe === 'Kuis' 
+                ? 'Semua jawaban dan nilai kuis mahasiswa akan ikut terhapus.' 
+                : 'Semua data pengumpulan mahasiswa untuk tugas ini akan ikut terhapus.'}
             </p>
             <div className="dt-modal-actions">
               <button
                 className="dt-btn-cancel"
-                onClick={() => setDeleteId(null)}
+                onClick={() => { setDeleteId(null); setDeleteTipe(null); }}
               >
                 Batal
               </button>
@@ -889,12 +978,6 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                     icon: "task_alt",
                     color: "#2f9696",
                   },
-                  {
-                    label: "Total Pengumpulan",
-                    value: tasks.reduce((sum, t) => sum + (t.submitted || 0), 0),
-                    icon: "upload_file",
-                    color: "#dc2626",
-                  },
                 ].map((s) => (
                   <div key={s.label} className="dt-stat-mini">
                     <span
@@ -920,9 +1003,9 @@ export default function DosenTugas({ onNavigate, onLogout }) {
               <div className="dt-task-grid">
                 {filtered.map((task) => {
                   const dl = daysLeft(task.deadline);
-                  const progress = Math.round(
-                    (task.submitted / task.total) * 100,
-                  );
+                  const progress = task.tipe === 'Kuis' 
+                    ? (task.totalMahasiswa > 0 ? Math.round((task.jumlahPengerjaan / task.totalMahasiswa) * 100) : 0)
+                    : (task.total > 0 ? Math.round((task.submitted / task.total) * 100) : 0);
                   return (
                     <div key={task.id} className="dt-task-card">
                       <div className="dt-task-card-header">
@@ -952,7 +1035,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                           </button>
                           <button
                             className="dt-delete-btn"
-                            onClick={() => confirmDelete(task.id)}
+                            onClick={() => confirmDelete(task)}
                           >
                             <span className="material-symbols-outlined">
                               delete
@@ -1021,9 +1104,11 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                       )}
                       <div className="dt-task-progress">
                         <div className="dt-progress-info">
-                          <span className="dt-progress-label">Pengumpulan</span>
+                          <span className="dt-progress-label">{task.tipe === 'Kuis' ? 'Pengerjaan' : 'Pengumpulan'}</span>
                           <span className="dt-progress-val">
-                            {task.submitted}/{task.total}
+                            {task.tipe === 'Kuis' 
+                              ? `${task.jumlahPengerjaan || 0}/${task.totalMahasiswa || 0}` 
+                              : `${task.submitted}/${task.total}`}
                           </span>
                         </div>
                         <div className="dt-progress-track">
@@ -1051,9 +1136,9 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                           onClick={() => handleViewSubmissions(task)}
                         >
                           <span className="material-symbols-outlined">
-                            visibility
+                            {task.tipe === 'Kuis' ? 'analytics' : 'visibility'}
                           </span>
-                          Lihat Pengumpulan
+                          {task.tipe === 'Kuis' ? 'Lihat Nilai' : 'Lihat Pengumpulan'}
                         </button>
                       </div>
                     </div>

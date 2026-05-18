@@ -55,6 +55,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   const [allStudents, setAllStudents] = useState([]);
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [selectedMkId, setSelectedMkId] = useState("");
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState(null);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -173,6 +174,23 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
     }
   };
 
+  const handleDeleteGroup = (groupId, groupName) => {
+    setDeleteConfirmModal({ id: groupId, name: groupName });
+  };
+
+  const confirmDeleteGroup = async () => {
+    if (!deleteConfirmModal) return;
+    const { id, name } = deleteConfirmModal;
+    try {
+      await apiClient.delete(`/api/kelompok/${id}`);
+      setDeleteConfirmModal(null);
+      showToast(`Kelompok "${name}" berhasil dihapus!`);
+      fetchGroups();
+    } catch (error) {
+      showToast("Gagal menghapus kelompok", "error");
+    }
+  };
+
   const getMemberColor = (nim) => {
     const idx = allStudents.findIndex(s => s.nim === nim);
     return MEMBER_COLORS[idx >= 0 ? idx % MEMBER_COLORS.length : 0];
@@ -276,6 +294,112 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
               <button className="dk-btn-save" onClick={saveNilai}>
                 <span className="material-symbols-outlined">save</span>
                 Simpan Nilai
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmModal && (
+        <div className="dk-overlay" onClick={() => setDeleteConfirmModal(null)}>
+          <div
+            className="dk-modal dk-modal--sm"
+            style={{
+              maxWidth: "400px",
+              textAlign: "center",
+              padding: "2rem",
+              borderRadius: "var(--radius-lg)"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "1.25rem"
+            }}>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "4rem",
+                height: "4rem",
+                borderRadius: "50%",
+                backgroundColor: "#fee2e2",
+                color: "#dc2626"
+              }}>
+                <span className="material-symbols-outlined" style={{ fontSize: "2.5rem" }}>warning</span>
+              </div>
+            </div>
+            
+            <h3 style={{
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: "var(--slate-800)",
+              margin: "0 0 0.75rem 0"
+            }}>
+              Hapus Kelompok?
+            </h3>
+            
+            <p style={{
+              fontSize: "0.9rem",
+              color: "var(--slate-600)",
+              lineHeight: "1.5",
+              margin: "0 0 2rem 0"
+            }}>
+              Apakah Anda yakin ingin menghapus kelompok <strong>"{deleteConfirmModal.name}"</strong>? 
+              <br />
+              <span style={{ fontSize: "0.8rem", color: "#ef4444", fontWeight: 500, marginTop: "0.5rem", display: "inline-block" }}>
+                * Tindakan ini permanen. Semua anggota dan pengumpulan tugas kelompok ini juga akan terhapus.
+              </span>
+            </p>
+            
+            <div style={{
+              display: "flex",
+              gap: "0.75rem",
+              justifyContent: "center"
+            }}>
+              <button
+                className="dk-btn-cancel"
+                style={{
+                  margin: 0,
+                  flex: 1,
+                  padding: "0.75rem",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--color-border)",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+                onClick={() => setDeleteConfirmModal(null)}
+              >
+                Batal
+              </button>
+              <button
+                style={{
+                  flex: 1,
+                  padding: "0.75rem",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  borderRadius: "var(--radius-md)",
+                  border: "none",
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  transition: "all 0.2s"
+                }}
+                onClick={confirmDeleteGroup}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#b91c1c"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#dc2626"}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>delete</span>
+                Ya, Hapus
               </button>
             </div>
           </div>
@@ -513,15 +637,38 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                         {group.mataKuliahName || "-"}
                       </p>
                     </div>
-                    <span
-                      className="dk-progress-status"
-                      style={{
-                        color: statusColor(group.status),
-                        background: statusBg(group.status),
-                      }}
-                    >
-                      {group.status}
-                    </span>
+                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                      <span
+                        className="dk-progress-status"
+                        style={{
+                          color: statusColor(group.status),
+                          background: statusBg(group.status),
+                        }}
+                      >
+                        {group.status}
+                      </span>
+                      <button
+                        className="dk-delete-group-btn"
+                        onClick={() => handleDeleteGroup(group.id, group.name)}
+                        title="Hapus Kelompok"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#dc2626",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0.25rem",
+                          borderRadius: "0.375rem",
+                          transition: "all 0.2s"
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fee2e2"}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: "1.25rem" }}>delete</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Progress */}
