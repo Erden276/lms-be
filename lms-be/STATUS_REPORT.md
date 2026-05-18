@@ -80,8 +80,8 @@ GET  /api/kuis/:id/soal             - 200 ✅ (stub)
 ### Seed Data Available ✅
 **Users (3):**
 - U001 - Ahmad Rizki (ADMIN)
-- U002 - Budi Santoso (MAHASISWA)  
-- U003 - Citra Wijaya (DOSEN)
+- 2026001 - Budi Santoso (MAHASISWA)  
+- D001 - Citra Wijaya (DOSEN)
 
 All with password: `password123`
 
@@ -263,5 +263,5 @@ Headers: Authorization: Bearer <token>
 ---
 
 **Status:** ✅ PRODUCTION READY (with known limitations)
-**Last Update:** April 28, 2026
+**Last Update:** 18 Mei 2026
 **All Tests:** PASSING
