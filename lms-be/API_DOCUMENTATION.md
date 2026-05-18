@@ -1,93 +1,237 @@
-# LMS Backend - API Documentation
+# Daftar API LeMaS — Urutan per Sequence Diagram
 
-## Overview
-
-Learning Management System (LMS) backend built with Node.js, Express, PostgreSQL, and Prisma ORM.
-
-- **Base URL:** `http://localhost:3000`
-- **Authentication:** JWT Bearer Token (24-hour expiry)
+Base URL: `http://localhost:3000`  
+Auth: Header `Authorization: Bearer <token>` (kecuali yang ditandai _public_)
 
 ---
 
-## Fitur & Endpoint (Berdasarkan Spesifikasi S1 - S9)
+## S9 — Log-in / Log-out
 
-### S1. Kelola Tugas (Dosen)
-Endpoint untuk membuat, mengubah, dan menghapus tugas.
-- **GET** `/api/tugas/mata-kuliah/:idMataKuliah` - Mengambil daftar tugas berdasarkan mata kuliah.
-- **POST** `/api/tugas` - Membuat tugas baru.
-- **PATCH** `/api/tugas/:idTugas` - Mengubah data tugas yang sudah ada.
-- **DELETE** `/api/tugas/:idTugas` - Menghapus tugas.
+| Method | Endpoint          | Auth   | Deskripsi                          |
+| ------ | ----------------- | ------ | ---------------------------------- |
+| POST   | `/api/auth/login` | Public | Login dengan nomorInduk + password |
 
-### S2. Kelola Anggota
-Endpoint untuk mengelola partisipan dan mata kuliah.
-- **GET** `/api/users` - Mengambil daftar seluruh pengguna (Status: 200 OK).
-- **GET** `/api/mata-kuliah` - Mengambil daftar mata kuliah (Status: 200 OK).
-- **GET** `/api/mata-kuliah/:idMataKuliah` - Mengambil detail mata kuliah (Status: 200 OK).
-- **POST** `/api/mata-kuliah` - Membuat kelas / mata kuliah baru (Status: 201 Created).
-- **PATCH** `/api/mata-kuliah/:id` - Memperbarui data mata kuliah (Status: 200 OK).
+**Body login:**
 
-### S3. Kelola Deadline
-- **DELETE** `/api/mata-kuliah/:id` - Menghapus enrollment / kelas (Status: 200 OK).
-
-### S4. Monitoring Progress
-- **GET** `/api/dashboard/mahasiswa` - Mengambil status dan progress belajar mahasiswa (Status: 200 OK).
-
-### S5. Upload Tugas (Mahasiswa)
-Endpoint untuk submission tugas oleh mahasiswa.
-- **POST** `/api/tugas/:idTugas/submit` - Mengunggah jawaban tugas.
-- **GET** `/api/tugas/:idTugas/submission` - Mengambil data pengumpulan / jawaban tugas mahasiswa.
-- **DELETE** `/api/tugas/submission/:idPengumpulan` - Membatalkan / menghapus file tugas yang dikumpulkan.
-
-### S6. Presensi
-- **GET** `/api/presensi/mata-kuliah/:idMataKuliah` - Mengambil daftar kehadiran mata kuliah (Status: 200 OK).
-- **POST** `/api/presensi` - Mencatat kehadiran baru (Status: 201 Created).
-- **PATCH** `/api/presensi/:id` - Memperbarui status kehadiran manual (Status: 200 OK).
-
-### S7. Penilaian
-- **GET** `/api/nilai/:nomorInduk` - Mengambil daftar nilai mahasiswa (Status: 200 OK).
-- **POST** `/api/nilai` - Memasukkan / menyimpan data nilai tugas (Status: 201 Created).
-- **PATCH** `/api/nilai/:id` - Mengubah data nilai (Status: 200 OK).
-- **GET** `/api/nilai/transkrip/mahasiswa` - Menampilkan rekapan transkrip akhir (Status: 200 OK).
-
-### S8. Diskusi (Forum)
-- **GET** `/api/forum/mata-kuliah/:idMataKuliah` - Mengambil daftar topik diskusi kelas (Status: 200 OK).
-- **POST** `/api/forum/create` - Membuat topik diskusi baru (Status: 201 Created).
-
-### S9. Autentikasi
-- **POST** `/api/auth/login` - Melakukan validasi kredensial dan mendapatkan session token (Status: 200 OK).
-
----
-
-## Test Credentials
-
-### Mahasiswa (Student)
-```
-Name: Budi Santoso
-Email: budi.santoso@kampus.ac.id
-NIM: 2021002
-Password: password123
-Role: MAHASISWA
-```
-
-### Dosen (Lecturer)
-```
-Name: Dr. Lestari, M.Pd
-Email: lestari@kampus.ac.id
-NIP: 197803252005012002
-Password: password123
-Role: DOSEN
+```json
+{
+  "nomorInduk": "U001",
+  "password": "password123"
+}
 ```
 
 ---
 
-## HTTP Status Codes
+## S2 — Kelola Anggota (Kelas / Kelompok)
 
-| Code | Meaning                                 |
-| ---- | --------------------------------------- |
-| 200  | OK - Request succeeded                  |
-| 201  | Created - Resource created successfully |
-| 400  | Bad Request - Invalid input             |
-| 401  | Unauthorized - Invalid/missing token    |
-| 403  | Forbidden - No permission               |
-| 404  | Not Found - Resource doesn't exist      |
-| 500  | Internal Server Error                   |
+| Method | Endpoint                                 | Auth | Deskripsi                                   |
+| ------ | ---------------------------------------- | ---- | ------------------------------------------- |
+| GET    | `/api/kelompok`                          | ✅   | Ambil semua kelompok (dosen: filter by NIP) |
+| GET    | `/api/kelompok/mahasiswa/all`            | ✅   | Ambil semua mahasiswa                       |
+| GET    | `/api/kelompok/:idMataKuliah`            | ✅   | Ambil kelompok per mata kuliah              |
+| POST   | `/api/kelompok`                          | ✅   | Buat kelompok baru                          |
+| POST   | `/api/kelompok/:idKelompok/members`      | ✅   | Tambah anggota ke kelompok                  |
+| DELETE | `/api/kelompok/:idKelompok/members/:nim` | ✅   | Hapus anggota dari kelompok                 |
+| PUT    | `/api/kelompok/:idKelompok/grades`       | ✅   | Simpan nilai anggota kelompok               |
+| DELETE | `/api/kelompok/:idKelompok`              | ✅   | Hapus kelompok secara permanen (Cascade)    |
+
+**Body POST /api/kelompok:**
+
+```json
+{
+  "name": "Kelompok 1",
+  "idMataKuliah": 1,
+  "task": "Proyek Akhir"
+}
+```
+
+**Body POST /api/kelompok/:id/members:**
+
+```json
+{ "nim": "2026001" }
+```
+
+---
+
+## S1 — Kelola Tugas
+
+| Method | Endpoint                                     | Auth | Deskripsi                                       |
+| ------ | -------------------------------------------- | ---- | ----------------------------------------------- |
+| GET    | `/api/dosen/tugas`                           | ✅   | Ambil semua tugas (dosen)                       |
+| GET    | `/api/dosen/tugas/mata-kuliah/:idMataKuliah` | ✅   | Ambil tugas per mata kuliah                     |
+| POST   | `/api/dosen/tugas`                           | ✅   | Buat tugas baru (multipart/form-data)           |
+| PUT    | `/api/dosen/tugas/:id`                       | ✅   | Update tugas                                    |
+| DELETE | `/api/dosen/tugas/:id`                       | ✅   | Hapus tugas                                     |
+| GET    | `/api/tugas`                                 | ✅   | Ambil daftar tugas (mahasiswa)                  |
+| GET    | `/api/tugas/:id`                             | ✅   | Detail tugas + status pengumpulan               |
+| GET    | `/api/kuis`                                  | ✅   | Ambil semua kuis (dosen management)             |
+| GET    | `/api/kuis/mata-kuliah/:idMataKuliah`        | ✅   | Ambil kuis per mata kuliah (mahasiswa)          |
+| GET    | `/api/kuis/:idKuis/detail`                   | ✅   | Detail kuis + soal + jawaban benar (dosen edit) |
+| GET    | `/api/kuis/:idKuis/soal`                     | ✅   | Daftar soal kuis (mahasiswa mengerjakan)        |
+| POST   | `/api/kuis`                                  | ✅   | Buat kuis baru + soal (dosen)                   |
+| PUT    | `/api/kuis/:idKuis`                          | ✅   | Update kuis + soal (dosen)                      |
+| DELETE | `/api/kuis/:idKuis`                          | ✅   | Hapus kuis (dosen)                              |
+| POST   | `/api/kuis/:idKuis/submit`                   | ✅   | Submit jawaban kuis (mahasiswa)                 |
+| GET    | `/api/kuis/:idKuis/status`                   | ✅   | Cek status pengerjaan kuis (mahasiswa)          |
+
+**Body POST /api/dosen/tugas (form-data):**
+
+```
+judul        : Website Portfolio
+detailTugas  : Buat website portfolio...
+deadlineTugas: 2026-06-01T23:59:00.000Z
+tipeTugas    : Individu
+idMataKuliah : 13
+fileTugas    : (file, opsional)
+```
+
+---
+
+## S3 — Kelola Deadline
+
+> Deadline diatur saat buat / update tugas. Tidak ada endpoint terpisah.
+
+| Method | Endpoint               | Auth | Deskripsi                         |
+| ------ | ---------------------- | ---- | --------------------------------- |
+| POST   | `/api/dosen/tugas`     | ✅   | Buat tugas + set deadline         |
+| PUT    | `/api/dosen/tugas/:id` | ✅   | Update deadline tugas             |
+| GET    | `/api/tugas/:id`       | ✅   | Cek deadline + status (mahasiswa) |
+
+---
+
+## S5 — Upload Tugas
+
+| Method | Endpoint                               | Auth | Deskripsi                             |
+| ------ | -------------------------------------- | ---- | ------------------------------------- |
+| POST   | `/api/tugas/:idTugas/submit`           | ✅   | Upload file jawaban tugas (multipart) |
+| GET    | `/api/tugas/:idTugas/submission`       | ✅   | Cek status pengumpulan mahasiswa      |
+| DELETE | `/api/tugas/submission/:idPengumpulan` | ✅   | Hapus pengumpulan                     |
+
+**Body POST /api/tugas/:idTugas/submit (form-data):**
+
+```
+file       : (file PDF/DOC/ZIP)
+catatan    : Berikut terlampir jawaban tugas
+```
+
+---
+
+## S4 — Monitoring Progress
+
+| Method | Endpoint                                         | Auth | Deskripsi                                 |
+| ------ | ------------------------------------------------ | ---- | ----------------------------------------- |
+| GET    | `/api/materi/mata-kuliah/:idMataKuliah`          | ✅   | Ambil materi + status sudah/belum diakses |
+| POST   | `/api/materi/:idModulAjar/access`                | ✅   | Tandai materi sudah diakses               |
+| GET    | `/api/materi/mata-kuliah/:idMataKuliah/progress` | ✅   | Ringkasan progress materi (%)             |
+| GET    | `/api/dashboard`                                 | ✅   | Dashboard mahasiswa (progress tugas, IPK) |
+| GET    | `/api/dosen/dashboard`                           | ✅   | Dashboard dosen                           |
+
+---
+
+## S6 — Presensi
+
+| Method | Endpoint                                                   | Auth | Deskripsi                             |
+| ------ | ---------------------------------------------------------- | ---- | ------------------------------------- |
+| POST   | `/api/dosen/presensi/matkul/:idMataKuliah/generate`        | ✅   | Generate sesi presensi + token QR     |
+| GET    | `/api/dosen/presensi/matkul/:idMataKuliah/daftar-hadir`    | ✅   | Daftar hadir terbaru                  |
+| GET    | `/api/dosen/presensi/daftar-hadir/:idMataKuliah/:tanggal`  | ✅   | Daftar hadir per tanggal              |
+| GET    | `/api/dosen/presensi/dates/:idMataKuliah`                  | ✅   | Semua tanggal presensi yang tersedia  |
+| PUT    | `/api/dosen/presensi/:idPresensi/status`                   | ✅   | Update status kehadiran by idPresensi |
+| PUT    | `/api/dosen/presensi/nim/:nim/matkul/:idMataKuliah/status` | ✅   | Update status kehadiran by NIM        |
+| POST   | `/api/presensi/scan`                                       | ✅   | Mahasiswa scan QR Code                |
+| GET    | `/api/presensi/mahasiswa/:idMataKuliah`                    | ✅   | Rekap presensi mahasiswa              |
+| GET    | `/api/presensi/summary/:idMataKuliah`                      | ✅   | Summary presensi per mata kuliah      |
+
+**Body POST /api/dosen/presensi/matkul/:id/generate:**
+
+```json
+{ "tanggal": "2026-05-15" }
+```
+
+**Body POST /api/presensi/scan:**
+
+```json
+{ "token": "LeMaS-1234567890-abc123", "idMataKuliah": 13 }
+```
+
+**Body PUT status:**
+
+```json
+{ "statusKehadiran": "Hadir" }
+```
+
+---
+
+## S7 — Penilaian
+
+| Method | Endpoint                                | Auth | Deskripsi                                                  |
+| ------ | --------------------------------------- | ---- | ---------------------------------------------------------- |
+| GET    | `/api/nilai/tugas-list/:idMataKuliah`   | ✅   | Daftar tugas unik per mata kuliah (dosen)                  |
+| GET    | `/api/nilai/submissions/tugas/:idTugas` | ✅   | List mahasiswa + status kumpul per tugas                   |
+| POST   | `/api/nilai/submissions/nilai`          | ✅   | Simpan nilai tugas individu                                |
+| GET    | `/api/nilai/mata-kuliah/:idMataKuliah`  | ✅   | Nilai per mata kuliah                                      |
+| GET    | `/api/nilai/transkrip/mahasiswa`        | ✅   | Transkrip nilai mahasiswa                                  |
+| PATCH  | `/api/nilai/:id`                        | ✅   | Update nilai (UTS/UAS/Akhir)                               |
+| GET    | `/api/kuis/:idKuis/hasil`               | ✅   | Hasil kuis mahasiswa (skor + detail jawaban, read-only 🔒) |
+
+**Body POST /api/nilai/submissions/nilai:**
+
+```json
+{
+  "nim": "2026001",
+  "idMataKuliah": 13,
+  "nilaiTugas": 88
+}
+```
+
+---
+
+## S8 — Diskusi (Forum)
+
+| Method | Endpoint                               | Auth   | Deskripsi                           |
+| ------ | -------------------------------------- | ------ | ----------------------------------- |
+| GET    | `/api/forum/mata-kuliah/:idMataKuliah` | ✅     | Ambil semua thread forum per matkul |
+| POST   | `/api/forum/thread`                    | ✅     | Buat thread forum baru              |
+| PUT    | `/api/forum/thread/:idForumDiskusi`    | ✅     | Edit thread forum                   |
+| DELETE | `/api/forum/thread/:idForumDiskusi`    | ✅     | Hapus thread forum                  |
+| POST   | `/api/forum/comment`                   | ✅     | Tambah komentar                     |
+| GET    | `/api/forum/comment/:idKomentar`       | Public | Ambil komentar by ID                |
+| PUT    | `/api/forum/comment/:idKomentar`       | ✅     | Edit komentar                       |
+| DELETE | `/api/forum/comment/:idKomentar`       | ✅     | Hapus komentar                      |
+| POST   | `/api/forum/like`                      | ✅     | Toggle like forum                   |
+
+**Body POST /api/forum/thread:**
+
+```json
+{
+  "idMataKuliah": 13,
+  "judul": "Diskusi Pertemuan 1",
+  "isiForum": "Silakan bertanya mengenai materi React..."
+}
+```
+
+**Body POST /api/forum/comment:**
+
+```json
+{
+  "idForum": 1,
+  "isiKomentar": "Terima kasih materinya sangat membantu!"
+}
+```
+
+**Body POST /api/forum/like:**
+
+```json
+{ "idForum": 1 }
+```
+
+---
+
+## Endpoint Tambahan (Pendukung)
+
+| Method | Endpoint           | Auth   | Deskripsi                   |
+| ------ | ------------------ | ------ | --------------------------- |
+| GET    | `/api/mata-kuliah` | ✅     | Daftar mata kuliah          |
+| GET    | `/ping`            | Public | Health check server         |
+| GET    | `/api/notifikasi`  | ✅     | Daftar notifikasi mahasiswa |
+| GET    | `/api/profile`     | ✅     | Profil user                 |
