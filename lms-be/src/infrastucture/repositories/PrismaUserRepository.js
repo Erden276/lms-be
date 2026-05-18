@@ -1,4 +1,4 @@
-import { prisma } from "../../../lib/prisma.ts";
+import { prisma } from "../../prismaClient.js";
 
 export class PrismaUserRepository {
   async create(user) {
