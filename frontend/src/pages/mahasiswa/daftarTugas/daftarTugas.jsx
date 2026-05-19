@@ -206,7 +206,9 @@ const allKuis = [];
     }
   });
 
-  const filtered = sortedTasks;
+  if (loading) {
+    return <LoadingSpinner message="Memuat tugas..." fullPage={true} />;
+  }
 
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
@@ -295,9 +297,7 @@ const allKuis = [];
 
           {/* Task List */}
           <div className="dt-task-list">
-            {loading ? (
-              <LoadingSpinner message="Memuat tugas..." />
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="dt-empty">
                 <span className="material-symbols-outlined">task_alt</span>
                 <p>Tidak ada tugas dalam kategori ini.</p>

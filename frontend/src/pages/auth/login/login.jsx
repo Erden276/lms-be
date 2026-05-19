@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./login.css";
 import { apiClient } from "../../../utils/apiClient";
 import logoImg from "../../../assets/logo.png";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 function Login({ onLogin, onFaq }) {
   const [role, setRole] = useState("Mahasiswa");
@@ -11,6 +12,10 @@ function Login({ onLogin, onFaq }) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null); // 'privasi' | 'syarat' | null
+
+  if (isLoading) {
+    return <LoadingSpinner message="Menghubungkan ke sistem..." fullPage={true} />;
+  }
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -106,7 +111,7 @@ function Login({ onLogin, onFaq }) {
           {/* Logo & Branding */}
           <div className="brand-header">
             <div className="logo-container-wrapper">
-              <div className={`logo-box ${isLoading ? "logo-loading" : ""}`}>
+              <div className="logo-box">
                 <img src={logoImg} alt="LeMaS Logo" className="logo-img" />
               </div>
             </div>

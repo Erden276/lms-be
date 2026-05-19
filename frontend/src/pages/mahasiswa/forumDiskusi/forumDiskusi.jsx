@@ -288,6 +288,14 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
     <Sidebar onNavigate={onNavigate} onLogout={onLogout} activePage="forumDiskusi" mobileOpen={sidebarOpen} onClose={closeSidebar} />
   );
 
+  if (loadingCourses) {
+    return <LoadingSpinner message="Memuat daftar mata kuliah..." fullPage={true} />;
+  }
+
+  if (loading) {
+    return <LoadingSpinner message="Memuat diskusi..." fullPage={true} />;
+  }
+
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
       {/* Toast */}
@@ -320,9 +328,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
                 </div>
               </div>
 
-              {loadingCourses ? (
-                <LoadingSpinner message="Memuat daftar mata kuliah..." />
-              ) : mataKuliahList.length === 0 ? (
+              {mataKuliahList.length === 0 ? (
                 <div className="fd-empty-state" style={{ textAlign: "center", padding: "4rem 2rem", background: "white", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
                   <span className="material-symbols-outlined" style={{ fontSize: "3rem", color: "#94a3b8", marginBottom: "1rem" }}>school</span>
                   <h3>Tidak Ada Mata Kuliah</h3>
@@ -384,9 +390,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
                 </div>
               </div>
 
-              {loading ? (
-                <LoadingSpinner message="Memuat diskusi..." />
-              ) : threads.length === 0 ? (
+              {threads.length === 0 ? (
                 <div className="fd-empty-state" style={{ textAlign: "center", padding: "4rem 2rem", background: "white", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
                   <span className="material-symbols-outlined" style={{ fontSize: "3rem", color: "#94a3b8", marginBottom: "1rem" }}>forum</span>
                   <h3>Belum Ada Diskusi</h3>

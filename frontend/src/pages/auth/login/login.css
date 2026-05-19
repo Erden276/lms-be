@@ -103,30 +103,10 @@
   transition: all 0.3s ease;
 }
 
-.logo-box.logo-loading::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 3px solid rgba(75, 83, 188, 0.1);
-  border-top-color: var(--secondary);
-  border-right-color: var(--secondary);
-  animation: logo-spin 1s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
-}
-
 .logo-img {
   width: 80px;
   height: 80px;
   object-fit: contain;
-}
-
-@keyframes logo-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .logo-text {
