@@ -21,15 +21,15 @@ const PAGE_NAMES = {
   dosenForum: "Forum Diskusi Dosen",
   dosenProfile: "Profil Dosen",
   dosenMateri: "Kelola Materi",
-  faq: "Tanya Jawab (FAQ)"
+  faq: "Tanya Jawab (FAQ)",
 };
 
 export default function PageTransitionLoader({ targetPage }) {
   const pageDisplayName = PAGE_NAMES[targetPage] || "Halaman";
   return (
-    <LoadingSpinner 
-      message={`Memuat halaman ${pageDisplayName.toLowerCase()}...`} 
-      fullPage={true} 
+    <LoadingSpinner
+      message={`Memuat halaman ${pageDisplayName.toLowerCase()}...`}
+      fullPage={true}
     />
   );
 }
