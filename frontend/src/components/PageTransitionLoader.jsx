@@ -25,7 +25,7 @@ const PAGE_NAMES = {
 };
 
 export default function PageTransitionLoader({ targetPage }) {
-  const pageDisplayName = PAGE_NAMES[targetPage] || "Halaman";
+  const pageDisplayName = Object.hasOwn(PAGE_NAMES, targetPage) ? PAGE_NAMES[targetPage] : "Halaman";
   return (
     <LoadingSpinner
       message={`Memuat halaman ${pageDisplayName.toLowerCase()}...`}
