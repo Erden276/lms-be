@@ -48,11 +48,10 @@ export default function Dashboard({ onNavigate, onLogout }) {
     return () => clearInterval(interval); // Membersihkan interval saat komponen unmount
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat dashboard..." fullPage={true} />;
+  if (!loading) {
+    console.log('=== STATE dashboardData ===', JSON.stringify(dashboardData, null, 2));
+    console.log('jadwal:', dashboardData?.jadwal);
   }
-  console.log('=== STATE dashboardData ===', JSON.stringify(dashboardData, null, 2));
-  console.log('jadwal:', dashboardData?.jadwal);
 
   return (
     <div className="page-shell">
@@ -90,23 +89,41 @@ export default function Dashboard({ onNavigate, onLogout }) {
                 <div className="db-hero-circle-1"></div>
                 <div className="db-hero-circle-2"></div>
                 <div className="db-hero-body">
-                  <div className="db-hero-avatar">
-                    <img alt="Profile" src={avatarUrl} onError={(e) => { e.target.src = AVATAR_HERO; }} />
+                  <div className={`db-hero-avatar ${loading ? 'skeleton-shimmer' : ''}`}>
+                    {!loading && <img alt="Profile" src={avatarUrl} onError={(e) => { e.target.src = AVATAR_HERO; }} />}
                   </div>
                   <div className="db-hero-info">
                     <span className="db-badge">Profil Mahasiswa</span>
-                    <h2 className="db-hero-name">Halo, {user?.nama || "Mahasiswa"}</h2>
-                    <p className="db-hero-sub">{user?.role || "S1 Informatika"}</p>
+                    {loading ? (
+                      <>
+                        <div className="skeleton-text skeleton-text--title" style={{ background: 'rgba(255,255,255,0.2)', width: '12rem', height: '1.75rem', marginTop: '0.5rem' }}></div>
+                        <div className="skeleton-text skeleton-text--medium" style={{ background: 'rgba(255,255,255,0.15)', width: '8rem', height: '1rem' }}></div>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="db-hero-name">Halo, {user?.nama || "Mahasiswa"}</h2>
+                        <p className="db-hero-sub">{user?.role || "S1 Informatika"}</p>
+                      </>
+                    )}
                   </div>
                   <div className="db-hero-stats">
-                    <div className="db-stat-box">
-                      <p className="db-stat-val">{dashboardData?.ipk?.toFixed(2) || '0.00'}</p>
-                      <p className="db-stat-lbl">IPK</p>
-                    </div>
-                    <div className="db-stat-box">
-                      <p className="db-stat-val">{dashboardData?.sks || '0'}</p>
-                      <p className="db-stat-lbl">SKS</p>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="db-stat-box skeleton-shimmer" style={{ width: '4.5rem', height: '3.5rem', border: 'none' }}></div>
+                        <div className="db-stat-box skeleton-shimmer" style={{ width: '4.5rem', height: '3.5rem', border: 'none' }}></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="db-stat-box">
+                          <p className="db-stat-val">{dashboardData?.ipk?.toFixed(2) || '0.00'}</p>
+                          <p className="db-stat-lbl">IPK</p>
+                        </div>
+                        <div className="db-stat-box">
+                          <p className="db-stat-val">{dashboardData?.sks || '0'}</p>
+                          <p className="db-stat-lbl">SKS</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -129,7 +146,17 @@ export default function Dashboard({ onNavigate, onLogout }) {
                 </div>
 
                 <div className="db-progress-list">
-                  {dashboardData?.progress && (
+                  {loading ? (
+                    <div className="db-progress-item">
+                      <div className="db-progress-row">
+                        <div style={{ width: '100%' }}>
+                          <div className="skeleton-text skeleton-text--medium"></div>
+                          <div className="skeleton-text skeleton-text--short"></div>
+                        </div>
+                      </div>
+                      <div className="db-bar-track skeleton-shimmer"></div>
+                    </div>
+                  ) : dashboardData?.progress ? (
                     <div
                       className="db-progress-item"
                       style={{ cursor: "pointer" }}
@@ -151,8 +178,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
                         ></div>
                       </div>
                     </div>
-                  )}
-                  {!dashboardData?.progress && (
+                  ) : (
                     <p style={{ padding: "1rem", color: "var(--slate-500)", textAlign: "center" }}>
                       Belum ada progres tugas.
                     </p>
@@ -186,9 +212,11 @@ export default function Dashboard({ onNavigate, onLogout }) {
                   Pindai QR Kehadiran
                 </button>
                 <div className="db-schedule-row">
-                  <div>
+                  <div style={{ width: '100%' }}>
                     <p className="db-sched-lbl">Jadwal Hari Ini</p>
-                    {dashboardData?.jadwal?.length > 0 ? (
+                    {loading ? (
+                      <div className="skeleton-text skeleton-text--medium" style={{ marginTop: '0.5rem', height: '1rem' }}></div>
+                    ) : dashboardData?.jadwal?.length > 0 ? (
                       dashboardData.jadwal.map((j, idx) => (
                         <p key={idx} className="db-sched-time">{j.mataKuliah} ({j.hari}) - {j.waktu}</p>
                       ))
@@ -196,12 +224,14 @@ export default function Dashboard({ onNavigate, onLogout }) {
                       <p className="db-sched-time">Tidak ada jadwal hari ini</p>
                     )}
                   </div>
-                  <span className="db-pulse-dot"></span>
+                  {!loading && <span className="db-pulse-dot"></span>}
                 </div>
               </div>
 
               {/* Class Card — clickable to mata kuliah */}
-              {dashboardData?.mataKuliah?.length > 0 ? (
+              {loading ? (
+                <div className="skeleton-card" style={{ height: "180px" }}></div>
+              ) : dashboardData?.mataKuliah?.length > 0 ? (
                 <div
                   className="db-class-card"
                   style={{ cursor: "pointer" }}
@@ -247,7 +277,18 @@ export default function Dashboard({ onNavigate, onLogout }) {
                   <span className="material-symbols-outlined">forum</span>
                   <h3>Diskusi Terbaru</h3>
                 </div>
-                {dashboardData?.threads?.length > 0 ? (
+                {loading ? (
+                  <>
+                    <div className="db-disc-box" style={{ marginBottom: "0.5rem" }}>
+                      <div className="skeleton-text skeleton-text--short"></div>
+                      <div className="skeleton-text skeleton-text--medium"></div>
+                    </div>
+                    <div className="db-disc-box" style={{ marginBottom: "0.5rem" }}>
+                      <div className="skeleton-text skeleton-text--short"></div>
+                      <div className="skeleton-text skeleton-text--medium"></div>
+                    </div>
+                  </>
+                ) : dashboardData?.threads?.length > 0 ? (
                   dashboardData.threads.slice(0, 2).map((thread, idx) => (
                     <div
                       key={idx}

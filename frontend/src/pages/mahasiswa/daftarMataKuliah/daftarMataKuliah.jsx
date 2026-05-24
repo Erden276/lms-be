@@ -58,10 +58,6 @@ export default function DaftarMataKuliah({ onNavigate, onLogout }) {
     fetchCourses();
   }, [nim]);
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat daftar mata kuliah..." fullPage={true} />;
-  }
-
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
       {/* ─── Sidebar ─── */}
@@ -95,9 +91,16 @@ export default function DaftarMataKuliah({ onNavigate, onLogout }) {
         {/* Course Grid */}
         <div className="dm-grid-wrap">
           <div className="dm-course-grid">
-            {courses.length > 0 ? courses.map((c) => (
-              <div key={c.id} className="dm-course-card">
-                <div className="dm-card-top">
+            {loading ? (
+              <>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+              </>
+            ) : courses.length > 0 ?
+              courses.map((c) => (
+                <div key={c.id} className="dm-course-card">
+                  <div className="dm-card-top">
                   <div className="dm-course-icon">
                     <span className="material-symbols-outlined">{c.icon}</span>
                   </div>

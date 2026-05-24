@@ -58,9 +58,8 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
 
   const nav = (page) => onNavigate && onNavigate(page);
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat dashboard..." fullPage={true} />;
-  }
+  // Remove early LoadingSpinner return
+
 
   return (
     <div className="page-shell">
@@ -97,7 +96,9 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
           <div className="dd-page-header">
             <div>
               <h2 className="dd-title">Dashbord Dosen</h2>
-              <p className="dd-subtitle">Selamat pagi, Pak / Bu {dashboardData.lecturerName}. Berikut ringkasan kurasi akademik Anda hari ini.</p>
+              <p className="dd-subtitle">
+                {loading ? "Memuat ringkasan kurasi akademik Anda..." : `Selamat pagi, Pak / Bu ${dashboardData?.lecturerName || "Dosen"}. Berikut ringkasan kurasi akademik Anda hari ini.`}
+              </p>
             </div>
             <div className="dd-action-row">
               <button className="dd-btn dd-btn--blue" onClick={() => nav("dosenTugas")}>
@@ -125,7 +126,13 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                 <span className="dd-badge dd-badge--green">Aktif</span>
               </div>
               <p className="dd-stat-label">Total Mahasiswa Aktif</p>
-              <p className="dd-stat-value">{dashboardData.stats.totalMahasiswa}</p>
+              <p className="dd-stat-value">
+                {loading ? (
+                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                ) : (
+                  dashboardData?.stats?.totalMahasiswa || 0
+                )}
+              </p>
             </div>
 
             <div className="dd-stat-card">
@@ -136,7 +143,13 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                 <span className="dd-badge dd-badge--blue">Total</span>
               </div>
               <p className="dd-stat-label">Pengumpulan Tugas Individu</p>
-              <p className="dd-stat-value">{dashboardData.stats.tugasIndividu}</p>
+              <p className="dd-stat-value">
+                {loading ? (
+                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                ) : (
+                  dashboardData?.stats?.tugasIndividu || 0
+                )}
+              </p>
             </div>
 
             <div className="dd-stat-card">
@@ -147,7 +160,13 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                 <span className="dd-badge dd-badge--purple">Total</span>
               </div>
               <p className="dd-stat-label">Pengumpulan Tugas Kelompok</p>
-              <p className="dd-stat-value">{dashboardData.stats.tugasKelompok}</p>
+              <p className="dd-stat-value">
+                {loading ? (
+                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                ) : (
+                  dashboardData?.stats?.tugasKelompok || 0
+                )}
+              </p>
             </div>
           </div>
 
@@ -172,35 +191,62 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {dashboardData.daftarMateri.length > 0 ? dashboardData.daftarMateri.map((materi, i) => (
-                    <tr key={materi.id || i}>
-                      <td>
-                        <div className="dd-student-cell">
-                          <div className="dd-avatar av-blue">
-                            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
-                              {materi.tipe?.toLowerCase().includes('video') ? 'play_circle' : 
-                               materi.tipe?.toLowerCase().includes('pdf') ? 'picture_as_pdf' : 'description'}
-                            </span>
+                   {loading ? (
+                    [1, 2, 3].map((idx) => (
+                      <tr key={idx}>
+                        <td>
+                          <div className="dd-student-cell">
+                            <div className="dd-avatar av-blue skeleton-shimmer" style={{ width: '2rem', height: '2rem', borderRadius: '0.5rem' }}></div>
+                            <div style={{ flex: 1 }}>
+                              <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                            </div>
                           </div>
-                          <div>
-                            <p className="dd-cell-name">{materi.judul}</p>
+                        </td>
+                        <td>
+                          <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                        </td>
+                        <td>
+                          <div className="skeleton-text skeleton-text--short" style={{ margin: 0 }}></div>
+                        </td>
+                        <td>
+                          <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                        </td>
+                        <td>
+                          <div className="skeleton-text skeleton-text--short" style={{ margin: 0 }}></div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : dashboardData?.daftarMateri?.length > 0 ? (
+                    dashboardData.daftarMateri.map((materi, i) => (
+                      <tr key={materi.id || i}>
+                        <td>
+                          <div className="dd-student-cell">
+                            <div className="dd-avatar av-blue">
+                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+                                {materi.tipe?.toLowerCase().includes('video') ? 'play_circle' : 
+                                 materi.tipe?.toLowerCase().includes('pdf') ? 'picture_as_pdf' : 'description'}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="dd-cell-name">{materi.judul}</p>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p className="dd-cell-name">{materi.mataKuliah}</p>
-                      </td>
-                      <td>
-                        <span className="dd-status-badge">{materi.tipe}</span>
-                      </td>
-                      <td>
-                        <p className="dd-cell-name">{materi.tanggal}</p>
-                      </td>
-                      <td>
-                        <p className="dd-cell-sub">{materi.ukuran}</p>
-                      </td>
-                    </tr>
-                  )) : (
+                        </td>
+                        <td>
+                          <p className="dd-cell-name">{materi.mataKuliah}</p>
+                        </td>
+                        <td>
+                          <span className="dd-status-badge">{materi.tipe}</span>
+                        </td>
+                        <td>
+                          <p className="dd-cell-name">{materi.tanggal}</p>
+                        </td>
+                        <td>
+                          <p className="dd-cell-sub">{materi.ukuran}</p>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
                     <tr>
                       <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>Belum ada materi yang diupload.</td>
                     </tr>
