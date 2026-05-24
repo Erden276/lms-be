@@ -65,7 +65,6 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
     if (upcoming.length > 0 && upcoming[selectedClass]) {
       try {
         const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-        const myNim = storedUser.nomorInduk || "";
 
         // Add cache-busting to get fresh data
         const res = await apiClient.get(`/api/presensi/mahasiswa/${upcoming[selectedClass].id}?_t=${Date.now()}`);
@@ -147,7 +146,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
         if (state === 2) { // SCANNING
           await html5QrCodeRef.current.stop();
         }
-      } catch (e) {
+      } catch {
         // ignore stop errors
       }
       html5QrCodeRef.current = null;
@@ -247,7 +246,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
       {/* Main */}
       <main className="page-main" style={{ backgroundColor: "var(--color-background)" }}>
-        <Navbar role="Mahasiswa" onOpenSidebar={openSidebar} onNavigate={typeof nav !== "undefined" ? nav : (typeof onNavigate !== "undefined" ? onNavigate : undefined)} />
+        <Navbar role="Mahasiswa" onOpenSidebar={openSidebar} onNavigate={onNavigate} />
 
         {/* ── Toast Notification ── */}
         {toast && (
