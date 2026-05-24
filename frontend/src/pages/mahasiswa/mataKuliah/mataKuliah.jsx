@@ -143,9 +143,8 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat materi..." fullPage={true} />;
-  }
+  // Remove early LoadingSpinner return
+
 
 
 
@@ -220,8 +219,25 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
 
         {/* Content */}
         <div className="page-content">
-          {/* Course header */}
-          <div className="mk-course-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '20rem' }}></div>
+              <div className="skeleton-text skeleton-text--medium" style={{ height: '1.25rem', width: '30rem' }}></div>
+              <div className="mk-body-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skeleton-card" style={{ height: '300px', width: '100%' }}></div>
+                  <div className="skeleton-card" style={{ height: '150px', width: '100%' }}></div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skeleton-card" style={{ height: '250px', width: '100%' }}></div>
+                  <div className="skeleton-card" style={{ height: '100px', width: '100%' }}></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Course header */}
+              <div className="mk-course-header">
             <span className="mk-faculty-badge">
               <span className="material-symbols-outlined">school</span>
               FAKULTAS INFORMATIKA
@@ -413,6 +429,8 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
               </div>
             </div>
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

@@ -219,9 +219,8 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
 
   const filtered = sortedTasks;
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat tugas..." fullPage={true} />;
-  }
+  // Remove early LoadingSpinner return
+
 
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
@@ -255,8 +254,20 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
 
         {/* Page Content */}
         <div className="page-content">
-          {/* Page Header */}
-          <div className="dt-page-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '15rem' }}></div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <div className="skeleton-text" style={{ width: '80px', height: '2rem', borderRadius: '9999px' }}></div>
+                <div className="skeleton-text" style={{ width: '80px', height: '2rem', borderRadius: '9999px' }}></div>
+              </div>
+              <div className="skeleton-card" style={{ height: '140px', width: '100%' }}></div>
+              <div className="skeleton-card" style={{ height: '140px', width: '100%' }}></div>
+            </div>
+          ) : (
+            <>
+              {/* Page Header */}
+              <div className="dt-page-header">
             <h2 className="dt-title">Daftar Tugas</h2>
             <p className="dt-subtitle">Perhatikan deadline tugasnya yaa!!</p>
           </div>
@@ -447,6 +458,8 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
             )}
           </div>
 
+            </>
+          )}
         </div>
       </main>
     </div>

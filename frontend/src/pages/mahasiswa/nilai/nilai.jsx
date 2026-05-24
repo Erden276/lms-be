@@ -254,9 +254,8 @@ export default function Nilai({ onNavigate, onLogout }) {
           .reduce((acc, s) => acc + s.sks, 0)
       : 0;
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat transkrip..." fullPage={true} />;
-  }
+  // Remove early LoadingSpinner return
+
 
   return (
     <div
@@ -321,8 +320,22 @@ export default function Nilai({ onNavigate, onLogout }) {
         />
 
         <div className="page-content">
-          {/* Page Header */}
-          <div className="nlai-page-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '15rem' }}></div>
+              <div className="skeleton-text skeleton-text--medium" style={{ height: '1.25rem', width: '20rem' }}></div>
+              <div className="nlai-summary-grid">
+                <div className="nlai-sum-card skeleton-card" style={{ height: '5rem', border: 'none' }}></div>
+                <div className="nlai-sum-card skeleton-card" style={{ height: '5rem', border: 'none' }}></div>
+                <div className="nlai-sum-card skeleton-card" style={{ height: '5rem', border: 'none' }}></div>
+                <div className="nlai-sum-card skeleton-card" style={{ height: '5rem', border: 'none' }}></div>
+              </div>
+              <div className="skeleton-card" style={{ height: '320px', width: '100%' }}></div>
+            </div>
+          ) : (
+            <>
+              {/* Page Header */}
+              <div className="nlai-page-header">
             <div>
               <h1 className="nlai-title">Transkrip Nilai</h1>
               <p className="nlai-subtitle">
@@ -546,8 +559,10 @@ export default function Nilai({ onNavigate, onLogout }) {
               <span>Skala 4.0 — IP ≥ 3.51 = Cum Laude</span>
             </div>
           </div>
-          </>
+            </>
           )}
+        </>
+      )}
         </div>
       </main>
     </div>

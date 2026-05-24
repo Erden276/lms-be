@@ -13,9 +13,7 @@ function Login({ onLogin, onFaq }) {
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null); // 'privasi' | 'syarat' | null
 
-  if (isLoading) {
-    return <LoadingSpinner message="Menghubungkan ke sistem..." fullPage={true} />;
-  }
+
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();

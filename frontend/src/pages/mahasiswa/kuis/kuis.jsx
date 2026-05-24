@@ -449,9 +449,8 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
     );
   }
 
-  if (loading) {
-    return <LoadingSpinner message="Memuat kuis..." fullPage={true} />;
-  }
+  // Remove early LoadingSpinner return
+
 
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
@@ -492,8 +491,16 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
 
         {/* Page Content */}
         <div className="page-content">
-          {/* Quiz Header */}
-          <div className="quiz-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '15rem' }}></div>
+              <div className="skeleton-card" style={{ height: '250px', width: '100%' }}></div>
+              <div className="skeleton-card" style={{ height: '100px', width: '100%' }}></div>
+            </div>
+          ) : (
+            <>
+              {/* Quiz Header */}
+              <div className="quiz-header">
             <div className="quiz-header-left">
               <button className="quiz-back-btn-small" onClick={() => onNavigate && onNavigate("daftarTugas")}>
                 <span className="material-symbols-outlined">arrow_back</span>
@@ -592,6 +599,8 @@ export default function QuizKuis({ onNavigate, onLogout, idKuis }) {
               ))}
             </div>
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>
