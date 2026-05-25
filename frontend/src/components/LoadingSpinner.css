@@ -20,8 +20,8 @@
 
 .logo-loading-box {
   position: relative;
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,8 +50,8 @@
 }
 
 .orbit-2 {
-  width: 75%;
-  height: 75%;
+  width: 80%;
+  height: 80%;
   animation: spin-left 1.8s linear infinite;
 }
 
