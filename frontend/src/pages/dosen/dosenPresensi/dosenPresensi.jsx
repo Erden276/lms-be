@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../../../components/shared.css";
 import "./dosenPresensi.css";
 import SidebarDosen from "../../../components/SidebarDosen";
@@ -533,7 +533,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                     <div>
                       <p className="dp-detail-label">Status Sesi</p>
                       <p className={`dp-detail-value ${sessionActive ? "dp-status--active" : "dp-status--closed"}`}>
-                        {sessionActive ? "â— Berlangsung" : "â— Ditutup"}
+                        {sessionActive ? "● Berlangsung" : "● Ditutup"}
                       </p>
                     </div>
                   </div>
