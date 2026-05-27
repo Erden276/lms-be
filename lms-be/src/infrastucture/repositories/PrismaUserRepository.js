@@ -27,15 +27,13 @@ export class PrismaUserRepository {
         if (roleType === 'MAHASISWA') {
           await tx.mahasiswa.create({
             data: {
-              nim: profileData.nim,
-              nomorInduk: user.nomorInduk
+              nim: user.nomorInduk
             }
           });
         } else if (roleType === 'DOSEN') {
           await tx.dosen.create({
             data: {
-              nip: profileData.nip,
-              nomorInduk: user.nomorInduk
+              nip: user.nomorInduk
             }
           });
         }

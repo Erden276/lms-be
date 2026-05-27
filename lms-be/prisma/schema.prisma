@@ -39,8 +39,7 @@ model User {
 // 2. TABEL MAHASISWA
 model Mahasiswa {
   nim        String @id @db.VarChar(20) 
-  nomorInduk String @unique @db.VarChar(20) 
-  user       User   @relation(fields: [nomorInduk], references: [nomorInduk], onDelete: Cascade) 
+  user       User   @relation(fields: [nim], references: [nomorInduk], onDelete: Cascade) 
   
   tugas            Tugas[] 
   presensi         Presensi[] 
@@ -55,8 +54,7 @@ model Mahasiswa {
 // 3. TABEL DOSEN
 model Dosen {
   nip        String @id @db.VarChar(20) 
-  nomorInduk String @unique @db.VarChar(20) 
-  user       User   @relation(fields: [nomorInduk], references: [nomorInduk], onDelete: Cascade) 
+  user       User   @relation(fields: [nip], references: [nomorInduk], onDelete: Cascade) 
   nidn          String?      @db.VarChar(20) // Tambahan
   bidang        String?      @db.VarChar(100) // Tambahan
   ruangKantor   String?      @db.VarChar(50) // Tambahan
