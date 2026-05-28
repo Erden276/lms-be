@@ -53,13 +53,13 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
   }, [storedUser.fotoUrl, API_BASE, defaultAvatar]);
 
   const DOSEN_NOTIFICATIONS = [
-    { id: 'd1', title: 'Jadwal UTS Semester Genap', desc: 'UTS akan dilaksanakan pada tanggal 2â€“6 Juni 2026. Pastikan materi sudah diunggah sebelum pelaksanaan.', time: '1 jam lalu', read: false, type: 'akademik' },
+    { id: 'd1', title: 'Jadwal UTS Semester Genap', desc: 'UTS akan dilaksanakan pada tanggal 2-6 Juni 2026. Pastikan materi sudah diunggah sebelum pelaksanaan.', time: '1 jam lalu', read: false, type: 'akademik' },
     { id: 'd2', title: 'Pengumuman Libur Nasional', desc: 'Perkuliahan diliburkan pada Kamis, 29 Mei 2026 dalam rangka Hari Raya Waisak. Jadwal dapat disesuaikan.', time: '3 jam lalu', read: false, type: 'akademik' },
-    { id: 'd3', title: 'Jadwal UAS Semester Genap', desc: 'UAS dijadwalkan pada tanggal 30 Juni â€“ 4 Juli 2026. Dosen dimohon mengumpulkan soal maksimal 2 minggu sebelumnya.', time: '5 jam lalu', read: false, type: 'akademik' },
+    { id: 'd3', title: 'Jadwal UAS Semester Genap', desc: 'UAS dijadwalkan pada tanggal 30 Juni - 4 Juli 2026. Dosen dimohon mengumpulkan soal maksimal 2 minggu sebelumnya.', time: '5 jam lalu', read: false, type: 'akademik' },
     { id: 'd4', title: 'Batas Input Nilai UTS', desc: 'Batas akhir pengisian nilai UTS adalah 13 Juni 2026. Harap segera mengisi nilai setelah pelaksanaan ujian.', time: 'Kemarin', read: true, type: 'akademik' },
     { id: 'd5', title: 'Rapat Koordinasi Akademik', desc: 'Rapat koordinasi semester genap akan diadakan pada Jumat, 23 Mei 2026 pukul 09.00 WIB di Ruang Rapat Utama.', time: 'Kemarin', read: true, type: 'akademik' },
     { id: 'd6', title: 'Revisi Kalender Akademik', desc: 'Kalender akademik 2025/2026 telah diperbarui. Silakan unduh versi terbaru melalui portal akademik kampus.', time: '2 hari lalu', read: true, type: 'akademik' },
-    { id: 'd7', title: 'Pengisian KRS Mahasiswa', desc: 'Periode pengisian KRS semester ganjil 2026/2027 dibuka 1â€“15 Juli 2026. Dosen wali dimohon melakukan persetujuan tepat waktu.', time: '3 hari lalu', read: true, type: 'akademik' },
+    { id: 'd7', title: 'Pengisian KRS Mahasiswa', desc: 'Periode pengisian KRS semester ganjil 2026/2027 dibuka 1-15 Juli 2026. Dosen wali dimohon melakukan persetujuan tepat waktu.', time: '3 hari lalu', read: true, type: 'akademik' },
   ];
 
   useEffect(() => {

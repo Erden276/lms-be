@@ -386,7 +386,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
                 <div className="fd-topbar">
                   <div>
                     <nav className="fd-breadcrumb">
-                      <button className="fd-breadcrumb-link" onClick={handleBackToCourses}>FORUM DISKUSI</button>
+                      <button className="fd-breadcrumb-link" onClick={handleBackToCourses}>Forum Diskusi</button>
                       <span className="material-symbols-outlined">chevron_right</span>
                       <span className="fd-breadcrumb--active">{selectedMatkul?.namaMataKuliah || "MATA KULIAH"}</span>
                     </nav>

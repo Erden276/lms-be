@@ -71,14 +71,14 @@ export default function Dashboard({ onNavigate, onLogout }) {
         {/* Content */}
         <div className="page-content">
           <div className="db-grid">
-            {/* â”€â”€ Left Column â”€â”€ */}
+            {/* -- Left Column -- */}
             <div className="db-left">
               <div className="db-page-header">
                 <h1>Dashboard Mahasiswa</h1>
                 <p>Selamat datang kembali</p>
               </div>
 
-              {/* Hero Card â€” clickable to profile */}
+              {/* Hero Card - clickable to profile */}
               <div
                 className="db-hero-card"
                 style={{ cursor: "pointer" }}
@@ -186,7 +186,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* â”€â”€ Right Column â”€â”€ */}
+            {/* -- Right Column -- */}
             <div className="db-right">
               {/* Presensi Card */}
               <div className="db-presensi-card">
@@ -227,7 +227,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
                 </div>
               </div>
 
-              {/* Class Card â€” clickable to mata kuliah */}
+              {/* Class Card - clickable to mata kuliah */}
               {loading ? (
                 <div className="skeleton-card" style={{ height: "180px" }}></div>
               ) : dashboardData?.mataKuliah?.length > 0 ? (
@@ -256,7 +256,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
                           {dashboardData.mataKuliah[0]?.dosenNama || "Dosen"}
                           {dashboardData.mataKuliah[0]?.jadwal && (
                             <span style={{ marginLeft: "0.5rem", color: "var(--color-secondary)" }}>
-                              â€¢ {dashboardData.mataKuliah[0]?.jadwal}
+                              • {dashboardData.mataKuliah[0]?.jadwal}
                             </span>
                           )}
                         </p>

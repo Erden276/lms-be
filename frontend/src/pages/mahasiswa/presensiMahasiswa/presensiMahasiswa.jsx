@@ -245,7 +245,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
       <main className="page-main" style={{ backgroundColor: "var(--color-background)" }}>
         <Navbar role="Mahasiswa" onOpenSidebar={openSidebar} onNavigate={onNavigate} />
 
-        {/* â”€â”€ Toast Notification â”€â”€ */}
+        {/* -- Toast Notification -- */}
         {toast && (
           <div className={`pmh-toast pmh-toast--${toast.type}`}>
             <span className="material-symbols-outlined">
@@ -481,7 +481,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     return filtered.length > 0 ? filtered.map((h, i) => (
                     <div key={i} className="pmh-history-item">
                       <div className="pmh-history-left">
-                        <p className="pmh-history-course">{h.code} â€” {h.name}</p>
+                        <p className="pmh-history-course">{h.code} - {h.name}</p>
                         <p className="pmh-history-date">{h.date} Â· {h.time}</p>
                       </div>
                       <StatusBadge status={h.status} />

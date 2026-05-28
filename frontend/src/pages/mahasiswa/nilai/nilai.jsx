@@ -38,7 +38,7 @@ function NilaiBadge({ nilai }) {
 }
 
 function scoreBar(score) {
-  if (score === null || score === undefined) return "â€”";
+  if (score === null || score === undefined) return "-";
   return score;
 }
 
@@ -52,7 +52,7 @@ function getIPKKumulatif(semesters) {
       totalSks += sem.sks;
     }
   });
-  return totalSks > 0 ? (totalBobot / totalSks).toFixed(2) : "â€”";
+  return totalSks > 0 ? (totalBobot / totalSks).toFixed(2) : "-";
 }
 
 function calculateGrade(tugas, kuis) {
@@ -144,7 +144,7 @@ export default function Nilai({ onNavigate, onLogout }) {
 
             return {
               label: !isAktif ? `Semester ${k}` : `Semester ${k} (Aktif)`,
-              year: !isAktif ? "Tahun Akademik 2023/2024" : "Sedang Berlangsung â€” Nilai belum final",
+              year: !isAktif ? "Tahun Akademik 2023/2024" : "Sedang Berlangsung - Nilai belum final",
               ipk: ipk,
               sks: totalSks,
               matkul: matkul,
@@ -191,10 +191,10 @@ export default function Nilai({ onNavigate, onLogout }) {
           <td>${mk.kode}</td>
           <td>${mk.nama}</td>
           <td style="text-align:center">${mk.sks}</td>
-          <td style="text-align:center">${mk.tugas ?? 'â€”'}</td>
-          <td style="text-align:center">${mk.uts ?? 'â€”'}</td>
-          <td style="text-align:center">${mk.uas ?? 'â€”'}</td>
-          <td style="text-align:center">${mk.nilai ?? 'â€”'}</td>
+          <td style="text-align:center">${mk.tugas ?? '-'}</td>
+          <td style="text-align:center">${mk.uts ?? '-'}</td>
+          <td style="text-align:center">${mk.uas ?? '-'}</td>
+          <td style="text-align:center">${mk.nilai ?? '-'}</td>
         </tr>
       `)
     ).join('');
@@ -244,7 +244,7 @@ export default function Nilai({ onNavigate, onLogout }) {
     sks: 0,
     ipk: null,
   };
-  const ipkKumulatif = semesters.length > 0 ? getIPKKumulatif(semesters) : "â€”";
+  const ipkKumulatif = semesters.length > 0 ? getIPKKumulatif(semesters) : "-";
   const totalSksSelesai =
     semesters.length > 0
       ? semesters
@@ -337,7 +337,7 @@ export default function Nilai({ onNavigate, onLogout }) {
             <div>
               <h1 className="nlai-title">{"Transkrip Nilai"}</h1>
               <p className="nlai-subtitle">
-                {"Rekap nilai akademik "}{storedUser.nama || "Mahasiswa"}{" â€” NIM "}{storedUser.nomorInduk || "NIM"}
+                {"Rekap nilai akademik "}{storedUser.nama || "Mahasiswa"}{" - NIM "}{storedUser.nomorInduk || "NIM"}
               </p>
             </div>
             <button
@@ -503,7 +503,7 @@ export default function Nilai({ onNavigate, onLogout }) {
                                 : "nlai-avg nlai-avg--pending"
                             }
                           >
-                            {avg !== null ? avg : "â€”"}
+                            {avg !== null ? avg : "-"}
                           </span>
                         </td>
                         <td className="nlai-center">
@@ -553,7 +553,7 @@ export default function Nilai({ onNavigate, onLogout }) {
                 })}
             </div>
             <div className="nlai-chart-legend">
-              <span>{"Skala 4.0 â€” IP â‰¥ 3.51 = Cum Laude"}</span>
+              <span>{"Skala 4.0 - IP >= 3.51 = Cum Laude"}</span>
             </div>
           </div>
             </>
