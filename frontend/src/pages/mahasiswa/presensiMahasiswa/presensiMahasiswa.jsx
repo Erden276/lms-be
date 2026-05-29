@@ -28,7 +28,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   // scan states: idle | scanning | success | error
   const [scanState, setScanState]   = useState("idle");
-  const [selectedClass, setSelectedClass] = useState(0); 
+  const [selectedClassId, setSelectedClassId] = useState(null);
+  const [activeTab, setActiveTab] = useState("hariIni"); // hariIni | semua
   const [toast, setToast]           = useState(null);   
   const [scanCode, setScanCode]     = useState("");
   const [upcoming, setUpcoming]     = useState([]);
@@ -37,6 +38,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
   const scanTimeoutRef              = useRef(null);
   const html5QrCodeRef              = useRef(null);
   const scannerContainerId          = "pmh-qr-reader";
+
+  const activeClass = upcoming.find(c => c.id === selectedClassId) || upcoming[0];
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -53,17 +56,16 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
         }));
         setUpcoming(formatted);
 
-        // Auto-select class that is today and currently ongoing
         if (formatted.length > 0) {
           const daysIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
           const now = new Date();
           const todayName = daysIndo[now.getDay()].toLowerCase();
           const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-          let selectedIndex = 0; // fallback to first class
+          let selectedId = null;
           let foundOngoing = false;
           let foundToday = false;
-          let todayFirstIndex = -1;
+          let todayFirstId = null;
 
           for (let i = 0; i < formatted.length; i++) {
             const c = formatted[i];
@@ -71,8 +73,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
             const scheduledDays = c.jadwal.split(',').map(d => d.trim().toLowerCase());
             if (scheduledDays.includes(todayName)) {
-              if (todayFirstIndex === -1) {
-                todayFirstIndex = i;
+              if (todayFirstId === null) {
+                todayFirstId = c.id;
               }
               foundToday = true;
 
@@ -88,7 +90,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     const endMinutes = endH * 60 + endM;
 
                     if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-                      selectedIndex = i;
+                      selectedId = c.id;
                       foundOngoing = true;
                       break;
                     }
@@ -99,11 +101,14 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
           }
 
           if (foundOngoing) {
-            setSelectedClass(selectedIndex);
-          } else if (foundToday && todayFirstIndex !== -1) {
-            setSelectedClass(todayFirstIndex);
+            setSelectedClassId(selectedId);
+            setActiveTab("hariIni");
+          } else if (foundToday && todayFirstId !== null) {
+            setSelectedClassId(todayFirstId);
+            setActiveTab("hariIni");
           } else {
-            setSelectedClass(0);
+            setSelectedClassId(formatted[0].id);
+            setActiveTab("semua"); // Fallback to semua tab if no classes today
           }
         }
       } catch (error) {
@@ -118,12 +123,12 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
   useEffect(() => () => clearTimeout(scanTimeoutRef.current), []);
 
   const fetchHistory = useCallback(async () => {
-    if (upcoming.length > 0 && upcoming[selectedClass]) {
+    if (activeClass) {
       try {
         const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
         // Add cache-busting to get fresh data
-        const res = await apiClient.get(`/api/presensi/mahasiswa/${upcoming[selectedClass].id}?_t=${Date.now()}`);
+        const res = await apiClient.get(`/api/presensi/mahasiswa/${activeClass.id}?_t=${Date.now()}`);
         const allData = res.data || res || [];
         const myRecords = Array.isArray(allData) ? allData : [];
 
@@ -167,8 +172,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
               date: localDate
                 ? localDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' })
                 : "-",
-              code: upcoming[selectedClass].code,
-              name: upcoming[selectedClass].name,
+              code: activeClass.code,
+              name: activeClass.name,
               status: displayStatus,
               time: localWaktu ? localWaktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : "-",
               rawStatus: h.statusKehadiran,
@@ -181,7 +186,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
         setHistory([]);
       }
     }
-  }, [selectedClass, upcoming]);
+  }, [activeClass]);
 
   useEffect(() => {
     fetchHistory();
@@ -210,13 +215,13 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
     await stopCamera();
     setScanState("scanning");
     try {
-      if (!upcoming[selectedClass]) throw new Error("Pilih kelas terlebih dahulu");
+      if (!activeClass) throw new Error("Pilih kelas terlebih dahulu");
       await apiClient.post("/api/presensi/scan", {
-        idMataKuliah: upcoming[selectedClass].id,
+        idMataKuliah: activeClass.id,
         token: decodedText
       });
       setScanState("success");
-      showToast("success", `Absen berhasil! ${upcoming[selectedClass].name}`);
+      showToast("success", `Absen berhasil! ${activeClass.name}`);
       // Refresh riwayat untuk update waktu presensi
       await fetchHistory();
     } catch (error) {
@@ -224,10 +229,10 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
       showToast("error", error.message || "Gagal melakukan presensi");
       setTimeout(() => setScanState("idle"), 2000);
     }
-  }, [upcoming, selectedClass, stopCamera, fetchHistory]);
+  }, [activeClass, stopCamera, fetchHistory]);
 
   const startScan = async () => {
-    if (!upcoming[selectedClass]) {
+    if (!activeClass) {
       showToast("error", "Pilih kelas terlebih dahulu");
       return;
     }
@@ -259,16 +264,16 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
   const handleManualSubmit = async (e) => {
     e.preventDefault();
-    if (!scanCode.trim() || !upcoming[selectedClass]) return;
+    if (!scanCode.trim() || !activeClass) return;
     
     setScanState("scanning");
     try {
       await apiClient.post("/api/presensi/scan", {
-        idMataKuliah: upcoming[selectedClass].id,
+        idMataKuliah: activeClass.id,
         token: scanCode.trim()
       });
       setScanState("success");
-      showToast("success", `Absen berhasil! ${upcoming[selectedClass].name}`);
+      showToast("success", `Absen berhasil! ${activeClass.name}`);
       // Refresh riwayat untuk update waktu presensi
       await fetchHistory();
     } catch (error) {
@@ -325,20 +330,59 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
             <div className="pmh-scanner-col">
               {/* Class selector */}
               <div className="pmh-class-selector">
-                <p className="pmh-class-selector-label">Pilih Kelas yang Sedang Berlangsung</p>
-                <div className="pmh-class-tabs">
-                  {upcoming.length > 0 ? upcoming.map((c, i) => (
-                    <button
-                      key={c.id}
-                      className={`pmh-class-tab ${selectedClass === i ? "pmh-class-tab--active" : ""}`}
-                      onClick={() => { setSelectedClass(i); resetScan(); }}
-                    >
-                      <span className="pmh-class-tab-code">{c.code}</span>
-                      <span className="pmh-class-tab-name">{c.name}</span>
-                    </button>
-                  )) : (
-                    <p style={{ color: "var(--slate-500)" }}>Belum terdaftar di mata kuliah manapun</p>
-                  )}
+                <p className="pmh-class-selector-label" style={{ fontWeight: 800, fontSize: "0.875rem", color: "#475569", marginBottom: "1rem" }}>Pilih Kelas</p>
+                
+                {/* Toggle Tab */}
+                <div className="pmh-toggle-container">
+                  <button 
+                    className={`pmh-toggle-btn ${activeTab === 'hariIni' ? 'pmh-toggle-btn--active' : ''}`}
+                    onClick={() => setActiveTab('hariIni')}
+                  >
+                    Jadwal Hari Ini
+                  </button>
+                  <button 
+                    className={`pmh-toggle-btn ${activeTab === 'semua' ? 'pmh-toggle-btn--active' : ''}`}
+                    onClick={() => setActiveTab('semua')}
+                  >
+                    Semua Jadwal
+                  </button>
+                </div>
+
+                {/* Class List */}
+                <div className="pmh-class-list">
+                  {(() => {
+                    const daysIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const todayName = daysIndo[new Date().getDay()].toLowerCase();
+                    
+                    const filtered = activeTab === 'hariIni' 
+                      ? upcoming.filter(c => c.jadwal && c.jadwal.split(',').map(d => d.trim().toLowerCase()).includes(todayName))
+                      : upcoming;
+
+                    if (filtered.length === 0) {
+                      return (
+                        <p style={{ color: "var(--slate-500)", textAlign: "center", padding: "1.5rem 0", fontSize: "0.875rem" }}>
+                          {activeTab === 'hariIni' ? 'Tidak ada jadwal kelas hari ini.' : 'Belum terdaftar di mata kuliah manapun.'}
+                        </p>
+                      );
+                    }
+
+                    return filtered.map((c) => (
+                      <div
+                        key={c.id}
+                        className={`pmh-class-card ${selectedClassId === c.id ? "pmh-class-card--active" : ""}`}
+                        onClick={() => { setSelectedClassId(c.id); resetScan(); }}
+                      >
+                        <div className="pmh-class-card-header">
+                          <span className="pmh-class-card-badge">{c.code}</span>
+                          <span className="pmh-class-card-name">{c.name}</span>
+                        </div>
+                        <div className="pmh-class-card-time-row">
+                          <span className="material-symbols-outlined">schedule</span>
+                          <span>{c.jadwal ? `${c.jadwal} · ${c.waktu || '08:00 - 10:30'}` : (c.waktu || '08:00 - 10:30')}</span>
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
 
@@ -389,7 +433,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                       </div>
                       <div className="pmh-success-info">
                         <p className="pmh-success-title">Absen Berhasil!</p>
-                        <p className="pmh-success-sub">{upcoming[selectedClass]?.name}</p>
+                        <p className="pmh-success-sub">{activeClass?.name}</p>
                         <p className="pmh-success-time">
                           {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
                         </p>
@@ -443,11 +487,11 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     LIVE
                   </span>
                 </div>
-                <h3 className="pmh-session-name">{upcoming[selectedClass]?.name || "Memuat..."}</h3>
+                <h3 className="pmh-session-name">{activeClass?.name || "Memuat..."}</h3>
                 <div className="pmh-session-details">
                   <div className="pmh-detail-row">
                     <span className="material-symbols-outlined">tag</span>
-                    <span>Kode: {upcoming[selectedClass]?.code || "-"}</span>
+                    <span>Kode: {activeClass?.code || "-"}</span>
                   </div>
                   <div className="pmh-detail-row">
                     <span className="material-symbols-outlined">event_available</span>

@@ -8,8 +8,7 @@ getDashboard = async (req, res) => {
     try {
       // Mengambil nomorInduk dari token JWT yang sudah di-decode oleh authMiddleware
         const nomorInduk = req.user.nomorInduk; 
-        const hari = req.query.hari;
-        const dashboardData = await this.useCase.getDashboardData(nomorInduk, hari);
+        const dashboardData = await this.useCase.getDashboardData(nomorInduk);
         res.status(200).json(dashboardData);
     } catch (error) {
         console.error("Dashboard Dosen Error:", error.message);

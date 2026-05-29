@@ -40,9 +40,7 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
         if (storedUser.fotoUrl) {
           setAvatarUrl(`${API_BASE}${storedUser.fotoUrl}`);
         }
-        const now = new Date();
-        const hariIni = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'][now.getDay()];
-        const res = await apiClient.get(`/api/dosen/dashboard?hari=${hariIni}`);
+        const res = await apiClient.get('/api/dosen/dashboard');
         if (res && res.data) {
           setDashboardData(res.data);
         } else if (res) {
@@ -259,55 +257,6 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                   )}
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          {/* Footer Grid: Jadwal + Banner */}
-          <div className="dd-footer-grid" style={{ marginTop: "2rem" }}>
-            {/* Schedule Card */}
-            <div className="dd-schedule-card">
-              <div className="dd-sched-header">
-                <h3>Jadwal Hari Ini</h3>
-                <span>{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-              </div>
-              <div className="dd-sched-list">
-                {loading ? (
-                  [1, 2].map((idx) => (
-                    <div key={idx} className="dd-sched-item skeleton-shimmer" style={{ height: "4.5rem", border: "none" }}></div>
-                  ))
-                ) : dashboardData?.jadwal?.length > 0 ? (
-                  dashboardData.jadwal.map((j, idx) => (
-                    <div key={idx} className="dd-sched-item dd-sched-item--clickable" onClick={() => nav("dosenPresensi")}>
-                      <div className="dd-time-box" style={{ backgroundColor: "var(--color-secondary)" }}>
-                        <span className="dd-time-val">{j.waktu.split('-')[0].trim()}</span>
-                        <span className="dd-time-zone">WIB</span>
-                      </div>
-                      <div className="dd-sched-info">
-                        <p className="dd-sched-name">{j.mataKuliah}</p>
-                        <p className="dd-sched-room">{j.ruang} • {j.waktu}</p>
-                      </div>
-                      <button className="dd-arrow-btn">
-                        <span className="material-symbols-outlined">chevron_right</span>
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p style={{ textAlign: "center", padding: "2rem", color: "var(--slate-500)" }}>Tidak ada jadwal mengajar hari ini.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Banner Card */}
-            <div className="dd-banner-card">
-              <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80" alt="Banner background" />
-              <div className="dd-banner-overlay">
-                <h3>Hasilkan QR Presensi Lebih Cepat</h3>
-                <p>Klik tombol di bawah untuk langsung menuju halaman presensi dan membuka sesi kehadiran kelas.</p>
-                <button className="dd-report-btn" onClick={() => nav("dosenPresensi")}>
-                  <span className="material-symbols-outlined">qr_code_2</span>
-                  Buka Presensi
-                </button>
-              </div>
             </div>
           </div>
 

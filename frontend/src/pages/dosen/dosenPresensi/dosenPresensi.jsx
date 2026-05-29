@@ -122,58 +122,8 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
         }));
         setMataKuliahList(formatted);
         if (formatted.length > 0 && !selectedMatkul?.id) {
-          const daysIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-          const now = new Date();
-          const todayName = daysIndo[now.getDay()].toLowerCase();
-          const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-          let selectedIndex = 0;
-          let foundOngoing = false;
-          let foundToday = false;
-          let todayFirstIndex = -1;
-
-          for (let i = 0; i < formatted.length; i++) {
-            const c = formatted[i];
-            if (!c.jadwal) continue;
-
-            const scheduledDays = c.jadwal.split(',').map(d => d.trim().toLowerCase());
-            if (scheduledDays.includes(todayName)) {
-              if (todayFirstIndex === -1) {
-                todayFirstIndex = i;
-              }
-              foundToday = true;
-
-              if (c.time) {
-                const parts = c.time.split('-');
-                if (parts.length === 2) {
-                  const [startStr, endStr] = parts.map(p => p.trim());
-                  const [startH, startM] = startStr.split(':').map(Number);
-                  const [endH, endM] = endStr.split(':').map(Number);
-
-                  if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM)) {
-                    const startMinutes = startH * 60 + startM;
-                    const endMinutes = endH * 60 + endM;
-
-                    if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-                      selectedIndex = i;
-                      foundOngoing = true;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          let defaultSelection = formatted[0];
-          if (foundOngoing) {
-            defaultSelection = formatted[selectedIndex];
-          } else if (foundToday && todayFirstIndex !== -1) {
-            defaultSelection = formatted[todayFirstIndex];
-          }
-
-          setSelectedMatkul(defaultSelection);
-          setSelectedDays(defaultSelection.jadwal ? defaultSelection.jadwal.split(',') : []);
+          setSelectedMatkul(formatted[0]);
+          setSelectedDays(formatted[0].jadwal ? formatted[0].jadwal.split(',') : []);
         }
       } catch (error) {
         console.error("Failed to load courses");
