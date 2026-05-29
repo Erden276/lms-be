@@ -151,7 +151,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
       deskripsi: item.deskripsi,
       url: item.url || "",
       file: null,
-      canDownload: item.canDownload,
+      canDownload: true, // Force to true since restriction is removed
     });
     setEditId(item.id);
     setView("edit");
@@ -813,36 +813,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                       />
                     </div>
 
-                    {/* Can Download toggle */}
-                    <div className="dm-field dm-field--full">
-                      <label className="dm-label">Izin Unduh</label>
-                      <div className="dm-toggle-row">
-                        <button
-                          type="button"
-                          className={`dm-toggle-opt ${form.canDownload ? "dm-toggle-opt--on" : ""}`}
-                          onClick={() =>
-                            setForm({ ...form, canDownload: true })
-                          }
-                        >
-                          <span className="material-symbols-outlined">
-                            download
-                          </span>
-                          Mahasiswa boleh mengunduh
-                        </button>
-                        <button
-                          type="button"
-                          className={`dm-toggle-opt ${!form.canDownload ? "dm-toggle-opt--off" : ""}`}
-                          onClick={() =>
-                            setForm({ ...form, canDownload: false })
-                          }
-                        >
-                          <span className="material-symbols-outlined">
-                            visibility
-                          </span>
-                          Hanya bisa dilihat / dibuka
-                        </button>
-                      </div>
-                    </div>
+
                   </div>
 
                   {/* Actions */}

@@ -6,6 +6,8 @@ import { useSidebar } from "../../../components/useSidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBjoXu55KCdSSPl-2t0t7d2EH6gux6Xz8nZaCdXHePrj-gGn1ZWZyBoOucWc2yVgrhmNFyy8cKbxWH8i9Wm5VKkpqX9jraXjkHTr8PVU1oN3V4nkzLWUUm6nyAIS3hGDic_uY0YoNLNNZluKTKqFwJb2gYlRl9eATGdlXClTx6IXpYvk-2u1qqvfUGTzs-QJPlXTouWTyNYzTe8j8mS09evVA_aHTYfHxneVwUsb2jUygYzuAIDU5KwqO2kISzLvnzaTentePscoGoo";
 
@@ -767,7 +769,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                         </span>
                         {group.submitted && group.fileKumpulan && (
                           <a
-                            href={`http://localhost:3000${group.fileKumpulan}`}
+                            href={`${API_BASE}${group.fileKumpulan}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ fontSize: "0.75rem", color: "#4b53bc", display: "flex", alignItems: "center", gap: "0.25rem", textDecoration: "none" }}

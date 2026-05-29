@@ -8,6 +8,8 @@ import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [activeModule, setActiveModule] = useState(null);
@@ -301,7 +303,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                           } else if (activeData?.action === "open") {
                             window.open(activeData.url, '_blank');
                           } else if (activeData?.action === "download") {
-                            const fileUrl = activeData.url?.startsWith('http') ? activeData.url : `http://localhost:3000${activeData.url}`;
+                            const fileUrl = activeData.url?.startsWith('http') ? activeData.url : `${API_BASE}${activeData.url}`;
                             window.open(fileUrl, '_blank');
                           }
                         }} style={{ cursor: "pointer" }}>
@@ -418,7 +420,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                                 }
                                 showToast(`Mengunduh: ${m.title}`);
                                 // Use absolute URL if provided, otherwise prepend base URL
-                                const fileUrl = m.url?.startsWith('http') ? m.url : `http://localhost:3000${m.url}`;
+                                const fileUrl = m.url?.startsWith('http') ? m.url : `${API_BASE}${m.url}`;
                                 window.open(fileUrl, '_blank');
                               }}
                             >
