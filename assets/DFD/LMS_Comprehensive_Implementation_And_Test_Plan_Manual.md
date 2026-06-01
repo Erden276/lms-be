@@ -202,4 +202,21 @@ Untuk mengukur keberhasilan tingkat kegunaan antarmuka aplikasi, metrik berikut 
 ---
 
 > [!TIP]
-> Dokumen berformat Markdown ini dirancang secara struktural agar siap disalin secara langsung (*copy-paste*) ke dalam platform AI pembuat dokumen (seperti ChatGPT, Claude, atau Word AI) untuk secara otomatis dikonversi menjadi dokumen resmi berformat Microsoft Word (.docx) lengkap dengan kop surat dan format penomoran akademis standar.
+> **Prompt untuk AI (ChatGPT/Claude/Gemini):**
+> Anda dapat menyalin prompt di bawah ini beserta seluruh isi dokumen markdown ini ke AI lain untuk dibuatkan dokumen Word yang rapi:
+
+---
+
+**[COPY MULAI DARI SINI UNTUK PROMPT AI]**
+
+Tolong bertindak sebagai Technical Writer profesional. Saya memiliki draf dokumen teknis berformat Markdown yang berisi "Standar Dokumentasi & Rencana Pengujian (Test Plan) Panduan Terintegrasi: DFD Level 1, Sequence Diagram, dan Testing". 
+
+Tugas Anda adalah:
+1. Mengubah struktur dan isi teks ini menjadi format dokumen resmi yang sangat rapi.
+2. Tolong buatkan ini agar siap disalin ke Microsoft Word. Gunakan heading yang jelas (H1, H2, H3).
+3. Buatkan bagian tabel dengan format tabel yang bersih dan proporsional (terutama untuk "Backend Test Plan" dan "Matriks Penyelarasan").
+4. Tambahkan bagian pengantar singkat di awal dokumen sebagai kata pengantar dokumen spesifikasi.
+5. Gunakan bahasa Indonesia baku yang sesuai dengan standar akademik/laporan teknis kampus.
+
+Berikut adalah draf Markdown-nya:
+*(...paste isi markdown mulai dari "1. STANDAR INSTALLATION MANUAL" sampai "MATRIKS PENYELARASAN" di sini...)*

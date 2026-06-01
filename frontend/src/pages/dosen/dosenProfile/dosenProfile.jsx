@@ -132,13 +132,24 @@ export default function DosenProfile({ onNavigate, onLogout }) {
       showToast("error", "Kata sandi baru tidak cocok.");
       return;
     }
-    if (pwForm.newPw.length < 8) {
-      showToast("error", "Kata sandi baru minimal 8 karakter.");
+    if (pwForm.newPw.length < 6) {
+      showToast("error", "Kata sandi baru minimal 6 karakter.");
       return;
     }
-    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
-    if (!specialCharRegex.test(pwForm.newPw)) {
-      showToast("error", "Kata sandi baru harus mengandung karakter unik/simbol.");
+    if (!/[A-Z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf besar.");
+      return;
+    }
+    if (!/[a-z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf kecil.");
+      return;
+    }
+    if (!/[0-9]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung angka.");
+      return;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung simbol.");
       return;
     }
     try {
