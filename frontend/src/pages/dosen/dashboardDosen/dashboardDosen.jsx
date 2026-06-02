@@ -134,7 +134,7 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
               <h2 className="dd-title">Dashbord Dosen</h2>
               <p className="dd-subtitle">
                 {loading
-                  ? "Memuat ringkasan kurasi akademik Anda..."
+                  ? "Memuat ringkasan akademik Anda..."
                   : `Selamat pagi, Pak / Bu ${dashboardData?.lecturerName || "Dosen"}. Berikut ringkasan kurasi akademik Anda hari ini.`}
               </p>
             </div>
@@ -205,7 +205,6 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                     {dashboardData?.stats?.tugasIndividu || 0}
                   </p>
                 </div>
-
               </>
             )}
           </div>

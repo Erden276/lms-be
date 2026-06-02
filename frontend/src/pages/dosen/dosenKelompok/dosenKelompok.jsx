@@ -598,34 +598,39 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                 color: "#059669",
               },
             ].map((s) => (
-              <div key={s.label} className="dk-stat-mini">
-                <span
-                  className="material-symbols-outlined"
-                  style={{ color: s.color }}
-                >
-                  {s.icon}
-                </span>
-                <div>
-                  <p className="dk-stat-val" style={{ color: s.color }}>
-                    {loading ? (
-                      <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                    ) : (
-                      s.value
-                    )}
-                  </p>
-                  <p className="dk-stat-lbl">{s.label}</p>
+              loading ? (
+                <div key={s.label} className="dk-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+              ) : (
+                <div key={s.label} className="dk-stat-mini">
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ color: s.color }}
+                  >
+                    {s.icon}
+                  </span>
+                  <div>
+                    <p className="dk-stat-val" style={{ color: s.color }}>
+                      {s.value}
+                    </p>
+                    <p className="dk-stat-lbl">{s.label}</p>
+                  </div>
                 </div>
-              </div>
+              )
             ))}
           </div>
 
           {/* Groups */}
           <div className="dk-groups-grid">
-            {groups.map((group) => {
-              const graded = Object.values(group.nilai).filter(
-                (v) => v !== "",
-              ).length;
-              return (
+            {loading ? (
+              [1, 2, 3].map((idx) => (
+                <div key={idx} className="dk-group-card skeleton-card" style={{ height: '350px', border: 'none' }}></div>
+              ))
+            ) : (
+              groups.map((group) => {
+                const graded = Object.values(group.nilai).filter(
+                  (v) => v !== "",
+                ).length;
+                return (
                 <div key={group.id} className="dk-group-card">
                   {/* Card Header */}
                   <div
@@ -798,7 +803,8 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                   </div>
                 </div>
               );
-            })}
+            })
+            )}
           </div>
         </div>
       </main>
