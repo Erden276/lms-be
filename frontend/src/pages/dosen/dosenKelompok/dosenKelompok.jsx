@@ -11,7 +11,17 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBjoXu55KCdSSPl-2t0t7d2EH6gux6Xz8nZaCdXHePrj-gGn1ZWZyBoOucWc2yVgrhmNFyy8cKbxWH8i9Wm5VKkpqX9jraXjkHTr8PVU1oN3V4nkzLWUUm6nyAIS3hGDic_uY0YoNLNNZluKTKqFwJb2gYlRl9eATGdlXClTx6IXpYvk-2u1qqvfUGTzs-QJPlXTouWTyNYzTe8j8mS09evVA_aHTYfHxneVwUsb2jUygYzuAIDU5KwqO2kISzLvnzaTentePscoGoo";
 
-const MEMBER_COLORS = ["#4b53bc", "#2f9696", "#c47f17", "#7c3aed", "#0891b2", "#059669", "#dc2626", "#be185d", "#8991fe"];
+const MEMBER_COLORS = [
+  "#4b53bc",
+  "#2f9696",
+  "#c47f17",
+  "#7c3aed",
+  "#0891b2",
+  "#059669",
+  "#dc2626",
+  "#be185d",
+  "#8991fe",
+];
 
 function initials(name) {
   if (!name) return "?";
@@ -66,8 +76,8 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   };
 
   const normalizeGroup = (g) => {
-    const members = (g.members || []).map(m =>
-      typeof m === 'string' ? { nim: m, name: m, nomorInduk: m } : m
+    const members = (g.members || []).map((m) =>
+      typeof m === "string" ? { nim: m, name: m, nomorInduk: m } : m,
     );
     return { ...g, members, nilai: g.nilai || {} };
   };
@@ -75,7 +85,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   const fetchGroups = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/api/kelompok');
+      const res = await apiClient.get("/api/kelompok");
       const data = res?.data || res;
       if (Array.isArray(data)) {
         setGroups(data.map(normalizeGroup));
@@ -89,7 +99,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
 
   const fetchAllStudents = async () => {
     try {
-      const data = await apiClient.get('/api/kelompok/mahasiswa/all');
+      const data = await apiClient.get("/api/kelompok/mahasiswa/all");
       if (Array.isArray(data)) {
         setAllStudents(data);
       }
@@ -106,8 +116,8 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
 
   const fetchCourses = async () => {
     try {
-      const res = await apiClient.get('/api/mata-kuliah');
-      const data = Array.isArray(res) ? res : (res.data || []);
+      const res = await apiClient.get("/api/mata-kuliah");
+      const data = Array.isArray(res) ? res : res.data || [];
       setMataKuliahList(data);
     } catch (error) {
       console.error("Gagal memuat mata kuliah:", error);
@@ -122,7 +132,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   const saveNilai = async () => {
     try {
       await apiClient.put(`/api/kelompok/${nilaiModal.id}/grades`, {
-        grades: gradeInputs
+        grades: gradeInputs,
       });
       setNilaiModal(null);
       showToast("Nilai berhasil disimpan!");
@@ -145,7 +155,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   const addMember = async (groupId, nim) => {
     try {
       await apiClient.post(`/api/kelompok/${groupId}/members`, {
-        nim: nim
+        nim: nim,
       });
       showToast("Anggota berhasil ditambahkan!");
       await fetchGroups();
@@ -164,10 +174,10 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
       return;
     }
     try {
-      await apiClient.post('/api/kelompok', {
+      await apiClient.post("/api/kelompok", {
         name: newGroupName.trim(),
         idMataKuliah: parseInt(selectedMkId),
-        task: newGroupTask.trim() || null
+        task: newGroupTask.trim() || null,
       });
       setNewGroupName("");
       setNewGroupTask("");
@@ -198,17 +208,19 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   };
 
   const getMemberColor = (nim) => {
-    const idx = allStudents.findIndex(s => s.nim === nim);
+    const idx = allStudents.findIndex((s) => s.nim === nim);
     return MEMBER_COLORS[idx >= 0 ? idx % MEMBER_COLORS.length : 0];
   };
 
   const availableStudents = (groupId) => {
-    const targetGroup = groups.find(g => g.id === groupId);
+    const targetGroup = groups.find((g) => g.id === groupId);
     if (!targetGroup) return allStudents;
     // Exclude mahasiswa yang sudah ada di kelompok manapun dalam matkul yang sama
-    const sameMkGroups = groups.filter(g => g.idMataKuliah === targetGroup.idMataKuliah);
+    const sameMkGroups = groups.filter(
+      (g) => g.idMataKuliah === targetGroup.idMataKuliah,
+    );
     const alreadyInAnyGroup = new Set(
-      sameMkGroups.flatMap(g => g.members.map(m => m.nim))
+      sameMkGroups.flatMap((g) => g.members.map((m) => m.nim)),
     );
     return allStudents.filter((s) => !alreadyInAnyGroup.has(s.nim));
   };
@@ -246,49 +258,49 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
             </div>
             <div className="dk-modal-body">
               {nilaiModal.members.map((member) => (
-                  <div key={member.nim} className="dk-grade-row">
-                    <div className="dk-grade-student">
-                      <div
-                        className="dk-avatar-sm"
-                        style={{ background: getMemberColor(member.nim) }}
-                      >
-                        {initials(member.name)}
-                      </div>
-                      <div>
-                        <p className="dk-grade-name">{member.name}</p>
-                        <p className="dk-grade-nim">{member.nim}</p>
-                      </div>
+                <div key={member.nim} className="dk-grade-row">
+                  <div className="dk-grade-student">
+                    <div
+                      className="dk-avatar-sm"
+                      style={{ background: getMemberColor(member.nim) }}
+                    >
+                      {initials(member.name)}
                     </div>
-                    <div className="dk-grade-input-wrap">
-                      <input
-                        className="dk-grade-input"
-                        type="number"
-                        min={0}
-                        max={100}
-                        placeholder="0-100"
-                        value={gradeInputs[member.nim] ?? ""}
-                        onChange={(e) =>
-                          setGradeInputs({
-                            ...gradeInputs,
-                            [member.nim]: e.target.value,
-                          })
-                        }
-                      />
-                      <span className="dk-grade-scale">/100</span>
-                      {gradeInputs[member.nim] && (
-                        <span className="dk-letter-grade">
-                          {+gradeInputs[member.nim] >= 85
-                            ? "A"
-                            : +gradeInputs[member.nim] >= 70
-                              ? "B"
-                              : +gradeInputs[member.nim] >= 55
-                                ? "C"
-                                : "D"}
-                        </span>
-                      )}
+                    <div>
+                      <p className="dk-grade-name">{member.name}</p>
+                      <p className="dk-grade-nim">{member.nim}</p>
                     </div>
                   </div>
-                ))}
+                  <div className="dk-grade-input-wrap">
+                    <input
+                      className="dk-grade-input"
+                      type="number"
+                      min={0}
+                      max={100}
+                      placeholder="0-100"
+                      value={gradeInputs[member.nim] ?? ""}
+                      onChange={(e) =>
+                        setGradeInputs({
+                          ...gradeInputs,
+                          [member.nim]: e.target.value,
+                        })
+                      }
+                    />
+                    <span className="dk-grade-scale">/100</span>
+                    {gradeInputs[member.nim] && (
+                      <span className="dk-letter-grade">
+                        {+gradeInputs[member.nim] >= 85
+                          ? "A"
+                          : +gradeInputs[member.nim] >= 70
+                            ? "B"
+                            : +gradeInputs[member.nim] >= 55
+                              ? "C"
+                              : "D"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="dk-modal-footer">
               <button
@@ -315,56 +327,81 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
               maxWidth: "400px",
               textAlign: "center",
               padding: "2rem",
-              borderRadius: "var(--radius-lg)"
+              borderRadius: "var(--radius-lg)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "1.25rem"
-            }}>
-              <div style={{
+            <div
+              style={{
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
-                width: "4rem",
-                height: "4rem",
-                borderRadius: "50%",
-                backgroundColor: "#fee2e2",
-                color: "#dc2626"
-              }}>
-                <span className="material-symbols-outlined" style={{ fontSize: "2.5rem" }}>warning</span>
+                marginBottom: "1.25rem",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "4rem",
+                  height: "4rem",
+                  borderRadius: "50%",
+                  backgroundColor: "#fee2e2",
+                  color: "#dc2626",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: "2.5rem" }}
+                >
+                  warning
+                </span>
               </div>
             </div>
-            
-            <h3 style={{
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              color: "var(--slate-800)",
-              margin: "0 0 0.75rem 0"
-            }}>
+
+            <h3
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                color: "var(--slate-800)",
+                margin: "0 0 0.75rem 0",
+              }}
+            >
               Hapus Kelompok?
             </h3>
-            
-            <p style={{
-              fontSize: "0.9rem",
-              color: "var(--slate-600)",
-              lineHeight: "1.5",
-              margin: "0 0 2rem 0"
-            }}>
-              Apakah Anda yakin ingin menghapus kelompok <strong>"{deleteConfirmModal.name}"</strong>? 
+
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: "var(--slate-600)",
+                lineHeight: "1.5",
+                margin: "0 0 2rem 0",
+              }}
+            >
+              Apakah Anda yakin ingin menghapus kelompok{" "}
+              <strong>"{deleteConfirmModal.name}"</strong>?
               <br />
-              <span style={{ fontSize: "0.8rem", color: "#ef4444", fontWeight: 500, marginTop: "0.5rem", display: "inline-block" }}>
-                * Tindakan ini permanen. Semua anggota dan pengumpulan tugas kelompok ini juga akan terhapus.
+              <span
+                style={{
+                  fontSize: "0.8rem",
+                  color: "#ef4444",
+                  fontWeight: 500,
+                  marginTop: "0.5rem",
+                  display: "inline-block",
+                }}
+              >
+                * Tindakan ini permanen. Semua anggota dan pengumpulan tugas
+                kelompok ini juga akan terhapus.
               </span>
             </p>
-            
-            <div style={{
-              display: "flex",
-              gap: "0.75rem",
-              justifyContent: "center"
-            }}>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                justifyContent: "center",
+              }}
+            >
               <button
                 className="dk-btn-cancel"
                 style={{
@@ -377,7 +414,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                   border: "1px solid var(--color-border)",
                   backgroundColor: "white",
                   cursor: "pointer",
-                  transition: "all 0.2s"
+                  transition: "all 0.2s",
                 }}
                 onClick={() => setDeleteConfirmModal(null)}
               >
@@ -398,13 +435,22 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "0.5rem",
-                  transition: "all 0.2s"
+                  transition: "all 0.2s",
                 }}
                 onClick={confirmDeleteGroup}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#b91c1c"}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#dc2626"}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#b91c1c")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#dc2626")
+                }
               >
-                <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>delete</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: "1.1rem" }}
+                >
+                  delete
+                </span>
                 Ya, Hapus
               </button>
             </div>
@@ -503,7 +549,12 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                 />
               </div>
               <div className="dk-field">
-                <label className="dk-label">Nama Tugas <span style={{ color: "#94a3b8", fontWeight: 400 }}>(opsional)</span></label>
+                <label className="dk-label">
+                  Nama Tugas{" "}
+                  <span style={{ color: "#94a3b8", fontWeight: 400 }}>
+                    (opsional)
+                  </span>
+                </label>
                 <input
                   className="dk-input"
                   placeholder="Misal: Proyek Akhir Semester..."
@@ -597,9 +648,13 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                 icon: "task_alt",
                 color: "#059669",
               },
-            ].map((s) => (
+            ].map((s) =>
               loading ? (
-                <div key={s.label} className="dk-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+                <div
+                  key={s.label}
+                  className="skeleton-shimmer"
+                  style={{ borderRadius: "0.875rem", height: "4.5rem" }}
+                ></div>
               ) : (
                 <div key={s.label} className="dk-stat-mini">
                   <span
@@ -615,196 +670,262 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                     <p className="dk-stat-lbl">{s.label}</p>
                   </div>
                 </div>
-              )
-            ))}
+              ),
+            )}
           </div>
 
           {/* Groups */}
           <div className="dk-groups-grid">
-            {loading ? (
-              [1, 2, 3].map((idx) => (
-                <div key={idx} className="dk-group-card skeleton-card" style={{ height: '350px', border: 'none' }}></div>
-              ))
-            ) : (
-              groups.map((group) => {
-                const graded = Object.values(group.nilai).filter(
-                  (v) => v !== "",
-                ).length;
-                return (
-                <div key={group.id} className="dk-group-card">
-                  {/* Card Header */}
+            {loading
+              ? [1, 2, 3].map((idx) => (
                   <div
-                    className="dk-group-header"
-                    style={{ borderLeftColor: group.color }}
-                  >
-                    <div>
-                      <h3 className="dk-group-name">{group.name}</h3>
-                      <p className="dk-group-task">
-                        <span className="material-symbols-outlined">
-                          assignment
-                        </span>
-                        {group.task}
-                      </p>
-                      <p className="dk-group-task" style={{ color: "var(--color-secondary)", fontSize: "0.75rem" }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: "0.875rem" }}>
-                          school
-                        </span>
-                        {group.mataKuliahName || "-"}
-                      </p>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                      <span
-                        className="dk-progress-status"
-                        style={{
-                          color: statusColor(group.status),
-                          background: statusBg(group.status),
-                        }}
-                      >
-                        {group.status}
-                      </span>
-                      <button
-                        className="dk-delete-group-btn"
-                        onClick={() => handleDeleteGroup(group.id, group.name)}
-                        title="Hapus Kelompok"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "#dc2626",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: "0.25rem",
-                          borderRadius: "0.375rem",
-                          transition: "all 0.2s"
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fee2e2"}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                      >
-                        <span className="material-symbols-outlined" style={{ fontSize: "1.25rem" }}>delete</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Progress */}
-                  <div className="dk-group-progress">
-                    <div className="dk-progress-hdr">
-                      <span>Progress</span>
-                      <span
-                        style={{
-                          color: statusColor(group.status),
-                          fontWeight: 800,
-                        }}
-                      >
-                        {group.progress}%
-                      </span>
-                    </div>
-                    <div className="dk-progress-track">
+                    key={idx}
+                    className="skeleton-card"
+                    style={{ height: "350px" }}
+                  ></div>
+                ))
+              : groups.map((group) => {
+                  const graded = Object.values(group.nilai).filter(
+                    (v) => v !== "",
+                  ).length;
+                  return (
+                    <div key={group.id} className="dk-group-card">
+                      {/* Card Header */}
                       <div
-                        className="dk-progress-fill"
-                        style={{
-                          width: `${group.progress}%`,
-                          background: group.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Members */}
-                  <div className="dk-members-section">
-                    <div className="dk-members-hdr">
-                      <span className="dk-members-label">
-                        Anggota ({group.members.length})
-                      </span>
-                      <button
-                        className="dk-add-member-btn"
-                        onClick={() => setAddMemberModal(group.id)}
+                        className="dk-group-header"
+                        style={{ borderLeftColor: group.color }}
                       >
-                        <span className="material-symbols-outlined">
-                          person_add
-                        </span>
-                        Tambah
-                      </button>
-                    </div>
-                    <div className="dk-members-list">
-                      {group.members.map((member) => {
-                        const nilai = group.nilai[member.nim];
-                        return (
-                          <div key={member.nim} className="dk-member-row">
-                            <div
-                              className="dk-avatar-sm"
-                              style={{ background: getMemberColor(member.nim) }}
-                            >
-                              {initials(member.name)}
-                            </div>
-                            <div className="dk-member-info">
-                              <p className="dk-member-name">{member.name}</p>
-                              <p className="dk-member-nim">{member.nim}</p>
-                            </div>
-                            <div className="dk-member-right">
-                              {nilai ? (
-                                <span className="dk-nilai-badge">{nilai}</span>
-                              ) : (
-                                <span className="dk-nilai-badge dk-nilai-badge--empty">
-                                  –
-                                </span>
-                              )}
-                              <button
-                                className="dk-remove-btn"
-                                onClick={() => removeMember(group.id, member.nim)}
-                                title="Keluarkan anggota"
-                              >
-                                <span className="material-symbols-outlined">
-                                  person_remove
-                                </span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                      {group.members.length === 0 && (
-                        <p className="dk-empty-members">Belum ada anggota</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="dk-group-footer">
-                    <div className="dk-submission-info">
-                      <span
-                        className={`material-symbols-outlined ${group.submitted ? "dk-sub-yes" : "dk-sub-no"}`}
-                      >
-                        {group.submitted ? "check_circle" : "pending"}
-                      </span>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                        <span className={group.submitted ? "dk-sub-yes" : "dk-sub-no"}>
-                          {group.submitted ? "Sudah Dikumpulkan" : "Belum Dikumpulkan"}
-                        </span>
-                        {group.submitted && group.fileKumpulan && (
-                          <a
-                            href={`${API_BASE}${group.fileKumpulan}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ fontSize: "0.75rem", color: "#4b53bc", display: "flex", alignItems: "center", gap: "0.25rem", textDecoration: "none" }}
+                        <div>
+                          <h3 className="dk-group-name">{group.name}</h3>
+                          <p className="dk-group-task">
+                            <span className="material-symbols-outlined">
+                              assignment
+                            </span>
+                            {group.task}
+                          </p>
+                          <p
+                            className="dk-group-task"
+                            style={{
+                              color: "var(--color-secondary)",
+                              fontSize: "0.75rem",
+                            }}
                           >
-                            <span className="material-symbols-outlined" style={{ fontSize: "0.875rem" }}>download</span>
-                            Lihat File
-                          </a>
-                        )}
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ fontSize: "0.875rem" }}
+                            >
+                              school
+                            </span>
+                            {group.mataKuliahName || "-"}
+                          </p>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span
+                            className="dk-progress-status"
+                            style={{
+                              color: statusColor(group.status),
+                              background: statusBg(group.status),
+                            }}
+                          >
+                            {group.status}
+                          </span>
+                          <button
+                            className="dk-delete-group-btn"
+                            onClick={() =>
+                              handleDeleteGroup(group.id, group.name)
+                            }
+                            title="Hapus Kelompok"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#dc2626",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "0.25rem",
+                              borderRadius: "0.375rem",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.backgroundColor =
+                                "#fee2e2")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.backgroundColor =
+                                "transparent")
+                            }
+                          >
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ fontSize: "1.25rem" }}
+                            >
+                              delete
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Progress */}
+                      <div className="dk-group-progress">
+                        <div className="dk-progress-hdr">
+                          <span>Progress</span>
+                          <span
+                            style={{
+                              color: statusColor(group.status),
+                              fontWeight: 800,
+                            }}
+                          >
+                            {group.progress}%
+                          </span>
+                        </div>
+                        <div className="dk-progress-track">
+                          <div
+                            className="dk-progress-fill"
+                            style={{
+                              width: `${group.progress}%`,
+                              background: group.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Members */}
+                      <div className="dk-members-section">
+                        <div className="dk-members-hdr">
+                          <span className="dk-members-label">
+                            Anggota ({group.members.length})
+                          </span>
+                          <button
+                            className="dk-add-member-btn"
+                            onClick={() => setAddMemberModal(group.id)}
+                          >
+                            <span className="material-symbols-outlined">
+                              person_add
+                            </span>
+                            Tambah
+                          </button>
+                        </div>
+                        <div className="dk-members-list">
+                          {group.members.map((member) => {
+                            const nilai = group.nilai[member.nim];
+                            return (
+                              <div key={member.nim} className="dk-member-row">
+                                <div
+                                  className="dk-avatar-sm"
+                                  style={{
+                                    background: getMemberColor(member.nim),
+                                  }}
+                                >
+                                  {initials(member.name)}
+                                </div>
+                                <div className="dk-member-info">
+                                  <p className="dk-member-name">
+                                    {member.name}
+                                  </p>
+                                  <p className="dk-member-nim">{member.nim}</p>
+                                </div>
+                                <div className="dk-member-right">
+                                  {nilai ? (
+                                    <span className="dk-nilai-badge">
+                                      {nilai}
+                                    </span>
+                                  ) : (
+                                    <span className="dk-nilai-badge dk-nilai-badge--empty">
+                                      –
+                                    </span>
+                                  )}
+                                  <button
+                                    className="dk-remove-btn"
+                                    onClick={() =>
+                                      removeMember(group.id, member.nim)
+                                    }
+                                    title="Keluarkan anggota"
+                                  >
+                                    <span className="material-symbols-outlined">
+                                      person_remove
+                                    </span>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {group.members.length === 0 && (
+                            <p className="dk-empty-members">
+                              Belum ada anggota
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="dk-group-footer">
+                        <div className="dk-submission-info">
+                          <span
+                            className={`material-symbols-outlined ${group.submitted ? "dk-sub-yes" : "dk-sub-no"}`}
+                          >
+                            {group.submitted ? "check_circle" : "pending"}
+                          </span>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.15rem",
+                            }}
+                          >
+                            <span
+                              className={
+                                group.submitted ? "dk-sub-yes" : "dk-sub-no"
+                              }
+                            >
+                              {group.submitted
+                                ? "Sudah Dikumpulkan"
+                                : "Belum Dikumpulkan"}
+                            </span>
+                            {group.submitted && group.fileKumpulan && (
+                              <a
+                                href={`${API_BASE}${group.fileKumpulan}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  color: "#4b53bc",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                <span
+                                  className="material-symbols-outlined"
+                                  style={{ fontSize: "0.875rem" }}
+                                >
+                                  download
+                                </span>
+                                Lihat File
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          className="dk-grade-btn"
+                          onClick={() => openNilai(group)}
+                        >
+                          <span className="material-symbols-outlined">
+                            grade
+                          </span>
+                          Beri Nilai ({graded}/{group.members.length})
+                        </button>
                       </div>
                     </div>
-                    <button
-                      className="dk-grade-btn"
-                      onClick={() => openNilai(group)}
-                    >
-                      <span className="material-symbols-outlined">grade</span>
-                      Beri Nilai ({graded}/{group.members.length})
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-            )}
+                  );
+                })}
           </div>
         </div>
       </main>
