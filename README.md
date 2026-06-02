@@ -51,13 +51,44 @@ Pastikan path folder `assets` berada di root repository kamu. Jika folder `asset
 
 ## 🗄️ Entity Relationship Diagram (ERD)
 
-![ERD](assets/ERD/ERD.png)
+![ERD](assets/ERD/erd.png)
 
 ---
 
 ## 🏗️ Class Diagram
 
 ![Class Diagram](assets/Class_Diagram/Class_Diagram.png)
+
+---
+
+## 🔄 Sequence Diagram
+
+### 1. Kelola Tugas
+![Sequence Kelola Tugas](assets/Sequence/sequences1.png)
+
+### 2. Kelola Anggota
+![Sequence Kelola Anggota](assets/Sequence/sequences2.png)
+
+### 3. Kelola Deadline
+![Sequence Kelola Deadline](assets/Sequence/sequences3.png)
+
+### 4. Monitoring Progress
+![Sequence Monitoring Progress](assets/Sequence/sequences4.png)
+
+### 5. Upload Tugas
+![Sequence Upload Tugas](assets/Sequence/sequences5.png)
+
+### 6. Presensi
+![Sequence Presensi](assets/Sequence/sequences6.png)
+
+### 7. Penilaian
+![Sequence Penilaian](assets/Sequence/sequences7.png)
+
+### 8. Diskusi
+![Sequence Diskusi](assets/Sequence/sequences8.png)
+
+### 9. Login
+![Sequence Login](assets/Sequence/sequences9.png)
 
 ---
 
