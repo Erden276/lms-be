@@ -983,27 +983,19 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                     color: "#2f9696",
                   },
                 ].map((s) => (
-                  <div key={s.label} className="dt-stat-mini">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ color: s.color }}
-                    >
-                      {s.icon}
-                    </span>
-                    <div>
-                      <p
-                        className="dt-stat-mini-val"
-                        style={{ color: s.color }}
-                      >
-                        {loading ? (
-                          <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                        ) : (
-                          s.value
-                        )}
-                      </p>
-                      <p className="dt-stat-mini-lbl">{s.label}</p>
+                  loading ? (
+                    <div key={s.label} className="dt-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+                  ) : (
+                    <div key={s.label} className="dt-stat-mini">
+                      <span className="material-symbols-outlined" style={{ color: s.color }}>{s.icon}</span>
+                      <div>
+                        <p className="dt-stat-mini-val" style={{ color: s.color }}>
+                          {s.value}
+                        </p>
+                        <p className="dt-stat-mini-lbl">{s.label}</p>
+                      </div>
                     </div>
-                  </div>
+                  )
                 ))}
               </div>
 

@@ -543,17 +543,15 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                   { label: "IZIN",   value: statCount("Izin"),  color: "#c47f17", icon: "event_busy" },
                   { label: "ALPA",   value: statCount("Alpa"),  color: "#dc2626", icon: "cancel" },
                 ].map((s) => (
-                  <div key={s.label} className="dp-stat-card">
-                    <span className="material-symbols-outlined dp-stat-icon" style={{ color: s.color }}>{s.icon}</span>
-                    <p className="dp-stat-label">{s.label}</p>
-                    <p className="dp-stat-value" style={{ color: s.color }}>
-                      {loading ? (
-                        <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                      ) : (
-                        s.value
-                      )}
-                    </p>
-                  </div>
+                  loading ? (
+                    <div key={s.label} className="dp-stat-card skeleton-shimmer" style={{ border: 'none', height: '6rem' }}></div>
+                  ) : (
+                    <div key={s.label} className="dp-stat-card">
+                      <span className="material-symbols-outlined dp-stat-icon" style={{ color: s.color }}>{s.icon}</span>
+                      <p className="dp-stat-label">{s.label}</p>
+                      <p className="dp-stat-value" style={{ color: s.color }}>{s.value}</p>
+                    </div>
+                  )
                 ))}
               </div>
             </div>

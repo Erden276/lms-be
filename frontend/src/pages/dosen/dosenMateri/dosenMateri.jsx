@@ -446,25 +446,29 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     <div
                       className="dm-stat-icon-wrap"
                       style={{ background: `${s.color}18` }}
-                    >
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ color: s.color }}
+                  loading ? (
+                    <div key={s.label} className="dm-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+                  ) : (
+                    <div key={s.label} className="dm-stat-mini">
+                      <div
+                        className="dm-stat-icon-wrap"
+                        style={{ background: `${s.color}18` }}
                       >
-                        {s.icon}
-                      </span>
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ color: s.color }}
+                        >
+                          {s.icon}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="dm-stat-val" style={{ color: s.color }}>
+                          {s.value}
+                        </p>
+                        <p className="dm-stat-lbl">{s.label}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="dm-stat-val" style={{ color: s.color }}>
-                        {loading ? (
-                          <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                        ) : (
-                          s.value
-                        )}
-                      </p>
-                      <p className="dm-stat-lbl">{s.label}</p>
-                    </div>
-                  </div>
+                  )
                 ))}
               </div>
 

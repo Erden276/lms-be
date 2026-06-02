@@ -18,7 +18,9 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
   const [selectedMateri, setSelectedMateri] = useState(null);
   const storedUserStr = localStorage.getItem("user");
   const storedUser = storedUserStr ? JSON.parse(storedUserStr) : {};
-  const initialAvatar = storedUser.fotoUrl ? `${API_BASE}${storedUser.fotoUrl}` : AVATAR_DOSEN;
+  const initialAvatar = storedUser.fotoUrl
+    ? `${API_BASE}${storedUser.fotoUrl}`
+    : AVATAR_DOSEN;
 
   const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
 
@@ -27,9 +29,9 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
     stats: {
       totalMahasiswa: 0,
       tugasIndividu: 0,
-      tugasKelompok: 0
+      tugasKelompok: 0,
     },
-    daftarMateri: []
+    daftarMateri: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +42,7 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
         if (storedUser.fotoUrl) {
           setAvatarUrl(`${API_BASE}${storedUser.fotoUrl}`);
         }
-        const res = await apiClient.get('/api/dosen/dashboard');
+        const res = await apiClient.get("/api/dosen/dashboard");
         if (res && res.data) {
           setDashboardData(res.data);
         } else if (res) {
@@ -64,35 +66,65 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
 
   // Remove early LoadingSpinner return
 
-
   return (
     <div className="page-shell">
       {/* Toast */}
       {toast && (
-        <div style={{
-          position: "fixed", top: "5rem", right: "1.5rem", zIndex: 999,
-          background: toast.type === "error" ? "#fff1f2" : "#ecfdf5",
-          color: toast.type === "error" ? "#dc2626" : "#059669",
-          border: toast.type === "error" ? "1px solid #fecaca" : "1px solid #a7f3d0",
-          padding: "0.75rem 1.25rem", borderRadius: "0.75rem", fontWeight: 600,
-          fontSize: "0.875rem", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-          display: "flex", alignItems: "center", gap: "0.5rem"
-        }}>
-          <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "5rem",
+            right: "1.5rem",
+            zIndex: 999,
+            background: toast.type === "error" ? "#fff1f2" : "#ecfdf5",
+            color: toast.type === "error" ? "#dc2626" : "#059669",
+            border:
+              toast.type === "error"
+                ? "1px solid #fecaca"
+                : "1px solid #a7f3d0",
+            padding: "0.75rem 1.25rem",
+            borderRadius: "0.75rem",
+            fontWeight: 600,
+            fontSize: "0.875rem",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: "1.1rem" }}
+          >
             {toast.type === "error" ? "error" : "check_circle"}
           </span>
           {toast.msg}
         </div>
       )}
 
-
       {/* ─── Sidebar ─── */}
-      <SidebarDosen onNavigate={onNavigate} onLogout={onLogout} activePage="dosenDashboard" mobileOpen={sidebarOpen} onClose={closeSidebar} />
+      <SidebarDosen
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+        activePage="dosenDashboard"
+        mobileOpen={sidebarOpen}
+        onClose={closeSidebar}
+      />
 
       {/* ─── Main ─── */}
       <main className="page-main">
         {/* Navbar */}
-        <Navbar role="Dosen" onOpenSidebar={openSidebar} onNavigate={typeof nav !== "undefined" ? nav : (typeof onNavigate !== "undefined" ? onNavigate : undefined)} />
+        <Navbar
+          role="Dosen"
+          onOpenSidebar={openSidebar}
+          onNavigate={
+            typeof nav !== "undefined"
+              ? nav
+              : typeof onNavigate !== "undefined"
+                ? onNavigate
+                : undefined
+          }
+        />
 
         {/* Content */}
         <div className="page-content">
@@ -101,77 +133,135 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
             <div>
               <h2 className="dd-title">Dashbord Dosen</h2>
               <p className="dd-subtitle">
-                {loading ? "Memuat ringkasan kurasi akademik Anda..." : `Selamat pagi, Pak / Bu ${dashboardData?.lecturerName || "Dosen"}. Berikut ringkasan kurasi akademik Anda hari ini.`}
+                {loading
+                  ? "Memuat ringkasan kurasi akademik Anda..."
+                  : `Selamat pagi, Pak / Bu ${dashboardData?.lecturerName || "Dosen"}. Berikut ringkasan kurasi akademik Anda hari ini.`}
               </p>
             </div>
             <div className="dd-action-row">
-              <button className="dd-btn dd-btn--blue" onClick={() => nav("dosenTugas")}>
-                <span className="material-symbols-outlined">add_task</span>
-                + Kelola Tugas
+              <button
+                className="dd-btn dd-btn--blue"
+                onClick={() => nav("dosenTugas")}
+              >
+                <span className="material-symbols-outlined">add_task</span>+
+                Kelola Tugas
               </button>
-              <button className="dd-btn dd-btn--dark" onClick={() => nav("dosenMateri")}>
-                <span className="material-symbols-outlined">post_add</span>
-                + Tambah Materi
+              <button
+                className="dd-btn dd-btn--dark"
+                onClick={() => nav("dosenMateri")}
+              >
+                <span className="material-symbols-outlined">post_add</span>+
+                Tambah Materi
               </button>
-              <button className="dd-btn dd-btn--amber" onClick={() => nav("dosenPresensi")}>
+              <button
+                className="dd-btn dd-btn--amber"
+                onClick={() => nav("dosenPresensi")}
+              >
                 <span className="material-symbols-outlined">qr_code_2</span>
                 Hasilkan QR Presensi
               </button>
             </div>
           </div>
 
-          {/* Stats Grid - 3 Card Utama */}
+          {/* Stats Grid */}
           <div className="dd-stats-grid">
-            <div className="dd-stat-card">
-              <div className="dd-stat-top">
-                <div className="dd-stat-icon dd-icon--blue">
-                  <span className="material-symbols-outlined">group</span>
+            {loading ? (
+              <>
+                <div
+                  className="dd-stat-card skeleton-shimmer"
+                  style={{ border: "none", minHeight: "8.5rem" }}
+                ></div>
+                <div
+                  className="dd-stat-card skeleton-shimmer"
+                  style={{ border: "none", minHeight: "8.5rem" }}
+                ></div>
+                <div
+                  className="dd-stat-card skeleton-shimmer"
+                  style={{ border: "none", minHeight: "8.5rem" }}
+                ></div>
+                <div
+                  className="dd-stat-card skeleton-shimmer"
+                  style={{ border: "none", minHeight: "8.5rem" }}
+                ></div>
+                <div
+                  className="dd-stat-card skeleton-shimmer"
+                  style={{ border: "none", minHeight: "8.5rem" }}
+                ></div>
+              </>
+            ) : (
+              <>
+                <div className="dd-stat-card">
+                  <div className="dd-stat-top">
+                    <div className="dd-stat-icon dd-icon--blue">
+                      <span className="material-symbols-outlined">group</span>
+                    </div>
+                    <span className="dd-badge dd-badge--green">Aktif</span>
+                  </div>
+                  <p className="dd-stat-label">Total Mahasiswa Aktif</p>
+                  <p className="dd-stat-value">
+                    {dashboardData?.stats?.totalMahasiswa || 0}
+                  </p>
                 </div>
-                <span className="dd-badge dd-badge--green">Aktif</span>
-              </div>
-              <p className="dd-stat-label">Total Mahasiswa Aktif</p>
-              <p className="dd-stat-value">
-                {loading ? (
-                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                ) : (
-                  dashboardData?.stats?.totalMahasiswa || 0
-                )}
-              </p>
-            </div>
 
-            <div className="dd-stat-card">
-              <div className="dd-stat-top">
-                <div className="dd-stat-icon dd-icon--orange">
-                  <span className="material-symbols-outlined">person</span>
+                <div className="dd-stat-card">
+                  <div className="dd-stat-top">
+                    <div className="dd-stat-icon dd-icon--blue">
+                      <span className="material-symbols-outlined">
+                        description
+                      </span>
+                    </div>
+                    <span className="dd-badge dd-badge--blue">Tugas</span>
+                  </div>
+                  <p className="dd-stat-label">Pengumpulan Tugas Individu</p>
+                  <p className="dd-stat-value">
+                    {dashboardData?.stats?.tugasIndividu || 0}
+                  </p>
                 </div>
-                <span className="dd-badge dd-badge--blue">Total</span>
-              </div>
-              <p className="dd-stat-label">Pengumpulan Tugas Individu</p>
-              <p className="dd-stat-value">
-                {loading ? (
-                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                ) : (
-                  dashboardData?.stats?.tugasIndividu || 0
-                )}
-              </p>
-            </div>
 
-            <div className="dd-stat-card">
-              <div className="dd-stat-top">
-                <div className="dd-stat-icon dd-icon--purple">
-                  <span className="material-symbols-outlined">groups</span>
+                <div className="dd-stat-card">
+                  <div className="dd-stat-top">
+                    <div className="dd-stat-icon dd-icon--green">
+                      <span className="material-symbols-outlined">
+                        check_circle
+                      </span>
+                    </div>
+                    <span className="dd-badge dd-badge--green">Presensi</span>
+                  </div>
+                  <p className="dd-stat-label">Hadir Hari Ini</p>
+                  <p className="dd-stat-value">
+                    {dashboardData?.stats?.mahasiswaHadir || 0}
+                  </p>
                 </div>
-                <span className="dd-badge dd-badge--purple">Total</span>
-              </div>
-              <p className="dd-stat-label">Pengumpulan Tugas Kelompok</p>
-              <p className="dd-stat-value">
-                {loading ? (
-                  <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
-                ) : (
-                  dashboardData?.stats?.tugasKelompok || 0
-                )}
-              </p>
-            </div>
+
+                <div className="dd-stat-card">
+                  <div className="dd-stat-top">
+                    <div className="dd-stat-icon dd-icon--amber">
+                      <span className="material-symbols-outlined">
+                        auto_stories
+                      </span>
+                    </div>
+                    <span className="dd-badge dd-badge--amber">Materi</span>
+                  </div>
+                  <p className="dd-stat-label">Modul & Video Diupload</p>
+                  <p className="dd-stat-value">
+                    {dashboardData?.stats?.totalMateri || 0}
+                  </p>
+                </div>
+
+                <div className="dd-stat-card">
+                  <div className="dd-stat-top">
+                    <div className="dd-stat-icon dd-icon--purple">
+                      <span className="material-symbols-outlined">groups</span>
+                    </div>
+                    <span className="dd-badge dd-badge--purple">Total</span>
+                  </div>
+                  <p className="dd-stat-label">Pengumpulan Tugas Kelompok</p>
+                  <p className="dd-stat-value">
+                    {dashboardData?.stats?.tugasKelompok || 0}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Daftar Materi */}
@@ -179,9 +269,16 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
             <div className="dd-table-head-row">
               <div>
                 <h3 className="dd-table-title">Daftar Materi</h3>
-                <p className="dd-table-sub">Materi yang tersedia untuk mahasiswa</p>
+                <p className="dd-table-sub">
+                  Materi yang tersedia untuk mahasiswa
+                </p>
               </div>
-              <button className="dd-table-link" onClick={() => nav("dosenMateri")}>Kelola Materi →</button>
+              <button
+                className="dd-table-link"
+                onClick={() => nav("dosenMateri")}
+              >
+                Kelola Materi →
+              </button>
             </div>
             <div className="dd-table-wrapper">
               <table className="dd-table">
@@ -195,28 +292,50 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                   {loading ? (
+                  {loading ? (
                     [1, 2, 3].map((idx) => (
                       <tr key={idx}>
                         <td>
                           <div className="dd-student-cell">
-                            <div className="dd-avatar av-blue skeleton-shimmer" style={{ width: '2rem', height: '2rem', borderRadius: '0.5rem' }}></div>
+                            <div
+                              className="dd-avatar av-blue skeleton-shimmer"
+                              style={{
+                                width: "2rem",
+                                height: "2rem",
+                                borderRadius: "0.5rem",
+                              }}
+                            ></div>
                             <div style={{ flex: 1 }}>
-                              <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                              <div
+                                className="skeleton-text skeleton-text--medium"
+                                style={{ margin: 0 }}
+                              ></div>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                          <div
+                            className="skeleton-text skeleton-text--medium"
+                            style={{ margin: 0 }}
+                          ></div>
                         </td>
                         <td>
-                          <div className="skeleton-text skeleton-text--short" style={{ margin: 0 }}></div>
+                          <div
+                            className="skeleton-text skeleton-text--short"
+                            style={{ margin: 0 }}
+                          ></div>
                         </td>
                         <td>
-                          <div className="skeleton-text skeleton-text--medium" style={{ margin: 0 }}></div>
+                          <div
+                            className="skeleton-text skeleton-text--medium"
+                            style={{ margin: 0 }}
+                          ></div>
                         </td>
                         <td>
-                          <div className="skeleton-text skeleton-text--short" style={{ margin: 0 }}></div>
+                          <div
+                            className="skeleton-text skeleton-text--short"
+                            style={{ margin: 0 }}
+                          ></div>
                         </td>
                       </tr>
                     ))
@@ -226,9 +345,15 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                         <td>
                           <div className="dd-student-cell">
                             <div className="dd-avatar av-blue">
-                              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
-                                {materi.tipe?.toLowerCase().includes('video') ? 'play_circle' : 
-                                 materi.tipe?.toLowerCase().includes('pdf') ? 'picture_as_pdf' : 'description'}
+                              <span
+                                className="material-symbols-outlined"
+                                style={{ fontSize: "1rem" }}
+                              >
+                                {materi.tipe?.toLowerCase().includes("video")
+                                  ? "play_circle"
+                                  : materi.tipe?.toLowerCase().includes("pdf")
+                                    ? "picture_as_pdf"
+                                    : "description"}
                               </span>
                             </div>
                             <div>
@@ -252,14 +377,18 @@ export default function DashboardDosen({ onNavigate, onLogout }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>Belum ada materi yang diupload.</td>
+                      <td
+                        colSpan={5}
+                        style={{ textAlign: "center", padding: "2rem" }}
+                      >
+                        Belum ada materi yang diupload.
+                      </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
           </div>
-
         </div>
       </main>
     </div>
