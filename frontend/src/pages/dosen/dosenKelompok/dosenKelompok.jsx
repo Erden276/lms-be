@@ -46,6 +46,7 @@ function statusBg(status) {
 export default function DosenKelompok({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [nilaiModal, setNilaiModal] = useState(null);
@@ -72,6 +73,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   };
 
   const fetchGroups = async () => {
+    setLoading(true);
     try {
       const res = await apiClient.get('/api/kelompok');
       const data = res?.data || res;
@@ -80,6 +82,8 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
       }
     } catch (error) {
       console.error("Gagal memuat kelompok:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -603,7 +607,11 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
                 </span>
                 <div>
                   <p className="dk-stat-val" style={{ color: s.color }}>
-                    {s.value}
+                    {loading ? (
+                      <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                    ) : (
+                      s.value
+                    )}
                   </p>
                   <p className="dk-stat-lbl">{s.label}</p>
                 </div>

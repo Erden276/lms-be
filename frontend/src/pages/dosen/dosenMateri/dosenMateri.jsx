@@ -47,6 +47,7 @@ const INITIAL_MATERI = [];
 export default function DosenMateri({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [materi, setMateri] = useState(INITIAL_MATERI);
+  const [loading, setLoading] = useState(true);
   const [matkulList, setMatkulList] = useState([]);
   const [toast, setToast] = useState(null);
   const [view, setView] = useState("list"); // "list" | "create" | "edit"
@@ -83,6 +84,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
   };
 
   const fetchMateri = async (mkFilter = filterMatkul, tpFilter = filterTipe) => {
+    setLoading(true);
     try {
       const params = new URLSearchParams();
       if (mkFilter && mkFilter !== "Semua") params.append('matkul', mkFilter);
@@ -108,6 +110,8 @@ export default function DosenMateri({ onNavigate, onLogout }) {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -452,7 +456,11 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     </div>
                     <div>
                       <p className="dm-stat-val" style={{ color: s.color }}>
-                        {s.value}
+                        {loading ? (
+                          <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                        ) : (
+                          s.value
+                        )}
                       </p>
                       <p className="dm-stat-lbl">{s.label}</p>
                     </div>

@@ -39,6 +39,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
   const [timeLeft, setTimeLeft] = useState(QR_TTL);
   const [qrLoaded, setQrLoaded] = useState(false);
   const [students, setStudents] = useState(INITIAL_STUDENTS);
+  const [loading, setLoading] = useState(true);
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [selectedMatkul, setSelectedMatkul] = useState({ id: null, name: "Memuat...", room: "-", time: "-", jadwal: "" });
   const [sessionActive, setSessionActive]   = useState(false);
@@ -105,6 +106,8 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
     } catch (error) {
       console.error("Error fetching students:", error);
       setStudents([]);
+    } finally {
+      setLoading(false);
     }
   }, [selectedMatkul?.id, selectedDateFilter]);
 
@@ -157,6 +160,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
 
   useEffect(() => {
     if (selectedMatkul?.id) {
+      setLoading(true);
       fetchDates();
       fetchStudents();
     }
@@ -165,6 +169,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
   // Fetch students saat tanggal berubah
   useEffect(() => {
     if (selectedMatkul?.id && selectedDateFilter) {
+      setLoading(true);
       fetchStudents();
     }
   }, [selectedDateFilter, selectedMatkul?.id, fetchStudents]);
@@ -541,7 +546,13 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                   <div key={s.label} className="dp-stat-card">
                     <span className="material-symbols-outlined dp-stat-icon" style={{ color: s.color }}>{s.icon}</span>
                     <p className="dp-stat-label">{s.label}</p>
-                    <p className="dp-stat-value" style={{ color: s.color }}>{s.value}</p>
+                    <p className="dp-stat-value" style={{ color: s.color }}>
+                      {loading ? (
+                        <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                      ) : (
+                        s.value
+                      )}
+                    </p>
                   </div>
                 ))}
               </div>

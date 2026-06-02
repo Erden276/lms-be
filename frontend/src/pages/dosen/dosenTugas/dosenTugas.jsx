@@ -49,6 +49,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteTipe, setDeleteTipe] = useState(null);
   const [filter, setFilter] = useState("Semua");
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     title: "",
@@ -94,6 +95,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   };
 
   const fetchTasks = async () => {
+    setLoading(true);
     try {
       const res = await apiClient.get('/api/dosen/tugas');
       const raw = res.data || res;
@@ -123,6 +125,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -991,7 +995,11 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                         className="dt-stat-mini-val"
                         style={{ color: s.color }}
                       >
-                        {s.value}
+                        {loading ? (
+                          <span className="skeleton-text" style={{ display: 'inline-block', height: '1.875rem', width: '3rem', margin: 0 }}></span>
+                        ) : (
+                          s.value
+                        )}
                       </p>
                       <p className="dt-stat-mini-lbl">{s.label}</p>
                     </div>
