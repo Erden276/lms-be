@@ -60,9 +60,11 @@ export default function DosenMateri({ onNavigate, onLogout }) {
 
   const fetchMatkulList = async () => {
     try {
-      const res = await apiClient.get('/api/mata-kuliah');
-      const data = Array.isArray(res) ? res : (res.data || []);
-      setMatkulList(data.map(mk => ({ id: mk.idMataKuliah, name: mk.namaMataKuliah })));
+      const res = await apiClient.get("/api/mata-kuliah");
+      const data = Array.isArray(res) ? res : res.data || [];
+      setMatkulList(
+        data.map((mk) => ({ id: mk.idMataKuliah, name: mk.namaMataKuliah })),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -83,30 +85,38 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchMateri = async (mkFilter = filterMatkul, tpFilter = filterTipe) => {
+  const fetchMateri = async (
+    mkFilter = filterMatkul,
+    tpFilter = filterTipe,
+  ) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (mkFilter && mkFilter !== "Semua") params.append('matkul', mkFilter);
-      if (tpFilter && tpFilter !== "Semua") params.append('tipe', tpFilter);
-      const query = params.toString() ? `?${params.toString()}` : '';
+      if (mkFilter && mkFilter !== "Semua") params.append("matkul", mkFilter);
+      if (tpFilter && tpFilter !== "Semua") params.append("tipe", tpFilter);
+      const query = params.toString() ? `?${params.toString()}` : "";
       const res = await apiClient.get(`/api/modul-ajar${query}`);
-      const data = Array.isArray(res) ? res : (res.data || []);
+      const data = Array.isArray(res) ? res : res.data || [];
       if (Array.isArray(data)) {
-        setMateri(data.map(m => ({
-          id: m.idModulAjar || m.id,
-          judul: m.judul,
-          tipe: m.tipe_modul || m.tipe,
-          matkul: m.idMataKuliah || m.matkul,
-          matakuliah: m.mataKuliah?.namaMataKuliah || m.matakuliah || "Mata Kuliah",
-          deskripsi: m.deskripsi,
-          url: m.url,
-          ukuran: m.ukuran,
-          tanggal: m.tanggal ? new Date(m.tanggal).toISOString().slice(0, 10) : "",
-          diunduh: m.diunduh || 0,
-          canDownload: m.canDownload,
-          file: null
-        })));
+        setMateri(
+          data.map((m) => ({
+            id: m.idModulAjar || m.id,
+            judul: m.judul,
+            tipe: m.tipe_modul || m.tipe,
+            matkul: m.idMataKuliah || m.matkul,
+            matakuliah:
+              m.mataKuliah?.namaMataKuliah || m.matakuliah || "Mata Kuliah",
+            deskripsi: m.deskripsi,
+            url: m.url,
+            ukuran: m.ukuran,
+            tanggal: m.tanggal
+              ? new Date(m.tanggal).toISOString().slice(0, 10)
+              : "",
+            diunduh: m.diunduh || 0,
+            canDownload: m.canDownload,
+            file: null,
+          })),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -128,7 +138,8 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     matkulList.find((m) => m.id === id)?.name || id;
 
   const filtered = materi.filter((m) => {
-    const mk = filterMatkul === "Semua" || String(m.matkul) === String(filterMatkul);
+    const mk =
+      filterMatkul === "Semua" || String(m.matkul) === String(filterMatkul);
     const tp = filterTipe === "Semua" || m.tipe === filterTipe;
     return mk && tp;
   });
@@ -441,13 +452,13 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     icon: "play_circle",
                     color: "#7c3aed",
                   },
-                ].map((s) => (
-                  <div key={s.label} className="dm-stat-mini">
-                    <div
-                      className="dm-stat-icon-wrap"
-                      style={{ background: `${s.color}18` }}
+                ].map((s) =>
                   loading ? (
-                    <div key={s.label} className="dm-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+                    <div
+                      key={s.label}
+                      className="dm-stat-mini skeleton-shimmer"
+                      style={{ border: "none", height: "4.5rem" }}
+                    ></div>
                   ) : (
                     <div key={s.label} className="dm-stat-mini">
                       <div
@@ -468,12 +479,15 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                         <p className="dm-stat-lbl">{s.label}</p>
                       </div>
                     </div>
-                  )
-                ))}
+                  ),
+                )}
               </div>
 
               {/* Filters */}
-              <div className="dm-filter-row" style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+              <div
+                className="dm-filter-row"
+                style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}
+              >
                 <div className="dm-filter-group--select">
                   <label className="dm-filter-label">Mata Kuliah:</label>
                   <select
@@ -483,7 +497,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                   >
                     <option value="Semua">Semua Mata Kuliah</option>
                     {matkulList.map((m) => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -496,7 +512,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                   >
                     <option value="Semua">Semua Tipe</option>
                     {TIPE_LIST.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -824,8 +842,6 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                         }
                       />
                     </div>
-
-
                   </div>
 
                   {/* Actions */}
