@@ -66,6 +66,10 @@ function Login({ onLogin, onFaq }) {
           heading: "Hak Pengguna",
           body: "Pengguna berhak mengajukan permintaan koreksi atau pembaruan data pribadi melalui administrator akademik kampus. Akun yang tidak aktif akan dinonaktifkan sesuai kebijakan institusi.",
         },
+        {
+          heading: "Akses Perangkat (Kamera)",
+          body: "Akses kamera yang diminta oleh browser hanya digunakan sementara secara langsung (real-time) untuk keperluan pemindaian QR Code pada fitur presensi. LeMaS tidak menyimpan, merekam, atau membagikan tangkapan gambar/video dari perangkat pengguna kepada pihak mana pun.",
+        },
       ],
     },
     syarat: {
@@ -91,6 +95,14 @@ function Login({ onLogin, onFaq }) {
         {
           heading: "Sanksi Pelanggaran",
           body: "Pelanggaran terhadap syarat penggunaan dapat mengakibatkan peringatan, pembatasan fitur, hingga penonaktifan akun secara permanen oleh administrator, sesuai dengan tingkat pelanggaran yang dilakukan.",
+        },
+        {
+          heading: "Integritas Akademik & Anti-Plagiarisme",
+          body: "Setiap pengguna diwajibkan menjunjung tinggi kejujuran akademik. Tindakan plagiarisme dalam pengumpulan tugas, kecurangan dalam pengerjaan kuis online, maupun pemalsuan presensi dikategorikan sebagai pelanggaran berat dan dapat dikenakan sanksi akademik yang tegas.",
+        },
+        {
+          heading: "Ketersediaan Layanan",
+          body: "Kami berkomitmen untuk menjaga ketersediaan platform LeMaS sebaik mungkin. Namun, platform mungkin mengalami jeda layanan sementara untuk keperluan pemeliharaan (maintenance) atau kendala teknis yang tidak terduga. Pengumuman terkait gangguan layanan akan diinformasikan melalui kanal komunikasi resmi kampus.",
         },
       ],
     },

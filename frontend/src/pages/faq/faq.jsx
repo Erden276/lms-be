@@ -51,6 +51,22 @@ const FAQ_DATA = {
           </>
         ),
       },
+      {
+        icon: "manage_accounts",
+        question: "Bagaimana cara memperbarui Profil dan Foto/Avatar saya?",
+        answer: (
+          <>
+            <p>Untuk memperbarui data diri dan mengganti foto profil:</p>
+            <ol>
+              <li>Buka menu <strong>Profil</strong> dari sidebar sebelah kiri.</li>
+              <li>Klik tab <strong>Edit Profil</strong>.</li>
+              <li>Untuk mengganti foto, klik tombol <strong>Unggah Foto</strong> atau ikon kamera pada area avatar, lalu pilih file gambar dari perangkat Anda.</li>
+              <li>Anda juga dapat memperbarui informasi kontak seperti Email, Nomor Telepon, atau Alamat.</li>
+              <li>Setelah selesai, klik <strong>Simpan Perubahan</strong>.</li>
+            </ol>
+          </>
+        ),
+      },
     ],
   },
   mahasiswa: {
@@ -259,6 +275,38 @@ const FAQ_DATA = {
               <li>Anda akan langsung diarahkan ke halaman <strong>Nilai Individu</strong> yang menyajikan rekap skor kuis mahasiswa secara otomatis.</li>
             </ol>
             <p><strong>Catatan:</strong> Nilai kuis ini dihitung otomatis oleh sistem berdasarkan jawaban pilihan ganda yang benar, dan bersifat 🔒 <strong>Permanen / Read-only</strong> (tidak dapat diedit secara manual oleh dosen demi menjaga keaslian nilai kuis).</p>
+          </>
+        ),
+      },
+      {
+        icon: "assignment_add",
+        question: "Bagaimana cara membuat Tugas atau Kuis baru?",
+        answer: (
+          <>
+            <ol>
+              <li>Masuk ke menu <strong>Tugas & Kuis</strong> dari sidebar.</li>
+              <li>Klik tombol <strong>Buat Baru</strong> di pojok kanan atas.</li>
+              <li>Pilih <strong>Tipe</strong> yang ingin dibuat: <em>Tugas (Pengumpulan File)</em> atau <em>Kuis (Pilihan Ganda)</em>.</li>
+              <li>Pilih mata kuliah, isi Judul, Deskripsi/Instruksi, dan tentukan <strong>Tenggat Waktu (Deadline)</strong>.</li>
+              <li>Jika membuat kuis, Anda akan diminta untuk memasukkan daftar pertanyaan dan pilihan jawabannya.</li>
+              <li>Klik <strong>Simpan dan Publikasikan</strong> agar mahasiswa dapat mulai mengerjakannya.</li>
+            </ol>
+          </>
+        ),
+      },
+      {
+        icon: "group_add",
+        question: "Bagaimana cara membuat Kelompok Kelas?",
+        answer: (
+          <>
+            <p>Untuk membuat kelompok belajar mahasiswa:</p>
+            <ol>
+              <li>Masuk ke menu <strong>Kelompok</strong>.</li>
+              <li>Pilih mata kuliah yang ingin diatur kelompoknya.</li>
+              <li>Klik tombol <strong>Buat Kelompok</strong>.</li>
+              <li>Anda dapat memilih <strong>Pembagian Otomatis</strong> (sistem akan mengacak mahasiswa ke dalam kelompok secara merata) atau <strong>Pembagian Manual</strong> (memilih sendiri anggota untuk setiap kelompok).</li>
+              <li>Beri nama kelompok (misal: Kelompok 1, Kelompok 2) dan simpan.</li>
+            </ol>
           </>
         ),
       },
