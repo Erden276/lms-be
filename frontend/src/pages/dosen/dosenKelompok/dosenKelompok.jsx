@@ -82,8 +82,8 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
     return { ...g, members, nilai: g.nilai || {} };
   };
 
-  const fetchGroups = async () => {
-    setLoading(true);
+  const fetchGroups = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await apiClient.get("/api/kelompok");
       const data = res?.data || res;
@@ -93,7 +93,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
     } catch (error) {
       console.error("Gagal memuat kelompok:", error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -197,13 +197,18 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
   const confirmDeleteGroup = async () => {
     if (!deleteConfirmModal) return;
     const { id, name } = deleteConfirmModal;
+    
+    // Optimistic: close modal and filter UI immediately
+    setDeleteConfirmModal(null);
+    setGroups(prev => prev.filter(g => g.id !== id));
+    
     try {
       await apiClient.delete(`/api/kelompok/${id}`);
-      setDeleteConfirmModal(null);
       showToast(`Kelompok "${name}" berhasil dihapus!`);
-      fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       showToast("Gagal menghapus kelompok", "error");
+      fetchGroups();
     }
   };
 

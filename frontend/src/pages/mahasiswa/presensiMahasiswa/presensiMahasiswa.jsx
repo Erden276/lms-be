@@ -361,7 +361,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                 <div className="pmh-class-list">
                   {isLoading ? (
                     Array(3).fill(0).map((_, i) => (
-                      <div key={i} className="pmh-class-card skeleton-shimmer" style={{ minHeight: "80px", border: "none" }}></div>
+                      <div key={i} className="skeleton-card" style={{ minHeight: "80px", borderRadius: "0.75rem" }}></div>
                     ))
                   ) : (
                   (() => {
@@ -519,7 +519,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
               <div className="pmh-summary-card">
                 <h4 className="pmh-summary-title">Rekap Kehadiran Semester</h4>
                 {isLoading ? (
-                  <div className="skeleton-shimmer" style={{ width: "100%", height: "120px", borderRadius: "1rem", marginTop: "1rem" }}></div>
+                  <div className="skeleton-card" style={{ width: "100%", height: "120px", borderRadius: "1rem", marginTop: "1rem" }}></div>
                 ) : (
                   <div className="pmh-summary-ring-wrap">
                     <div className="pmh-ring-chart">
@@ -585,7 +585,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                 <div className="pmh-history-list">
                   {isLoading ? (
                     Array(3).fill(0).map((_, i) => (
-                      <div key={i} className="pmh-history-item skeleton-shimmer" style={{ height: "64px", border: "none" }}></div>
+                      <div key={i} className="skeleton-card" style={{ height: "64px", borderRadius: "0.5rem" }}></div>
                     ))
                   ) : (
                   (() => {

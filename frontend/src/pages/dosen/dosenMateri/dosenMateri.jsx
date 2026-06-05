@@ -121,7 +121,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      if (mkFilter !== false && tpFilter !== false && arguments[2] !== false) {
+        setLoading(false);
+      }
     }
   };
 
@@ -219,14 +221,22 @@ export default function DosenMateri({ onNavigate, onLogout }) {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const currentDeleteId = deleteId;
+    
+    // Optimistic delete: Close modal and update UI instantly ("satset")
+    setDeleteId(null);
+    setMateri(prev => prev.filter(m => m.id !== currentDeleteId));
+    
     try {
-      await apiClient.delete(`/api/modul-ajar/${deleteId}`);
+      await apiClient.delete(`/api/modul-ajar/${currentDeleteId}`);
       showToast("Materi dihapus.");
-      fetchMateri();
+      // Silent background sync
+      fetchMateri(filterMatkul, filterTipe, false);
     } catch (error) {
       showToast("Gagal menghapus", "error");
+      // Revert UI if fail
+      fetchMateri();
     }
-    setDeleteId(null);
   };
 
   const handleDownload = async (item) => {

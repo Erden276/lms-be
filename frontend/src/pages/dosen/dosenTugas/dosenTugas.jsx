@@ -94,8 +94,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchTasks = async () => {
-    setLoading(true);
+  const fetchTasks = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await apiClient.get('/api/dosen/tugas');
       const raw = res.data || res;
@@ -126,7 +126,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -308,20 +308,27 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   };
   const handleDelete = async () => {
     if (!deleteId) return;
-    try {
-      if (deleteTipe === 'Kuis') {
-        await apiClient.delete(`/api/kuis/${deleteId}`);
-        showToast("Kuis dihapus.");
-      } else {
-        await apiClient.delete(`/api/dosen/tugas/${deleteId}`);
-        showToast("Tugas dihapus.");
-      }
-      fetchTasks();
-    } catch (error) {
-      showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
-    }
+    const currentId = deleteId;
+    const currentTipe = deleteTipe;
+    
+    // Optimistic delete
     setDeleteId(null);
     setDeleteTipe(null);
+    setTasks(prev => prev.filter(t => t.id !== currentId));
+    
+    try {
+      if (currentTipe === 'Kuis') {
+        await apiClient.delete(`/api/kuis/${currentId}`);
+        showToast("Kuis dihapus.");
+      } else {
+        await apiClient.delete(`/api/dosen/tugas/${currentId}`);
+        showToast("Tugas dihapus.");
+      }
+      fetchTasks(false);
+    } catch (error) {
+      showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
+      fetchTasks();
+    }
   };
 
   const handleViewSubmissions = (task) => {
