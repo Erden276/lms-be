@@ -24,22 +24,10 @@ import DosenMateri from "./pages/dosen/dosenMateri/dosenMateri";
 import FAQ from "./pages/faq/faq";
 import PageTransitionLoader from "./components/PageTransitionLoader";
 
-// Event listener global untuk mendeteksi F5 atau Ctrl+R
-window.addEventListener("keydown", (e) => {
-  if (e.key === "F5" || (e.ctrlKey && (e.key === "r" || e.key === "R"))) {
-    sessionStorage.setItem("isF5", "true");
-  }
-});
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    if (sessionStorage.getItem("isF5") === "true") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      sessionStorage.removeItem("currentPage");
-      sessionStorage.removeItem("isF5"); // Hapus flag setelah digunakan
-      return false;
-    }
     return localStorage.getItem("token") !== null;
   });
   const [userRole, setUserRole] = useState(() => {
