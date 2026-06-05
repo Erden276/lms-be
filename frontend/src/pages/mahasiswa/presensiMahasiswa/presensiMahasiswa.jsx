@@ -37,6 +37,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
   const [dateFilter, setDateFilter] = useState("semua"); // semua | minggu | bulan
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const isLoading = isLoadingCourses || isLoadingHistory;
   const scanTimeoutRef              = useRef(null);
   const html5QrCodeRef              = useRef(null);
   const scannerContainerId          = "pmh-qr-reader";
@@ -358,7 +359,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
                 {/* Class List */}
                 <div className="pmh-class-list">
-                  {isLoadingCourses ? (
+                  {isLoading ? (
                     Array(3).fill(0).map((_, i) => (
                       <div key={i} className="pmh-class-card skeleton-shimmer" style={{ minHeight: "80px", border: "none" }}></div>
                     ))
@@ -494,17 +495,13 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
             <div className="pmh-right-col">
               {/* Session info */}
               <div className="pmh-session-card">
-                {isLoadingCourses ? (
-                  <div className="skeleton-shimmer" style={{ width: "100%", height: "140px", borderRadius: "1rem" }}></div>
-                ) : (
-                  <>
-                    <div className="pmh-session-top">
-                      <span className="pmh-session-chip">SESI AKTIF</span>
-                      <span className="pmh-live-dot">
-                        <span className="pmh-live-pulse"></span>
-                        LIVE
-                      </span>
-                    </div>
+                <div className="pmh-session-top">
+                  <span className="pmh-session-chip">SESI AKTIF</span>
+                  <span className="pmh-live-dot">
+                    <span className="pmh-live-pulse"></span>
+                    LIVE
+                  </span>
+                </div>
                 <h3 className="pmh-session-name">{activeClass?.name || "Memuat..."}</h3>
                 <div className="pmh-session-details">
                   <div className="pmh-detail-row">
@@ -516,14 +513,12 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     <span>Total sesi: {history.length}</span>
                   </div>
                 </div>
-                </>
-                )}
               </div>
 
               {/* Attendance summary */}
               <div className="pmh-summary-card">
                 <h4 className="pmh-summary-title">Rekap Kehadiran Semester</h4>
-                {isLoadingHistory ? (
+                {isLoading ? (
                   <div className="skeleton-shimmer" style={{ width: "100%", height: "120px", borderRadius: "1rem", marginTop: "1rem" }}></div>
                 ) : (
                   <div className="pmh-summary-ring-wrap">
@@ -588,7 +583,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                   </div>
                 </div>
                 <div className="pmh-history-list">
-                  {isLoadingHistory ? (
+                  {isLoading ? (
                     Array(3).fill(0).map((_, i) => (
                       <div key={i} className="pmh-history-item skeleton-shimmer" style={{ height: "64px", border: "none" }}></div>
                     ))

@@ -41,6 +41,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [loading, setLoading] = useState(true);
   const [loadingMatkul, setLoadingMatkul] = useState(true);
+  const isDataLoading = loading || loadingMatkul;
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [selectedMatkul, setSelectedMatkul] = useState({ id: null, name: "Memuat...", room: "-", time: "-", jadwal: "" });
   const [sessionActive, setSessionActive]   = useState(false);
@@ -494,12 +495,8 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
             {/* Right: session info + stats */}
             <div className="dp-info-col">
               <div className="dp-session-card">
-                {loadingMatkul ? (
-                  <div className="skeleton-shimmer" style={{ width: "100%", height: "200px", borderRadius: "1rem" }}></div>
-                ) : (
-                  <>
-                    <span className="dp-chip">SESI AKTIF</span>
-                    <h2 className="dp-session-title">{selectedMatkul.name}</h2>
+                <span className="dp-chip">SESI AKTIF</span>
+                <h2 className="dp-session-title">{selectedMatkul.name}</h2>
                 <div className="dp-session-details">
                   <div className="dp-detail-item">
                     <span className="material-symbols-outlined">schedule</span>
@@ -541,8 +538,6 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                     </div>
                   </div>
                 </div>
-                </>
-                )}
               </div>
 
               {/* Stats */}
@@ -553,7 +548,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                   { label: "IZIN",   value: statCount("Izin"),  color: "#c47f17", icon: "event_busy" },
                   { label: "ALPA",   value: statCount("Alpa"),  color: "#dc2626", icon: "cancel" },
                 ].map((s) => (
-                  loading ? (
+                  isDataLoading ? (
                     <div key={s.label} className="dp-stat-card skeleton-shimmer" style={{ border: 'none', height: '6rem' }}></div>
                   ) : (
                     <div key={s.label} className="dp-stat-card">
@@ -603,7 +598,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {loading ? (
+                  {isDataLoading ? (
                     Array(5).fill(0).map((_, i) => (
                       <tr key={i}>
                         <td colSpan="4" style={{ padding: "16px" }}>
