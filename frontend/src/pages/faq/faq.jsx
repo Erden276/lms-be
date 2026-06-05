@@ -366,7 +366,7 @@ export default function FAQ() {
 
   return (
     <main className="faq-main">
-      <div className="faq-container">
+      <div className="faq-container animate-fade-in-up">
         {/* Header */}
         <div className="faq-header">
           <div className="faq-badge">
@@ -407,7 +407,11 @@ export default function FAQ() {
                 const key = `${catKey}-${i}`;
                 const isOpen = openIndex === key;
                 return (
-                  <div key={key} className={`faq-item ${isOpen ? "open" : ""}`}>
+                  <div 
+                    key={key} 
+                    className={`faq-item animate-fade-in-up ${isOpen ? "open" : ""}`}
+                    style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
+                  >
                     <button className="faq-question" onClick={() => toggle(key)}>
                       <span className="faq-q-left">
                         <span className="faq-q-icon">

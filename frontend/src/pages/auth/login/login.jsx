@@ -117,7 +117,7 @@ function Login({ onLogin, onFaq }) {
 
       <div className="login-container">
         {/* Login Card */}
-        <div className="login-card">
+        <div className="login-card animate-fade-in-up">
           {/* Logo & Branding */}
           <div className="brand-header">
             <div className="logo-container-wrapper">
@@ -243,8 +243,8 @@ function Login({ onLogin, onFaq }) {
 
         {/* Modal Privasi / Syarat */}
         {modal && (
-          <div className="lm-modal-overlay" onClick={() => setModal(null)}>
-            <div className="lm-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="lm-modal-overlay animate-fade-in" onClick={() => setModal(null)}>
+            <div className="lm-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
               <div className="lm-modal-header">
                 <div className="lm-modal-title">
                   <span className="material-symbols-outlined lm-modal-icon">{MODAL_CONTENT[modal].icon}</span>
