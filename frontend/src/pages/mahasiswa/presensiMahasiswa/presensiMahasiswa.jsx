@@ -35,6 +35,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
   const [upcoming, setUpcoming]     = useState([]);
   const [history, setHistory]       = useState([]);
   const [dateFilter, setDateFilter] = useState("semua"); // semua | minggu | bulan
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scanTimeoutRef              = useRef(null);
   const html5QrCodeRef              = useRef(null);
   const scannerContainerId          = "pmh-qr-reader";
@@ -43,6 +45,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
   useEffect(() => {
     const fetchCourses = async () => {
+      setIsLoadingCourses(true);
       try {
         // Hanya mata kuliah yang diikuti mahasiswa (berdasarkan relasi Presensi di DB)
         const res = await apiClient.get('/api/mata-kuliah/mahasiswa/me');
@@ -114,6 +117,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
       } catch (error) {
         console.error("Failed to load courses", error);
         setUpcoming([]);
+      } finally {
+        setIsLoadingCourses(false);
       }
     };
     fetchCourses();
@@ -124,9 +129,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
   const fetchHistory = useCallback(async () => {
     if (activeClass) {
+      setIsLoadingHistory(true);
       try {
-        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-
         // Add cache-busting to get fresh data
         const res = await apiClient.get(`/api/presensi/mahasiswa/${activeClass.id}?_t=${Date.now()}`);
         const allData = res.data || res || [];
@@ -184,7 +188,11 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
       } catch (error) {
         console.error("DEBUG - fetchHistory error:", error);
         setHistory([]);
+      } finally {
+        setIsLoadingHistory(false);
       }
+    } else {
+      setIsLoadingHistory(false);
     }
   }, [activeClass]);
 
@@ -350,7 +358,12 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
 
                 {/* Class List */}
                 <div className="pmh-class-list">
-                  {(() => {
+                  {isLoadingCourses ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={i} className="pmh-class-card skeleton-shimmer" style={{ minHeight: "80px", border: "none" }}></div>
+                    ))
+                  ) : (
+                  (() => {
                     const daysIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
                     const todayName = daysIndo[new Date().getDay()].toLowerCase();
                     
@@ -382,7 +395,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                         </div>
                       </div>
                     ));
-                  })()}
+                  })()
+                  )}
                 </div>
               </div>
 
@@ -480,13 +494,17 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
             <div className="pmh-right-col">
               {/* Session info */}
               <div className="pmh-session-card">
-                <div className="pmh-session-top">
-                  <span className="pmh-session-chip">SESI AKTIF</span>
-                  <span className="pmh-live-dot">
-                    <span className="pmh-live-pulse"></span>
-                    LIVE
-                  </span>
-                </div>
+                {isLoadingCourses ? (
+                  <div className="skeleton-shimmer" style={{ width: "100%", height: "140px", borderRadius: "1rem" }}></div>
+                ) : (
+                  <>
+                    <div className="pmh-session-top">
+                      <span className="pmh-session-chip">SESI AKTIF</span>
+                      <span className="pmh-live-dot">
+                        <span className="pmh-live-pulse"></span>
+                        LIVE
+                      </span>
+                    </div>
                 <h3 className="pmh-session-name">{activeClass?.name || "Memuat..."}</h3>
                 <div className="pmh-session-details">
                   <div className="pmh-detail-row">
@@ -498,13 +516,18 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     <span>Total sesi: {history.length}</span>
                   </div>
                 </div>
+                </>
+                )}
               </div>
 
               {/* Attendance summary */}
               <div className="pmh-summary-card">
                 <h4 className="pmh-summary-title">Rekap Kehadiran Semester</h4>
-                <div className="pmh-summary-ring-wrap">
-                  <div className="pmh-ring-chart">
+                {isLoadingHistory ? (
+                  <div className="skeleton-shimmer" style={{ width: "100%", height: "120px", borderRadius: "1rem", marginTop: "1rem" }}></div>
+                ) : (
+                  <div className="pmh-summary-ring-wrap">
+                    <div className="pmh-ring-chart">
                     <svg viewBox="0 0 80 80" className="pmh-ring-svg">
                       <circle cx="40" cy="40" r="30" fill="none" stroke="#e2e8f0" strokeWidth="10"/>
                       <circle cx="40" cy="40" r="30" fill="none" stroke="#2f9696" strokeWidth="10"
@@ -542,6 +565,7 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
 
               {/* History */}
@@ -564,7 +588,12 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                   </div>
                 </div>
                 <div className="pmh-history-list">
-                  {(() => {
+                  {isLoadingHistory ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={i} className="pmh-history-item skeleton-shimmer" style={{ height: "64px", border: "none" }}></div>
+                    ))
+                  ) : (
+                  (() => {
                     const filtered = history.filter(h => {
                       if (dateFilter === 'semua') return true;
                       const hDate = new Date(h.rawDate || Date.now());
@@ -592,7 +621,8 @@ export default function PresensiMahasiswa({ onNavigate, onLogout }) {
                        dateFilter === 'minggu' ? 'Tidak ada kehadiran minggu ini.' :
                        'Tidak ada kehadiran bulan ini.'}
                     </p>
-                  )})()}
+                  )})()
+                  )}
                 </div>
               </div>
             </div>

@@ -40,6 +40,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
   const [qrLoaded, setQrLoaded] = useState(false);
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [loading, setLoading] = useState(true);
+  const [loadingMatkul, setLoadingMatkul] = useState(true);
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [selectedMatkul, setSelectedMatkul] = useState({ id: null, name: "Memuat...", room: "-", time: "-", jadwal: "" });
   const [sessionActive, setSessionActive]   = useState(false);
@@ -113,6 +114,7 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
 
   useEffect(() => {
     const fetchCourses = async () => {
+      setLoadingMatkul(true);
       try {
         const res = await apiClient.get('/api/mata-kuliah');
         const data = Array.isArray(res) ? res : (res.data || []);
@@ -130,6 +132,8 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
         }
       } catch (error) {
         console.error("Failed to load courses");
+      } finally {
+        setLoadingMatkul(false);
       }
     };
     fetchCourses();
@@ -490,8 +494,12 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
             {/* Right: session info + stats */}
             <div className="dp-info-col">
               <div className="dp-session-card">
-                <span className="dp-chip">SESI AKTIF</span>
-                <h2 className="dp-session-title">{selectedMatkul.name}</h2>
+                {loadingMatkul ? (
+                  <div className="skeleton-shimmer" style={{ width: "100%", height: "200px", borderRadius: "1rem" }}></div>
+                ) : (
+                  <>
+                    <span className="dp-chip">SESI AKTIF</span>
+                    <h2 className="dp-session-title">{selectedMatkul.name}</h2>
                 <div className="dp-session-details">
                   <div className="dp-detail-item">
                     <span className="material-symbols-outlined">schedule</span>
@@ -533,6 +541,8 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                     </div>
                   </div>
                 </div>
+                </>
+                )}
               </div>
 
               {/* Stats */}
@@ -593,13 +603,15 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {(() => {
-                    if (students.length > 0) {
-                      const firstStudent = students[0];
-                    }
-                    return null;
-                  })()}
-                  {students.length === 0 ? (
+                  {loading ? (
+                    Array(5).fill(0).map((_, i) => (
+                      <tr key={i}>
+                        <td colSpan="4" style={{ padding: "16px" }}>
+                          <div className="skeleton-shimmer" style={{ height: "40px", borderRadius: "0.5rem" }}></div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : students.length === 0 ? (
                     <tr>
                       <td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
                         Tidak ada data mahasiswa. Klik "Buka Sesi" untuk membuat sesi presensi.
