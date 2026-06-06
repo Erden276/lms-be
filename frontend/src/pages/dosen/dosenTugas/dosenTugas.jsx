@@ -186,7 +186,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       setQuizQuestions(0);
       setView("list");
       showToast("Berhasil dibuat!");
-      fetchTasks();
+      fetchTasks(false);
     } catch (error) {
       showToast("Gagal membuat: " + (error.message || ""), "error");
     }
@@ -296,7 +296,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       setQuizQuestions(0);
       setView("list");
       showToast(form.type === "Kuis" ? "Kuis berhasil diperbarui!" : "Tugas berhasil diperbarui!");
-      fetchTasks();
+      fetchTasks(false);
     } catch (error) {
       showToast("Gagal memperbarui " + (form.type === "Kuis" ? "kuis" : "tugas"), "error");
     }

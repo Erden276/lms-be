@@ -55,18 +55,15 @@ function getIPKKumulatif(semesters) {
   return totalSks > 0 ? (totalBobot / totalSks).toFixed(2) : "-";
 }
 
-function calculateGrade(tugas, kuis) {
-  if (tugas === null && kuis === null) return null;
-  const total = Number(tugas || 0) + Number(kuis || 0);
-  if (total === 0) return null;
-  const avg = Number(tugas || 0) * 0.5 + Number(kuis || 0) * 0.5;
-  if (avg >= 85) return "A";
-  if (avg >= 80) return "A-";
-  if (avg >= 75) return "B+";
-  if (avg >= 70) return "B";
-  if (avg >= 65) return "B-";
-  if (avg >= 60) return "C";
-  if (avg >= 50) return "D";
+function calculateGrade(score) {
+  if (score === null || score === undefined) return null;
+  if (score >= 85) return "A";
+  if (score >= 80) return "A-";
+  if (score >= 75) return "B+";
+  if (score >= 70) return "B";
+  if (score >= 65) return "B-";
+  if (score >= 60) return "C";
+  if (score >= 50) return "D";
   return "E";
 }
 
@@ -116,17 +113,15 @@ export default function Nilai({ onNavigate, onLogout }) {
 
             const matkul = (data[k] || []).map((m) => {
               const tugas =
-                !isAktif && m.nilaiTugas ? parseFloat(m.nilaiTugas) : null;
+                !isAktif && m.nilaiTugas !== null && m.nilaiTugas !== undefined ? parseFloat(m.nilaiTugas) : null;
               const kuis =
-                !isAktif && m.nilaiKuis ? parseFloat(m.nilaiKuis) : null;
+                !isAktif && m.nilaiKuis !== null && m.nilaiKuis !== undefined ? parseFloat(m.nilaiKuis) : null;
               const finalScore =
-                !isAktif && m.nilaiAkhir
+                !isAktif && m.nilaiAkhir !== null && m.nilaiAkhir !== undefined
                   ? parseFloat(m.nilaiAkhir)
-                  : !isAktif && tugas !== null && kuis !== null
-                    ? Math.round(tugas * 0.5 + kuis * 0.5)
-                    : null;
+                  : null;
               const grade =
-                !isAktif && finalScore ? calculateGrade(tugas, kuis) : null;
+                !isAktif && finalScore !== null ? calculateGrade(finalScore) : null;
 
               const sks = m.mataKuliah?.sks || 3;
               totalSks += sks;

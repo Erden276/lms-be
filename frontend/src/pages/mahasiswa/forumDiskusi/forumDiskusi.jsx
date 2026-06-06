@@ -91,11 +91,11 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchForumThreads = async (matkulId) => {
+  const fetchForumThreads = async (matkulId, silent = false) => {
     const id = matkulId || (selectedMatkul && selectedMatkul.idMataKuliah);
     if (!id) return;
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await apiClient.get(`/api/forum/mata-kuliah/${id}`);
       const data = res.data || res;
       if (Array.isArray(data) && data.length > 0) {
@@ -132,12 +132,21 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
     } catch (error) {
       setThreads([]);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (selectedMatkul) fetchForumThreads(selectedMatkul.idMataKuliah);
+    let intervalId;
+    if (selectedMatkul) {
+      fetchForumThreads(selectedMatkul.idMataKuliah);
+      intervalId = setInterval(() => {
+        fetchForumThreads(selectedMatkul.idMataKuliah, true);
+      }, 5000); // 5 detik
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [selectedMatkul]);
 
   // ── Toolbar actions (simulate rich-text with markdown-like wrap) ──
@@ -212,7 +221,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
       setFormBody("");
       setAttachedFile(null);
       setView("forum");
-      fetchForumThreads();
+      fetchForumThreads(null, true);
     } catch (error) {
       showToast("error", error.message || "Gagal membuat diskusi");
     }
@@ -245,7 +254,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
     } catch (error) {
       console.error('Like error:', error);
       // Revert on error by refetching
-      fetchForumThreads();
+      fetchForumThreads(null, true);
     }
   };
 
@@ -261,7 +270,7 @@ export default function ForumDiskusi({ onNavigate, onLogout }) {
       setReplyText("");
       showToast("success", "Balasan berhasil dikirim!");
       // Refetch threads to show the new reply
-      await fetchForumThreads();
+      await fetchForumThreads(null, true);
       setExpandedIds(prev => new Set([...prev, threadId]));
     } catch (error) {
       showToast("error", error.message || "Gagal mengirim balasan");

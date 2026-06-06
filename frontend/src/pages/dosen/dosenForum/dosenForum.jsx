@@ -104,11 +104,11 @@ export default function DosenForum({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchThreads = async (matkulId) => {
+  const fetchThreads = async (matkulId, silent = false) => {
     const id = matkulId || (selectedMatkul && selectedMatkul.idMataKuliah);
     if (!id) return;
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await apiClient.get(`/api/dosen/forum/mata-kuliah/${id}`);
       const data = res.data || res;
       if (Array.isArray(data)) {
@@ -152,12 +152,21 @@ export default function DosenForum({ onNavigate, onLogout }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (selectedMatkul) fetchThreads(selectedMatkul.idMataKuliah);
+    let intervalId;
+    if (selectedMatkul) {
+      fetchThreads(selectedMatkul.idMataKuliah);
+      intervalId = setInterval(() => {
+        fetchThreads(selectedMatkul.idMataKuliah, true);
+      }, 5000); // 5 detik
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [selectedMatkul]);
 
   const handleSelectCourse = (matkul) => {
@@ -246,7 +255,7 @@ export default function DosenForum({ onNavigate, onLogout }) {
       setAttachedFile(null);
       setView("forum");
       showToast("success", "Diskusi berhasil dibuat!");
-      fetchThreads(); // reload threads
+      fetchThreads(null, true); // reload threads
     } catch (error) {
       showToast("error", error.message || "Gagal membuat diskusi");
     }
@@ -283,7 +292,7 @@ export default function DosenForum({ onNavigate, onLogout }) {
       await apiClient.post(`/api/dosen/forum/${threadId}/like`);
     } catch (error) {
       console.error("Like error:", error);
-      fetchThreads();
+      fetchThreads(null, true);
     }
   };
 
@@ -296,7 +305,7 @@ export default function DosenForum({ onNavigate, onLogout }) {
       setReplyingTo(null);
       setReplyText("");
       showToast("success", "Balasan berhasil dikirim!");
-      await fetchThreads();
+      await fetchThreads(null, true);
       setExpandedIds((prev) => new Set([...prev, threadId]));
     } catch (error) {
       showToast("error", error.message || "Gagal mengirim balasan");

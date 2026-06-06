@@ -107,14 +107,12 @@ export class DashboardMahasiswaUseCase {
 
       const bobotNilai = (n) => {
         if (n >= 85) return 4.0;
-        if (n >= 80) return 3.7;
-        if (n >= 75) return 3.3;
+        if (n >= 80) return 3.75;
+        if (n >= 75) return 3.5;
         if (n >= 70) return 3.0;
-        if (n >= 65) return 2.7;
-        if (n >= 60) return 2.3;
-        if (n >= 55) return 2.0;
-        if (n >= 50) return 1.7;
-        if (n >= 45) return 1.0;
+        if (n >= 65) return 2.75;
+        if (n >= 60) return 2.0;
+        if (n >= 50) return 1.0;
         return 0;
       };
 

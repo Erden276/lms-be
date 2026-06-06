@@ -23,9 +23,17 @@ import tugasDosenRoutes from './src/interfaces/routes/tugasDosenRoutes.js';
 import tugasRoutes from './src/interfaces/routes/tugasRoutes.js';
 import profileRoutes from './src/interfaces/routes/profileRoutes.js';
 import notifikasiRoutes from './src/interfaces/routes/notifikasiRoutes.js';
+import fs from 'fs';
 
 const app = express();
 const PORT = process.env.PORT_APP || process.env.PORT || 8080;
+
+// Ensure uploads directory exists
+['uploads', 'public/uploads'].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
 const userRepository = new PrismaUserRepository();
 const authUseCase = new AuthUseCase(userRepository);
