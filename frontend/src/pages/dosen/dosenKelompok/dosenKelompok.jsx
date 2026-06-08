@@ -136,31 +136,52 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
       });
       setNilaiModal(null);
       showToast("Nilai berhasil disimpan!");
-      fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       showToast("Gagal menyimpan nilai", "error");
     }
   };
 
   const removeMember = async (groupId, studentId) => {
+    // Optimistic UI update
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id === groupId
+          ? { ...g, members: g.members.filter((m) => m.nim !== studentId) }
+          : g
+      )
+    );
     try {
       await apiClient.delete(`/api/kelompok/${groupId}/members/${studentId}`);
       showToast("Anggota dikeluarkan.");
-      await fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       showToast("Gagal mengeluarkan", "error");
+      fetchGroups(false);
     }
   };
 
   const addMember = async (groupId, nim) => {
+    const student = allStudents.find((s) => s.nim === nim);
+    // Optimistic UI update
+    if (student) {
+      setGroups((prev) =>
+        prev.map((g) =>
+          g.id === groupId
+            ? { ...g, members: [...g.members, { nim: student.nim, name: student.name, nomorInduk: student.nomorInduk || student.nim }] }
+            : g
+        )
+      );
+    }
     try {
       await apiClient.post(`/api/kelompok/${groupId}/members`, {
         nim: nim,
       });
       showToast("Anggota berhasil ditambahkan!");
-      await fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       showToast(error.message || "Gagal menambahkan anggota", "error");
+      fetchGroups(false);
     }
   };
 
@@ -184,7 +205,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
       setSelectedMkId("");
       setCreateModal(false);
       showToast("Kelompok berhasil dibuat!");
-      fetchGroups();
+      fetchGroups(false);
     } catch (error) {
       showToast(error.message || "Gagal membuat kelompok", "error");
     }
@@ -208,7 +229,7 @@ export default function DosenKelompok({ onNavigate, onLogout }) {
       fetchGroups(false);
     } catch (error) {
       showToast("Gagal menghapus kelompok", "error");
-      fetchGroups();
+      fetchGroups(false);
     }
   };
 

@@ -48,6 +48,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [materi, setMateri] = useState(INITIAL_MATERI);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [matkulList, setMatkulList] = useState([]);
   const [toast, setToast] = useState(null);
   const [view, setView] = useState("list"); // "list" | "create" | "edit"
@@ -88,8 +89,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
   const fetchMateri = async (
     mkFilter = filterMatkul,
     tpFilter = filterTipe,
+    showLoading = true
   ) => {
-    setLoading(true);
+    if (showLoading) setLoading(true);
     try {
       const params = new URLSearchParams();
       if (mkFilter && mkFilter !== "Semua") params.append("matkul", mkFilter);
@@ -121,9 +123,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     } catch (error) {
       console.error(error);
     } finally {
-      if (mkFilter !== false && tpFilter !== false && arguments[2] !== false) {
-        setLoading(false);
-      }
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -185,6 +185,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
       return;
     }
 
+    setIsSubmitting(true);
+    showToast("Menyimpan materi...", "info");
+
     try {
       const payload = new FormData();
       payload.append("judul", form.judul);
@@ -212,10 +215,12 @@ export default function DosenMateri({ onNavigate, onLogout }) {
         });
         showToast("Materi berhasil diperbarui!");
       }
-      fetchMateri();
+      fetchMateri(filterMatkul, filterTipe, false);
       setView("list");
     } catch (error) {
       showToast(error.message || "Gagal menyimpan materi", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -235,7 +240,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     } catch (error) {
       showToast("Gagal menghapus", "error");
       // Revert UI if fail
-      fetchMateri();
+      fetchMateri(filterMatkul, filterTipe, false);
     }
   };
 
@@ -243,7 +248,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     showToast(`Mengunduh: ${item.judul}`);
     try {
       await apiClient.post(`/api/modul-ajar/${item.id}/download`);
-      fetchMateri();
+      fetchMateri(filterMatkul, filterTipe, false);
     } catch (error) {}
   };
 
@@ -863,9 +868,18 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     >
                       Batal
                     </button>
-                    <button type="submit" className="dm-btn-submit">
-                      <span className="material-symbols-outlined">save</span>
-                      {view === "create" ? "Simpan Materi" : "Perbarui Materi"}
+                    <button type="submit" className="dm-btn-submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <>
+                          <span className="material-symbols-outlined" style={{ animation: "spin 1s linear infinite" }}>autorenew</span>
+                          Menyimpan...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined">save</span>
+                          {view === "create" ? "Simpan Materi" : "Perbarui Materi"}
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

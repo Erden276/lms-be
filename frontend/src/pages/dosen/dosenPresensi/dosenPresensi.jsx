@@ -165,15 +165,13 @@ export default function DosenPresensi({ onNavigate, onLogout }) {
 
   useEffect(() => {
     if (selectedMatkul?.id) {
-      setLoading(true);
       fetchDates();
-      fetchStudents();
     }
-  }, [selectedMatkul?.id, fetchDates, fetchStudents]);
+  }, [selectedMatkul?.id, fetchDates]);
   
-  // Fetch students saat tanggal berubah
+  // Fetch students saat matkul atau tanggal berubah
   useEffect(() => {
-    if (selectedMatkul?.id && selectedDateFilter) {
+    if (selectedMatkul?.id) {
       setLoading(true);
       fetchStudents();
     }

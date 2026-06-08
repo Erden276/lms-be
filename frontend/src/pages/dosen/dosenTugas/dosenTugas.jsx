@@ -50,6 +50,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   const [deleteTipe, setDeleteTipe] = useState(null);
   const [filter, setFilter] = useState("Semua");
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -141,6 +142,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       showToast("Judul dan deadline wajib diisi.", "error");
       return;
     }
+    setIsSubmitting(true);
+    showToast("Menyimpan data...", "info");
     try {
       if (form.type === "Kuis") {
         // Buat kuis via /api/kuis
@@ -189,6 +192,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       fetchTasks(false);
     } catch (error) {
       showToast("Gagal membuat: " + (error.message || ""), "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -260,6 +265,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       showToast("Judul dan deadline wajib diisi.", "error");
       return;
     }
+    setIsSubmitting(true);
+    showToast("Memperbarui data...", "info");
     try {
       if (form.type === "Kuis") {
         // Update kuis dengan soal-soal baru
@@ -299,6 +306,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       fetchTasks(false);
     } catch (error) {
       showToast("Gagal memperbarui " + (form.type === "Kuis" ? "kuis" : "tugas"), "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -327,7 +336,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       fetchTasks(false);
     } catch (error) {
       showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
-      fetchTasks();
+      fetchTasks(false);
     }
   };
 
@@ -847,9 +856,18 @@ export default function DosenTugas({ onNavigate, onLogout }) {
             >
               Batal
             </button>
-            <button type="submit" className="dt-btn-submit">
-              <span className="material-symbols-outlined">save</span>
-              {submitLabel}
+            <button type="submit" className="dt-btn-submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <span className="material-symbols-outlined" style={{ animation: "spin 1s linear infinite" }}>autorenew</span>
+                  Menyimpan...
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined">save</span>
+                  {submitLabel}
+                </>
+              )}
             </button>
           </div>
         </form>
