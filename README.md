@@ -106,7 +106,7 @@ Pastikan path folder `assets` berada di root repository kamu. Jika folder `asset
 
 ## 🎨 Mockup Antarmuka (Figma)
 
-> [Klik di sini untuk melihat desain Figma]([LINK_FIGMA_KAMU_DISINI](https://www.figma.com/design/U7E23STjd9mdzj4BNMLAKo/Lms-v2?node-id=0-1&t=4nzyZuUxpb75UDOo-1))
+> [Klik di sini untuk melihat desain Figma](https://www.figma.com/design/U7E23STjd9mdzj4BNMLAKo/Lms-v2?node-id=0-1&t=4nzyZuUxpb75UDOo-1)
 
 ---
 
