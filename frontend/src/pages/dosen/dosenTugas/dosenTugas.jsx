@@ -1009,7 +1009,13 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                   },
                 ].map((s) => (
                   loading ? (
-                    <div key={s.label} className="dt-stat-mini skeleton-shimmer" style={{ border: 'none', height: '4.5rem' }}></div>
+                    <div key={s.label} className="dt-stat-mini skeleton-card" style={{ border: 'none', height: '4.5rem', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
+                      <div className="skeleton-circle" style={{ width: '40px', height: '40px' }}></div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className="skeleton-text" style={{ width: '30px', height: '24px', margin: 0 }}></div>
+                        <div className="skeleton-text" style={{ width: '60px', height: '14px', margin: 0 }}></div>
+                      </div>
+                    </div>
                   ) : (
                     <div key={s.label} className="dt-stat-mini">
                       <span className="material-symbols-outlined" style={{ color: s.color }}>{s.icon}</span>
@@ -1026,8 +1032,34 @@ export default function DosenTugas({ onNavigate, onLogout }) {
 
               {/* Task Cards */}
               <div className="dt-task-grid">
-                {filtered.map((task) => {
-                  const dl = daysLeft(task.deadline);
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="dt-task-card skeleton-card" style={{ padding: '1.5rem', minHeight: '280px', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <div className="skeleton-text" style={{ width: '80px', height: '24px', borderRadius: '12px' }}></div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <div className="skeleton-circle" style={{ width: '32px', height: '32px' }}></div>
+                          <div className="skeleton-circle" style={{ width: '32px', height: '32px' }}></div>
+                        </div>
+                      </div>
+                      <div className="skeleton-text skeleton-text--medium" style={{ height: '20px', marginBottom: '12px' }}></div>
+                      <div className="skeleton-text skeleton-text--short" style={{ marginBottom: '16px' }}></div>
+                      <div className="skeleton-text" style={{ width: '100%', height: '40px', marginBottom: '16px' }}></div>
+                      <div className="skeleton-text" style={{ width: '100%', height: '8px', marginBottom: '24px' }}></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
+                        <div className="skeleton-text" style={{ width: '120px', height: '32px' }}></div>
+                        <div className="skeleton-text" style={{ width: '100px', height: '32px', borderRadius: '16px' }}></div>
+                      </div>
+                    </div>
+                  ))
+                ) : filtered.length === 0 ? (
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--slate-500)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '3rem', color: 'var(--slate-300)', marginBottom: '1rem' }}>assignment</span>
+                    <p>Belum ada tugas.</p>
+                  </div>
+                ) : (
+                  filtered.map((task) => {
+                    const dl = daysLeft(task.deadline);
                   const progress = task.tipe === 'Kuis' 
                     ? (task.totalMahasiswa > 0 ? Math.round((task.jumlahPengerjaan / task.totalMahasiswa) * 100) : 0)
                     : (task.total > 0 ? Math.round((task.submitted / task.total) * 100) : 0);
@@ -1168,7 +1200,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                       </div>
                     </div>
                   );
-                })}
+                }))}
               </div>
             </>
           )}
