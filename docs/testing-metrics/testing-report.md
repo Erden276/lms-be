@@ -267,7 +267,7 @@ Saya menggunakan *tool* **Jest** dan **Supertest** untuk melakukan pengujian oto
 ## Output
 
 - 🔗 **Link Repository GitHub:** <https://github.com/Erden276/lms-be>
-- 📄 **Link File:** `docs/testing-metrics/testing-report.md`
+- 📄 **Link File:** <https://github.com/Erden276/lms-be/blob/main/docs/testing-metrics/testing-report.md>
 
 ---
 
