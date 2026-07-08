@@ -1,11 +1,13 @@
 # Testing Report — Implementasi Metrik Pengujian
 
-**Nama:** Moch Firmansyah  
+**Nama:** Muhammad Daffa  
 **Mata Kuliah:** Implementasi Perancangan Perangkat Lunak  
 **Dosen:** Muhammad Shiddiq Azis, S.T., MBA  
 **Proyek:** LeMaS — Learning Management System  
-**Repository:** https://github.com/moch-firmansyahh/Learning_Management_System  
-**Base URL API:** `https://lms-be-production-efde.up.railway.app`  
+**Repository:** <https://github.com/Erden276/lms-be>  
+**Frontend (Vercel):** `https://learning-management-system-nu-six.vercel.app`  
+**Backend / Base URL API (Railway):** `https://lms-be-production-efde.up.railway.app`  
+**Database:** PostgreSQL via Supabase  
 **Tanggal:** 8 Juli 2026  
 
 ---
@@ -85,6 +87,7 @@ Jumlah bug yang ditemukan: **3 bug**
 | 3 | Generate QR tanpa parameter tanggal tidak menghasilkan pesan validasi yang jelas | Presensi QR | Minor |
 
 **Pengelompokan:**
+
 - 🔴 **Critical:** 0 bug
 - 🟠 **Major:** 2 bug
 - 🟡 **Minor:** 1 bug
@@ -104,93 +107,72 @@ Defect Density = Jumlah Bug / Jumlah Fitur
 ### Screenshot 1 — Login Dosen Berhasil (TC-01)
 
 > Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/auth/login`  
-> Input: `{ "nomorInduk": "lestari@kampus.ac.id", "password": "password123", "role": "DOSEN" }`  
+> Input: `{ "nomorInduk": "2025001", "password": "password123" }`  
 > Hasil: Response `200 OK` dengan token JWT
 
-```json
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": 1,
-    "nama": "Dr. Lestari",
-    "role": "DOSEN"
-  }
-}
-```
+![Login Dosen Berhasil](Login_Berhasil.png)
 
 ---
 
-### Screenshot 2 — Upload Tugas Berhasil (TC-07)
+### Screenshot 2 — Login Mahasiswa Berhasil (TC-02)
 
-> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/tugas/1/submit`  
-> Input: form-data dengan file PDF + catatan  
-> Hasil: Response `201 Created`, file tersimpan di server
+> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/auth/login`  
+> Input: `{ "nomorInduk": "2026002", "password": "password123" }`  
+> Hasil: Response `200 OK` dengan token JWT
 
-```json
-{
-  "success": true,
-  "message": "Tugas berhasil dikumpulkan",
-  "data": {
-    "idPengumpulan": 5,
-    "namaFile": "jawaban_tugas.pdf",
-    "status": "Terkumpul"
-  }
-}
-```
+![Login Mahasiswa Berhasil](Login_Berhasil_Mahasiswa.png)
 
 ---
 
-### Screenshot 3 — Upload File .exe Tidak Divalidasi — BUG (TC-09)
+### Screenshot 3 — Login Password Salah (TC-03)
 
-> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/tugas/1/submit`  
-> Input: form-data dengan file berekstensi `.exe`  
-> Expected: `400 Bad Request` — tipe file tidak diizinkan  
-> Actual: `201 Created` — **file .exe berhasil terupload (BUG)**
+> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/auth/login`  
+> Input: `{ "nomorInduk": "2025001", "password": "salahbanget" }`  
+> Hasil: Response `401 Unauthorized`
 
-```json
-{
-  "success": true,
-  "message": "Tugas berhasil dikumpulkan",
-  "data": {
-    "namaFile": "virus.exe"
-  }
-}
-```
-
-> ⚠️ **Bug ditemukan:** Tidak ada validasi tipe file di server, semua format diterima.
+![Login Password Salah](Login_Password_Salah.png)
 
 ---
 
-### Screenshot 4 — Generate QR Presensi Berhasil (TC-13)
+### Screenshot 4 — Generate QR Presensi Dosen (TC-13)
 
 > Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/dosen/presensi/matkul/1/generate`  
 > Input: `{ "tanggal": "2026-07-08" }`  
-> Hasil: `201 Created` dengan token QR
+> Hasil: Token QR berhasil dibuat
 
-```json
-{
-  "success": true,
-  "token": "LeMaS-1720425600-abc123xyz",
-  "tanggal": "2026-07-08",
-  "idMataKuliah": 1
-}
-```
+![Generate QR Presensi Dosen](Generate_QR_Presensi_dosen.png)
 
 ---
 
-### Screenshot 5 — Akses Hapus Thread Milik Orang Lain Ditolak (TC-20)
+### Screenshot 5 — Buat Thread Forum (TC-18)
 
-> Endpoint: `DELETE https://lms-be-production-efde.up.railway.app/api/forum/thread/1`  
-> Input: Token mahasiswa yang bukan pemilik thread  
-> Hasil: Response `403 Forbidden`
+> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/forum/thread`  
+> Input: `{ "idMataKuliah": 1, "judul": "Diskusi Pertemuan 1", "isiForum": "..." }`  
+> Hasil: Thread berhasil dibuat
 
-```json
-{
-  "success": false,
-  "message": "Anda tidak memiliki izin untuk menghapus thread ini"
-}
-```
+![Buat Thread Forum](Buat_Thread_Forum.png)
+
+---
+
+### Screenshot 6 — Upload Tugas Mahasiswa (TC-07)
+
+> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/tugas/:id/submit`  
+> Input: form-data dengan file PDF + catatan  
+> Hasil: Tugas berhasil dikumpulkan
+
+![Upload Tugas Mahasiswa](Upload_Tugas_Mahasiswa.png)
+
+---
+
+### Screenshot 7 — Upload File .exe Tidak Divalidasi — BUG (TC-09)
+
+> Endpoint: `POST https://lms-be-production-efde.up.railway.app/api/tugas/:id/submit`  
+> Input: form-data dengan file berekstensi `.exe`  
+> Hasil: Response `201 Created` — **file .exe berhasil terupload (BUG)**
+
+![Upload File .exe BUG](Test_Upload_Exe.png)
+
+> ⚠️ **Bug ditemukan:** Tidak ada validasi tipe file di server, semua format diterima.
 
 ---
 
@@ -215,6 +197,7 @@ Ketika parameter `tanggal` tidak dikirim saat generate QR, server mengembalikan 
 
 **Bug #1 — Validasi tipe file:**  
 Tambahkan konfigurasi `fileFilter` pada middleware Multer di `src/interfaces/middlewares/` untuk memfilter ekstensi file:
+
 ```js
 fileFilter: (req, file, cb) => {
   const allowed = ['.pdf', '.doc', '.docx', '.zip', '.png', '.jpg'];
@@ -226,6 +209,7 @@ fileFilter: (req, file, cb) => {
 
 **Bug #2 — Pengecekan deadline:**  
 Tambahkan logika pengecekan di `TugasUseCase.js` sebelum menyimpan pengumpulan:
+
 ```js
 if (new Date() > new Date(tugas.deadlineTugas)) {
   throw new Error('Deadline pengumpulan sudah terlewat');
@@ -273,11 +257,18 @@ git push origin main
 
 ---
 
+## Nilai Tambahan (+10) — Eksekusi Test dengan Jest
+
+Saya menggunakan *tool* **Jest** dan **Supertest** untuk melakukan pengujian otomatis (E2E API Testing) pada *endpoint* Authentication (Login). Pengujian dijalankan langsung menembak API di server *production* (Railway) untuk memastikan bahwa kredensial ditolak atau diterima dengan respons dan *status code* yang sesuai.
+
+![Hasil Eksekusi Jest](Hasil_Jest.png)
+---
+
 ## Output
 
-- 🔗 **Link Repository GitHub:** https://github.com/moch-firmansyahh/Learning_Management_System
+- 🔗 **Link Repository GitHub:** <https://github.com/Erden276/lms-be>
 - 📄 **Link File:** `docs/testing-metrics/testing-report.md`
 
 ---
 
-*Report dibuat oleh: Moch Firmansyah — Tugas Pengganti Kuis IPPL*
+*Report dibuat oleh: Muhammad Daffa — Tugas Pengganti Kuis*
