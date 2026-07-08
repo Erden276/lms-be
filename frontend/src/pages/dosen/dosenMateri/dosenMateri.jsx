@@ -47,6 +47,8 @@ const INITIAL_MATERI = [];
 export default function DosenMateri({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
   const [materi, setMateri] = useState(INITIAL_MATERI);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [matkulList, setMatkulList] = useState([]);
   const [toast, setToast] = useState(null);
   const [view, setView] = useState("list"); // "list" | "create" | "edit"
@@ -59,9 +61,11 @@ export default function DosenMateri({ onNavigate, onLogout }) {
 
   const fetchMatkulList = async () => {
     try {
-      const res = await apiClient.get('/api/mata-kuliah');
-      const data = Array.isArray(res) ? res : (res.data || []);
-      setMatkulList(data.map(mk => ({ id: mk.idMataKuliah, name: mk.namaMataKuliah })));
+      const res = await apiClient.get("/api/mata-kuliah");
+      const data = Array.isArray(res) ? res : res.data || [];
+      setMatkulList(
+        data.map((mk) => ({ id: mk.idMataKuliah, name: mk.namaMataKuliah })),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -82,32 +86,44 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchMateri = async (mkFilter = filterMatkul, tpFilter = filterTipe) => {
+  const fetchMateri = async (
+    mkFilter = filterMatkul,
+    tpFilter = filterTipe,
+    showLoading = true
+  ) => {
+    if (showLoading) setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (mkFilter && mkFilter !== "Semua") params.append('matkul', mkFilter);
-      if (tpFilter && tpFilter !== "Semua") params.append('tipe', tpFilter);
-      const query = params.toString() ? `?${params.toString()}` : '';
+      if (mkFilter && mkFilter !== "Semua") params.append("matkul", mkFilter);
+      if (tpFilter && tpFilter !== "Semua") params.append("tipe", tpFilter);
+      const query = params.toString() ? `?${params.toString()}` : "";
       const res = await apiClient.get(`/api/modul-ajar${query}`);
-      const data = Array.isArray(res) ? res : (res.data || []);
+      const data = Array.isArray(res) ? res : res.data || [];
       if (Array.isArray(data)) {
-        setMateri(data.map(m => ({
-          id: m.idModulAjar || m.id,
-          judul: m.judul,
-          tipe: m.tipe_modul || m.tipe,
-          matkul: m.idMataKuliah || m.matkul,
-          matakuliah: m.mataKuliah?.namaMataKuliah || m.matakuliah || "Mata Kuliah",
-          deskripsi: m.deskripsi,
-          url: m.url,
-          ukuran: m.ukuran,
-          tanggal: m.tanggal ? new Date(m.tanggal).toISOString().slice(0, 10) : "",
-          diunduh: m.diunduh || 0,
-          canDownload: m.canDownload,
-          file: null
-        })));
+        setMateri(
+          data.map((m) => ({
+            id: m.idModulAjar || m.id,
+            judul: m.judul,
+            tipe: m.tipe_modul || m.tipe,
+            matkul: m.idMataKuliah || m.matkul,
+            matakuliah:
+              m.mataKuliah?.namaMataKuliah || m.matakuliah || "Mata Kuliah",
+            deskripsi: m.deskripsi,
+            url: m.url,
+            ukuran: m.ukuran,
+            tanggal: m.tanggal
+              ? new Date(m.tanggal).toISOString().slice(0, 10)
+              : "",
+            diunduh: m.diunduh || 0,
+            canDownload: m.canDownload,
+            file: null,
+          })),
+        );
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -124,7 +140,8 @@ export default function DosenMateri({ onNavigate, onLogout }) {
     matkulList.find((m) => m.id === id)?.name || id;
 
   const filtered = materi.filter((m) => {
-    const mk = filterMatkul === "Semua" || String(m.matkul) === String(filterMatkul);
+    const mk =
+      filterMatkul === "Semua" || String(m.matkul) === String(filterMatkul);
     const tp = filterTipe === "Semua" || m.tipe === filterTipe;
     return mk && tp;
   });
@@ -151,7 +168,7 @@ export default function DosenMateri({ onNavigate, onLogout }) {
       deskripsi: item.deskripsi,
       url: item.url || "",
       file: null,
-      canDownload: item.canDownload,
+      canDownload: true, // Force to true since restriction is removed
     });
     setEditId(item.id);
     setView("edit");
@@ -167,6 +184,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
       showToast("URL wajib diisi untuk tipe Link/Video.", "error");
       return;
     }
+
+    setIsSubmitting(true);
+    showToast("Menyimpan materi...", "info");
 
     try {
       const payload = new FormData();
@@ -195,30 +215,40 @@ export default function DosenMateri({ onNavigate, onLogout }) {
         });
         showToast("Materi berhasil diperbarui!");
       }
-      fetchMateri();
+      fetchMateri(filterMatkul, filterTipe, false);
       setView("list");
     } catch (error) {
       showToast(error.message || "Gagal menyimpan materi", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const currentDeleteId = deleteId;
+    
+    // Optimistic delete: Close modal and update UI instantly ("satset")
+    setDeleteId(null);
+    setMateri(prev => prev.filter(m => m.id !== currentDeleteId));
+    
     try {
-      await apiClient.delete(`/api/modul-ajar/${deleteId}`);
+      await apiClient.delete(`/api/modul-ajar/${currentDeleteId}`);
       showToast("Materi dihapus.");
-      fetchMateri();
+      // Silent background sync
+      fetchMateri(filterMatkul, filterTipe, false);
     } catch (error) {
       showToast("Gagal menghapus", "error");
+      // Revert UI if fail
+      fetchMateri(filterMatkul, filterTipe, false);
     }
-    setDeleteId(null);
   };
 
   const handleDownload = async (item) => {
     showToast(`Mengunduh: ${item.judul}`);
     try {
       await apiClient.post(`/api/modul-ajar/${item.id}/download`);
-      fetchMateri();
+      fetchMateri(filterMatkul, filterTipe, false);
     } catch (error) {}
   };
 
@@ -437,31 +467,42 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     icon: "play_circle",
                     color: "#7c3aed",
                   },
-                ].map((s) => (
-                  <div key={s.label} className="dm-stat-mini">
+                ].map((s) =>
+                  loading ? (
                     <div
-                      className="dm-stat-icon-wrap"
-                      style={{ background: `${s.color}18` }}
-                    >
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ color: s.color }}
+                      key={s.label}
+                      className="dm-stat-mini skeleton-shimmer"
+                      style={{ border: "none", height: "4.5rem" }}
+                    ></div>
+                  ) : (
+                    <div key={s.label} className="dm-stat-mini">
+                      <div
+                        className="dm-stat-icon-wrap"
+                        style={{ background: `${s.color}18` }}
                       >
-                        {s.icon}
-                      </span>
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ color: s.color }}
+                        >
+                          {s.icon}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="dm-stat-val" style={{ color: s.color }}>
+                          {s.value}
+                        </p>
+                        <p className="dm-stat-lbl">{s.label}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="dm-stat-val" style={{ color: s.color }}>
-                        {s.value}
-                      </p>
-                      <p className="dm-stat-lbl">{s.label}</p>
-                    </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
 
               {/* Filters */}
-              <div className="dm-filter-row" style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+              <div
+                className="dm-filter-row"
+                style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}
+              >
                 <div className="dm-filter-group--select">
                   <label className="dm-filter-label">Mata Kuliah:</label>
                   <select
@@ -471,7 +512,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                   >
                     <option value="Semua">Semua Mata Kuliah</option>
                     {matkulList.map((m) => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -484,7 +527,9 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                   >
                     <option value="Semua">Semua Tipe</option>
                     {TIPE_LIST.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -812,37 +857,6 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                         }
                       />
                     </div>
-
-                    {/* Can Download toggle */}
-                    <div className="dm-field dm-field--full">
-                      <label className="dm-label">Izin Unduh</label>
-                      <div className="dm-toggle-row">
-                        <button
-                          type="button"
-                          className={`dm-toggle-opt ${form.canDownload ? "dm-toggle-opt--on" : ""}`}
-                          onClick={() =>
-                            setForm({ ...form, canDownload: true })
-                          }
-                        >
-                          <span className="material-symbols-outlined">
-                            download
-                          </span>
-                          Mahasiswa boleh mengunduh
-                        </button>
-                        <button
-                          type="button"
-                          className={`dm-toggle-opt ${!form.canDownload ? "dm-toggle-opt--off" : ""}`}
-                          onClick={() =>
-                            setForm({ ...form, canDownload: false })
-                          }
-                        >
-                          <span className="material-symbols-outlined">
-                            visibility
-                          </span>
-                          Hanya bisa dilihat / dibuka
-                        </button>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Actions */}
@@ -854,9 +868,18 @@ export default function DosenMateri({ onNavigate, onLogout }) {
                     >
                       Batal
                     </button>
-                    <button type="submit" className="dm-btn-submit">
-                      <span className="material-symbols-outlined">save</span>
-                      {view === "create" ? "Simpan Materi" : "Perbarui Materi"}
+                    <button type="submit" className="dm-btn-submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <>
+                          <span className="material-symbols-outlined" style={{ animation: "spin 1s linear infinite" }}>autorenew</span>
+                          Menyimpan...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined">save</span>
+                          {view === "create" ? "Simpan Materi" : "Perbarui Materi"}
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

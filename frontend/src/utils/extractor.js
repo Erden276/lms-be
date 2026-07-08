@@ -1,4 +1,4 @@
-import mammoth from "mammoth";
+﻿import mammoth from "mammoth";
 import * as XLSX from "xlsx";
 import * as pdfjsLib from "pdfjs-dist/build/pdf.mjs";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
@@ -91,11 +91,9 @@ ${text.substring(0, 30000)}
 
   for (const name of modelNames) {
     try {
-      console.log(`Mencoba model: ${name}...`);
       const currentModel = genAI.getGenerativeModel({ model: name });
       result = await currentModel.generateContent(prompt);
       if (result) {
-        console.log(`Berhasil menggunakan model: ${name}`);
         break;
       }
     } catch (error) {

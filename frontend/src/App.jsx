@@ -22,32 +22,100 @@ import DosenForum from "./pages/dosen/dosenForum/dosenForum";
 import DosenProfile from "./pages/dosen/dosenProfile/dosenProfile";
 import DosenMateri from "./pages/dosen/dosenMateri/dosenMateri";
 import FAQ from "./pages/faq/faq";
+import PageTransitionLoader from "./components/PageTransitionLoader";
+
+
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState("");
-  const [currentPage, setCurrentPage] = useState({ page: "dashboard" });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("token") !== null;
+  });
+  const [userRole, setUserRole] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        const role = parsed.role || "";
+        return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+      } catch (e) {
+        return "";
+      }
+    }
+    return "";
+  });
+  const [currentPage, setCurrentPage] = useState(() => {
+    // Check if the current page load is a normal refresh/reload
+    const navEntries = performance.getEntriesByType('navigation');
+    const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
+
+    if (isReload) {
+      const savedPage = sessionStorage.getItem("currentPage");
+      if (savedPage) {
+        try {
+          return JSON.parse(savedPage);
+        } catch (e) {
+          // ignore parsing failure
+        }
+      }
+    } else {
+      sessionStorage.removeItem("currentPage");
+    }
+
+    // Fallback to default dashboard based on role
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        const role = parsed.role || "";
+        const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+        return { page: formattedRole === "Dosen" ? "dosenDashboard" : "dashboard" };
+      } catch (e) {
+        // ignore
+      }
+    }
+    return { page: "dashboard" };
+  });
   const [showFaq, setShowFaq] = useState(false);
+  const [transitionLoading, setTransitionLoading] = useState(false);
+  const [transitionTarget, setTransitionTarget] = useState(null);
 
   const handleLogin = (role) => {
     setIsLoggedIn(true);
     setUserRole(role);
-    setCurrentPage({ page: role === "Dosen" ? "dosenDashboard" : "dashboard" });
+    const initialPage = { page: role === "Dosen" ? "dosenDashboard" : "dashboard" };
+    setCurrentPage(initialPage);
+    sessionStorage.setItem("currentPage", JSON.stringify(initialPage));
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole("");
-    setCurrentPage({ page: "dashboard" });
+    const defaultPage = { page: "dashboard" };
+    setCurrentPage(defaultPage);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("currentPage");
   };
 
   const navigateTo = (target) => {
+    let newPage;
     if (typeof target === "string") {
-      setCurrentPage({ page: target });
+      newPage = { page: target };
     } else {
-      setCurrentPage(target); // { page: "mataKuliah", id: 1 }
+      newPage = target; // { page: "mataKuliah", id: 1 }
     }
+    setTransitionTarget(newPage.page);
+    setTransitionLoading(true);
+    setTimeout(() => {
+      setCurrentPage(newPage);
+      sessionStorage.setItem("currentPage", JSON.stringify(newPage));
+      setTransitionLoading(false);
+    }, 600);
   };
+
+  if (transitionLoading) {
+    return <PageTransitionLoader targetPage={transitionTarget} />;
+  }
 
   if (showFaq) {
     return (

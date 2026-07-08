@@ -2,7 +2,7 @@ import { prisma } from "../../../lib/prisma.js";
 export class PrismaDashboardDosenRepository {
   async getDosenInfo(nomorInduk) {
     return await prisma.dosen.findUnique({
-      where: { nomorInduk },
+      where: { nip: nomorInduk },
       include: {
         user: true,
       }

@@ -16,6 +16,7 @@ export class ForumUseCase {
               time: thread.createdAt,
               title: thread.judul,
               content: thread.isiForum,
+              lampiran: thread.lampiran,
               comments: (thread.komentarForum || []).map(k => ({
               id: k.idKomentar,
               authorName: k.user?.nama || 'Unknown',
@@ -43,14 +44,15 @@ export class ForumUseCase {
     }
 
   // Membuat Diskusi Baru
-async createThread(idMataKuliah, nomorInduk, judul, isiForum) {
+async createThread(idMataKuliah, nomorInduk, judul, isiForum, lampiran) {
     if (!judul || !isiForum) throw new Error("Judul dan isi forum tidak boleh kosong");
     
     return await this.forumRepository.createThread({
         idMataKuliah,
         nomorInduk,
         judul,
-        isiForum
+        isiForum,
+        lampiran
         });
     }
 

@@ -20,9 +20,11 @@ export default function DosenProfile({ onNavigate, onLogout }) {
   const [toast, setToast] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR);
   const storedUserStr = localStorage.getItem("user");
   const storedUser = storedUserStr ? JSON.parse(storedUserStr) : {};
+
+  const initialAvatar = storedUser.fotoUrl ? `${API_BASE}${storedUser.fotoUrl}` : DEFAULT_AVATAR;
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
 
   const [formData, setFormData] = useState({
     email: storedUser.email || "",
@@ -32,7 +34,7 @@ export default function DosenProfile({ onNavigate, onLogout }) {
   });
   const [profileData, setProfileData] = useState({
     nama: storedUser.nama || "Dosen",
-    nidn: storedUser.nomorInduk || "-",
+    nidn: storedUser.dosen?.nidn || "-",
   });
   const [mataKuliahList, setMataKuliahList] = useState([]);
   const [stats, setStats] = useState({
@@ -41,6 +43,7 @@ export default function DosenProfile({ onNavigate, onLogout }) {
     rataPresensi: "0%"
   });
   const [pwForm, setPwForm] = useState({ old: "", newPw: "", confirm: "" });
+  const [showPw, setShowPw] = useState({ old: false, new: false, confirm: false });
 
   // Camera refs
   const videoRef = useRef(null);
@@ -66,7 +69,7 @@ export default function DosenProfile({ onNavigate, onLogout }) {
           const d = res.data;
           setProfileData({
             nama: d.nama || storedUser.nama || "Dosen",
-            nidn: d.nidn || storedUser.nomorInduk || "-",
+            nidn: d.nidn || storedUser.dosen?.nidn || "-",
           });
           setFormData({
             email: d.email || storedUser.email || "",
@@ -131,6 +134,22 @@ export default function DosenProfile({ onNavigate, onLogout }) {
     }
     if (pwForm.newPw.length < 6) {
       showToast("error", "Kata sandi baru minimal 6 karakter.");
+      return;
+    }
+    if (!/[A-Z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf besar.");
+      return;
+    }
+    if (!/[a-z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf kecil.");
+      return;
+    }
+    if (!/[0-9]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung angka.");
+      return;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung simbol.");
       return;
     }
     try {
@@ -253,19 +272,28 @@ export default function DosenProfile({ onNavigate, onLogout }) {
             </div>
             <form onSubmit={handlePwSubmit} className="prf-modal-body">
               {[
-                ["Kata Sandi Lama", "old"],
-                ["Kata Sandi Baru", "newPw"],
-                ["Konfirmasi Kata Sandi", "confirm"],
-              ].map(([label, key]) => (
-                <div key={key} className="prf-field">
+                ["Kata Sandi Lama", "old", "old"],
+                ["Kata Sandi Baru", "newPw", "new"],
+                ["Konfirmasi Kata Sandi", "confirm", "confirm"],
+              ].map(([label, key, showKey]) => (
+                <div key={key} className="prf-field prf-field--pw">
                   <label className="prf-label">{label}</label>
-                  <input
-                    className="prf-input"
-                    type="password"
-                    placeholder="••••••••"
-                    value={pwForm[key]}
-                    onChange={(e) => setPwForm({ ...pwForm, [key]: e.target.value })}
-                  />
+                  <div className="prf-pw-input-wrap">
+                    <input
+                      className="prf-input prf-input--pw"
+                      type={showPw[showKey] ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={pwForm[key]}
+                      onChange={(e) => setPwForm({ ...pwForm, [key]: e.target.value })}
+                    />
+                    <button
+                      type="button"
+                      className="prf-pw-toggle"
+                      onClick={() => setShowPw({ ...showPw, [showKey]: !showPw[showKey] })}
+                    >
+                      <span className="material-symbols-outlined">{showPw[showKey] ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                  </div>
                 </div>
               ))}
               <div className="prf-modal-actions">
@@ -356,114 +384,127 @@ export default function DosenProfile({ onNavigate, onLogout }) {
         <Navbar role="Dosen" onOpenSidebar={openSidebar} onNavigate={onNavigate} />
 
         <div className="page-content">
-          {/* Identity Card */}
-          <div className="prf-identity-card dprf-identity-card">
-            <div className="prf-avatar-wrap">
-              <img src={avatarUrl} alt="Foto Profil Dosen" className="prf-avatar" onError={(e) => { e.target.src = DEFAULT_AVATAR; }} />
-              <button className="prf-avatar-edit" title="Ganti foto" onClick={() => setShowPhotoModal(true)}>
-                <span className="material-symbols-outlined">photo_camera</span>
-              </button>
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className="skeleton-card" style={{ height: '140px', borderRadius: '1rem' }}></div>
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                <div className="skeleton-card" style={{ flex: '1 1 300px', height: '250px', borderRadius: '1rem' }}></div>
+                <div className="skeleton-card" style={{ flex: '1 1 300px', height: '250px', borderRadius: '1rem' }}></div>
+              </div>
+              <div className="skeleton-card" style={{ height: '150px', borderRadius: '1rem' }}></div>
             </div>
-            <div className="prf-identity-info">
-              <h1 className="prf-name">{profileData.nama}</h1>
-              <div className="prf-identity-meta">
-                <span className="prf-nim-badge dprf-nidn-badge">
-                  NIDN: {profileData.nidn}
-                </span>
-                <span className="prf-verified">
-                  <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#059669" }}>verified</span>
-                  Akun Terverifikasi
-                </span>
-              </div>
-              <div className="dprf-tags">
-                <span className="dprf-tag">Dosen Tetap</span>
-                <span className="dprf-tag dprf-tag--teal">S3 Informatika</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Data + Security */}
-          <div className="prf-main-row">
-            <div className="prf-data-card">
-              <div className="prf-data-header">
-                <div className="prf-data-title">
-                  <span className="material-symbols-outlined" style={{ color: "var(--color-secondary)", fontSize: "1.25rem" }}>id_card</span>
-                  <h2>Data Pribadi</h2>
+          ) : (
+            <>
+              {/* Identity Card */}
+              <div className="prf-identity-card dprf-identity-card">
+                <div className="prf-avatar-wrap">
+                  <img src={avatarUrl} alt="Foto Profil Dosen" className="prf-avatar" onError={(e) => { e.target.src = DEFAULT_AVATAR; }} />
+                  <button className="prf-avatar-edit" title="Ganti foto" onClick={() => setShowPhotoModal(true)}>
+                    <span className="material-symbols-outlined">photo_camera</span>
+                  </button>
+                </div>
+                <div className="prf-identity-info">
+                  <h1 className="prf-name">{profileData.nama}</h1>
+                  <div className="prf-identity-meta">
+                    <span className="prf-nim-badge dprf-nidn-badge">
+                      NIDN: {profileData.nidn}
+                    </span>
+                    <span className="prf-verified">
+                      <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#059669" }}>verified</span>
+                      Akun Terverifikasi
+                    </span>
+                  </div>
+                  <div className="dprf-tags">
+                    <span className="dprf-tag">Dosen Tetap</span>
+                    <span className="dprf-tag dprf-tag--teal">S3 Informatika</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="prf-data-grid">
-                <div className="prf-data-field">
-                  <p className="prf-field-label">EMAIL INSTITUSI</p>
-                  <p className="prf-field-value">{formData.email}</p>
-                </div>
-                <div className="prf-data-field">
-                  <p className="prf-field-label">NOMOR TELEPON</p>
-                  <p className="prf-field-value">{formData.telepon}</p>
-                </div>
-              </div>
-
-              <div className="prf-data-field prf-fullwidth">
-                <p className="prf-field-label">BIDANG KEAHLIAN</p>
-                <p className="prf-field-value prf-prodi">{formData.bidang}</p>
-              </div>
-
-              <div className="prf-data-grid prf-data-grid--3">
-                <div className="prf-data-field">
-                  <p className="prf-field-label">RUANG KANTOR</p>
-                  <p className="prf-field-value">{formData.officeRoom}</p>
-                </div>
-                <div className="prf-data-field">
-                  <p className="prf-field-label">TAHUN AKADEMIK</p>
-                  <p className="prf-field-value">2023/2024</p>
-                </div>
-              </div>
-              <div className="prf-admin-notice">
-                <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#7c5800" }}>info</span>
-                <p>Untuk mengubah data pribadi, ajukan permintaan ke <strong>administrator akademik</strong>.</p>
-              </div>
-            </div>
-
-            <div className="prf-security-card">
-              <div className="prf-security-header">
-                <span className="material-symbols-outlined prf-shield-icon">security</span>
-                <h2>Keamanan</h2>
-              </div>
-              <p className="prf-security-desc">
-                Jaga keamanan akun Anda dengan memperbarui kata sandi secara berkala.
-              </p>
-              <button className="prf-pw-btn" onClick={() => setShowPasswordModal(true)}>
-                <span className="material-symbols-outlined">lock_reset</span>
-                Ubah Kata Sandi
-              </button>
-            </div>
-          </div>
-
-          {/* Mata Kuliah Diampu + Statistik */}
-          <div className="prf-bottom-row">
-            <div className="dprf-matkul-card">
-              <div className="dprf-matkul-icon">
-                <span className="material-symbols-outlined">menu_book</span>
-              </div>
-              <h3 className="dprf-matkul-title">Mata Kuliah Diampu</h3>
-              <div className="dprf-matkul-list">
-                {mataKuliahList.length > 0 ? (
-                  mataKuliahList.map((mk) => (
-                    <div key={mk.idMataKuliah} className="dprf-matkul-row">
-                      <div>
-                        <p className="dprf-mk-name">{mk.namaMataKuliah}</p>
-                        <p className="dprf-mk-code">MK-{mk.idMataKuliah} · 3 SKS</p>
-                      </div>
-                      <span className="dprf-mk-badge">Aktif</span>
+              {/* Data + Security */}
+              <div className="prf-main-row">
+                <div className="prf-data-card">
+                  <div className="prf-data-header">
+                    <div className="prf-data-title">
+                      <span className="material-symbols-outlined" style={{ color: "var(--color-secondary)", fontSize: "1.25rem" }}>id_card</span>
+                      <h2>Data Pribadi</h2>
                     </div>
-                  ))
-                ) : (
-                  <p style={{ color: "var(--slate-500)", fontSize: "0.875rem" }}>Belum ada mata kuliah yang diampu.</p>
-                )}
-              </div>
-            </div>
+                  </div>
 
-          </div>
+                  <div className="prf-data-grid">
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">EMAIL INSTITUSI</p>
+                      <p className="prf-field-value">{formData.email}</p>
+                    </div>
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">NOMOR TELEPON</p>
+                      <p className="prf-field-value">{formData.telepon}</p>
+                    </div>
+                  </div>
+
+                  <div className="prf-data-field prf-fullwidth">
+                    <p className="prf-field-label">BIDANG KEAHLIAN</p>
+                    <p className="prf-field-value prf-prodi">{formData.bidang}</p>
+                  </div>
+
+                  <div className="prf-data-grid prf-data-grid--3">
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">RUANG KANTOR</p>
+                      <p className="prf-field-value">{formData.officeRoom}</p>
+                    </div>
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">TAHUN AKADEMIK</p>
+                      <p className="prf-field-value">2023/2024</p>
+                    </div>
+                  </div>
+                  <div className="prf-admin-notice">
+                    <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#7c5800" }}>info</span>
+                    <p>Untuk mengubah data pribadi, ajukan permintaan ke <strong>administrator akademik</strong>.</p>
+                  </div>
+                </div>
+
+                <div className="prf-security-card">
+                  <div className="prf-security-header">
+                    <span className="material-symbols-outlined prf-shield-icon">security</span>
+                    <h2>Keamanan</h2>
+                  </div>
+                  <p className="prf-security-desc">
+                    Jaga keamanan akun Anda dengan memperbarui kata sandi secara berkala.
+                  </p>
+                  <button className="prf-pw-btn" onClick={() => setShowPasswordModal(true)}>
+                    <span className="material-symbols-outlined">lock_reset</span>
+                    Ubah Kata Sandi
+                  </button>
+                </div>
+              </div>
+
+              {/* Mata Kuliah Diampu + Statistik */}
+              <div className="prf-bottom-row">
+                <div className="dprf-matkul-card">
+                  <div className="dprf-matkul-icon">
+                    <span className="material-symbols-outlined">menu_book</span>
+                  </div>
+                  <h3 className="dprf-matkul-title">Mata Kuliah Diampu</h3>
+                  <div className="dprf-matkul-list">
+                    {mataKuliahList.length > 0 ? (
+                      mataKuliahList.map((mk) => (
+                        <div key={mk.idMataKuliah} className="dprf-matkul-row">
+                          <div>
+                            <p className="dprf-mk-name">{mk.namaMataKuliah}</p>
+                            <p className="dprf-mk-code">MK-{mk.idMataKuliah} · 3 SKS</p>
+                          </div>
+                          <span className="dprf-mk-badge">Aktif</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p style={{ color: "var(--slate-500)", fontSize: "0.875rem" }}>Belum ada mata kuliah yang diampu.</p>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

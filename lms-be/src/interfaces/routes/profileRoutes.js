@@ -132,7 +132,19 @@ router.post('/change-password', async (req, res) => {
     }
     
     if (newPassword.length < 6) {
-      return res.status(400).json({ status: 'error', message: 'Password baru minimal 6 karakter' });
+      return res.status(400).json({ status: 'error', message: 'Kata sandi baru minimal 6 karakter' });
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      return res.status(400).json({ status: 'error', message: 'Kata sandi baru harus mengandung huruf besar' });
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      return res.status(400).json({ status: 'error', message: 'Kata sandi baru harus mengandung huruf kecil' });
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      return res.status(400).json({ status: 'error', message: 'Kata sandi baru harus mengandung angka' });
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(newPassword)) {
+      return res.status(400).json({ status: 'error', message: 'Kata sandi baru harus mengandung simbol' });
     }
 
     const user = await prisma.user.findUnique({

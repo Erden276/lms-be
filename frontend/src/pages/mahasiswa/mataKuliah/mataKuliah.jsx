@@ -6,6 +6,9 @@ import Sidebar from "../../../components/Sidebar";
 import { useSidebar } from "../../../components/useSidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
@@ -142,9 +145,8 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
-  if (loading) {
-    return <div className="page-shell"><main className="page-main"><div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>Memuat materi...</div></main></div>;
-  }
+  // Remove early LoadingSpinner return
+
 
 
 
@@ -159,7 +161,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
           fontSize: "0.875rem", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
           display: "flex", alignItems: "center", gap: "0.5rem"
         }}>
-          <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>check_circle</span>
+          <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>{"check_circle"}</span>
           {toast}
         </div>
       )}
@@ -169,7 +171,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
         <div className="mk-video-modal" onClick={() => setVideoOpen(false)}>
           <div className="mk-video-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="mk-video-modal-close" onClick={() => setVideoOpen(false)}>
-              <span className="material-symbols-outlined">close</span>
+              <span className="material-symbols-outlined">{"close"}</span>
             </button>
             <div className="mk-video-modal-header">
               <h3>{modules.find(m => m.id === activeModule)?.title || "Video Pembelajaran"}</h3>
@@ -200,7 +202,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                     src={activeVideo.url || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
                     poster={getYouTubeThumbnail(activeVideo.url)}
                   >
-                    Browser Anda tidak mendukung tag video.
+                    {"Browser Anda tidak mendukung tag video."}
                   </video>
                 );
               })()}
@@ -219,15 +221,32 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
 
         {/* Content */}
         <div className="page-content">
-          {/* Course header */}
-          <div className="mk-course-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '20rem' }}></div>
+              <div className="skeleton-text skeleton-text--medium" style={{ height: '1.25rem', width: '30rem' }}></div>
+              <div className="mk-body-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skeleton-card" style={{ height: '300px', width: '100%' }}></div>
+                  <div className="skeleton-card" style={{ height: '150px', width: '100%' }}></div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skeleton-card" style={{ height: '250px', width: '100%' }}></div>
+                  <div className="skeleton-card" style={{ height: '100px', width: '100%' }}></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Course header */}
+              <div className="mk-course-header">
             <span className="mk-faculty-badge">
-              <span className="material-symbols-outlined">school</span>
-              FAKULTAS INFORMATIKA
+              <span className="material-symbols-outlined">{"school"}</span>
+              {"FAKULTAS INFORMATIKA"}
             </span>
-            <h2 className="mk-course-title">Mata Kuliah: {course?.namaMataKuliah || course?.nama || "Mata Kuliah"}</h2>
+            <h2 className="mk-course-title">{"Mata Kuliah: "}{course?.namaMataKuliah || course?.nama || "Mata Kuliah"}</h2>
             <p className="mk-course-desc">
-              Silakan pelajari materi dan kerjakan tugas yang tersedia.
+              {"Silakan pelajari materi dan kerjakan tugas yang tersedia."}
             </p>
           </div>
 
@@ -242,15 +261,34 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                   <>
                     <div className="mk-video-card">
                       <div className="mk-video-thumb">
-                        <img
-                          src={activeData?.type === "video" && isYouTubeUrl(activeData?.url)
-                            ? getYouTubeThumbnail(activeData.url)
-                            : activeData?.type === "video"
-                              ? "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
-                              : "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&auto=format&fit=crop"
-                          }
-                          alt={activeData?.title}
-                        />
+                        <span className={`mk-type-badge mk-badge-${activeData?.type || "default"}`}>
+                          <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
+                            {getTypeIcon(activeData?.meta)}
+                          </span>
+                          {activeData?.type === "pdf"
+                            ? "PDF"
+                            : activeData?.type === "presentasi"
+                              ? "Presentasi"
+                              : activeData?.type === "link"
+                                ? "Link"
+                                : activeData?.type === "dokumen"
+                                  ? "Dokumen"
+                                  : activeData?.type === "spreadsheet"
+                                    ? "Excel"
+                                    : "Materi"}
+                        </span>
+                        {activeData?.type === "video" ? (
+                          <img
+                            src={
+                              isYouTubeUrl(activeData?.url)
+                                ? getYouTubeThumbnail(activeData.url)
+                                : "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
+                            }
+                            alt={activeData?.title}
+                          />
+                        ) : (
+                          <div className={`mk-file-placeholder mk-placeholder-${activeData?.type || "default"}`} />
+                        )}
                         <div className="mk-video-overlay" onClick={async () => {
                           if (activeData?.action === "play") {
                             try {
@@ -265,7 +303,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                           } else if (activeData?.action === "open") {
                             window.open(activeData.url, '_blank');
                           } else if (activeData?.action === "download") {
-                            const fileUrl = activeData.url?.startsWith('http') ? activeData.url : `http://localhost:3000${activeData.url}`;
+                            const fileUrl = activeData.url?.startsWith('http') ? activeData.url : `${API_BASE}${activeData.url}`;
                             window.open(fileUrl, '_blank');
                           }
                         }} style={{ cursor: "pointer" }}>
@@ -288,8 +326,8 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                     {/* Description */}
                     <div className="mk-desc-card">
                       <h3 className="mk-desc-heading">
-                        <span className="material-symbols-outlined">info</span>
-                        Deskripsi Materi
+                        <span className="material-symbols-outlined">{"info"}</span>
+                        {"Deskripsi Materi"}
                       </h3>
                       <p className="mk-desc-body">
                         {activeData?.deskripsi}
@@ -313,8 +351,8 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
               {/* Module List */}
               <div className="mk-module-card">
                 <div className="mk-module-header">
-                  <h3>Daftar Materi</h3>
-                  <span className="mk-prog-badge">{modules.length} MODUL</span>
+                  <h3>{"Daftar Materi"}</h3>
+                  <span className="mk-prog-badge">{modules.length} {"MODUL"}</span>
                 </div>
                 <div className="mk-module-list">
                   {modules.map((m) => {
@@ -360,7 +398,7 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                                   padding: "2px"
                                 }}
                               >
-                                check_circle
+                                {"check_circle"}
                               </span>
                             )}
                           </div>
@@ -382,12 +420,12 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
                                 }
                                 showToast(`Mengunduh: ${m.title}`);
                                 // Use absolute URL if provided, otherwise prepend base URL
-                                const fileUrl = m.url?.startsWith('http') ? m.url : `http://localhost:3000${m.url}`;
+                                const fileUrl = m.url?.startsWith('http') ? m.url : `${API_BASE}${m.url}`;
                                 window.open(fileUrl, '_blank');
                               }}
                             >
-                              <span className="material-symbols-outlined">download</span>
-                              Unduh Modul
+                              <span className="material-symbols-outlined">{"download"}</span>
+                              {"Unduh Modul"}
                             </button>
                           )}
                         </div>
@@ -399,19 +437,21 @@ export default function MataKuliah({ onNavigate, onLogout, idMataKuliah = 1 }) {
 
               {/* Instructor */}
               <div className="mk-instructor-card">
-                <p className="mk-inst-label">PENGAJAR</p>
+                <p className="mk-inst-label">{"PENGAJAR"}</p>
                 <div className="mk-inst-row">
                   <div className="mk-inst-avatar" style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, #2f9696, #4b53bc)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '1.1rem' }}>
                     {(course?.dosen?.user?.nama || course?.dosenNama || "??").split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}
                   </div>
                   <div className="mk-inst-info">
                     <p className="mk-inst-name">{course?.dosen?.user?.nama || course?.dosenNama || "Dosen"}</p>
-                    <p className="mk-inst-role">Dosen {course?.namaMataKuliah || course?.nama || ""}</p>
+                    <p className="mk-inst-role">{"Dosen "}{course?.namaMataKuliah || course?.nama || ""}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

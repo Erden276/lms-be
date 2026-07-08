@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import "../../../components/shared.css";
 import "./pengumpulanTugas.css";
 import Sidebar from "../../../components/Sidebar";
@@ -65,10 +65,6 @@ export default function PengumpulanTugas({ onNavigate, onLogout, taskId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting task:", taskId);
-    console.log("User NIM:", nim);
-    console.log("File selected:", file);
-    console.log("Existing submission:", submission);
 
     // Cek deadline - tidak bisa submit jika sudah lewat
     if (isDeadlinePassed() && !submission) {
@@ -93,9 +89,7 @@ export default function PengumpulanTugas({ onNavigate, onLogout, taskId }) {
         formData.append("fileJawaban", submission.fileJawaban);
       }
 
-      console.log("Sending to /api/tugas/" + taskId + "/submit");
       const response = await apiClient.post(`/api/tugas/${taskId}/submit`, formData);
-      console.log("Response:", response);
 
       showToast("Tugas berhasil dikumpulkan!");
       setFile(null);

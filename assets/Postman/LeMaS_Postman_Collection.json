@@ -1,0 +1,2281 @@
+{
+  "info": {
+    "name": "LeMaS API Collection v2",
+    "description": "API Collection LeMaS - Learning Management System, diurutkan per Sequence Diagram (S9→S2→S1→S3→S5→S4→S6→S7→S8)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "S9 - Login & Auth",
+      "item": [
+        {
+          "name": "Login Dosen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) { pm.collectionVariables.set('token', res.data.token); }",
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomorInduk\": \"2025001\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login Mahasiswa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) { pm.collectionVariables.set('token', res.data.token); }",
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomorInduk\": \"2026001\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ping",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ping"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S2 - Kelola Anggota (Kelompok)",
+      "item": [
+        {
+          "name": "Get Semua Kelompok",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Semua Mahasiswa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/mahasiswa/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "mahasiswa",
+                "all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Kelompok per Mata Kuliah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat Kelompok Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kelompok A\",\n  \"idMataKuliah\": 13,\n  \"task\": \"Proyek Akhir Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/kelompok",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.idKelompok) { pm.collectionVariables.set('created_kelompok_id', res.data.idKelompok); }",
+                  "pm.test('Kelompok berhasil dibuat', function () { pm.response.to.have.status(201); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tambah Anggota Kelompok",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"2026002\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/{{created_kelompok_id}}/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "{{created_kelompok_id}}",
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Anggota Kelompok",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/{{created_kelompok_id}}/members/2026002",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "{{created_kelompok_id}}",
+                "members",
+                "2026002"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Simpan Nilai Kelompok",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"nim\": \"2026002\",\n    \"nilaiTugas\": 90\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/{{created_kelompok_id}}/grades",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "{{created_kelompok_id}}",
+                "grades"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Kelompok per Mata Kuliah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Anggota Kelompok",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kelompok/1/members/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kelompok",
+                "1",
+                "members",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        },
+        {
+          "name": "Get Semua Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        },
+        {
+          "name": "Hapus User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S1 - Kelola Tugas",
+      "item": [
+        {
+          "name": "Get Semua Tugas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/tugas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "tugas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tugas per Mata Kuliah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/tugas/mata-kuliah/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "tugas",
+                "mata-kuliah",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat Tugas Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "judul",
+                  "value": "Website Portfolio dengan HTML & CSS",
+                  "type": "text"
+                },
+                {
+                  "key": "detailTugas",
+                  "value": "Buat website portfolio pribadi menggunakan HTML5 dan CSS3.",
+                  "type": "text"
+                },
+                {
+                  "key": "deadlineTugas",
+                  "value": "2026-06-01T23:59:00.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "tipeTugas",
+                  "value": "Individu",
+                  "type": "text"
+                },
+                {
+                  "key": "idMataKuliah",
+                  "value": "13",
+                  "type": "text"
+                },
+                {
+                  "key": "fileTugas",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dosen/tugas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "tugas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.idTugas) { pm.collectionVariables.set('created_task_id', res.data.idTugas); }",
+                  "pm.test('Tugas berhasil dibuat', function () { pm.response.to.have.status(201); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Daftar Tugas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tugas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Detail Tugas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tugas/{{created_task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas",
+                "{{created_task_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Semua Kuis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Detail Kuis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/{{created_kuis_id}}/detail",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "{{created_kuis_id}}",
+                "detail"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Soal Kuis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/{{created_kuis_id}}/soal",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "{{created_kuis_id}}",
+                "soal"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat Kuis Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.idKuis) { pm.collectionVariables.set('created_kuis_id', res.data.idKuis); }",
+                  "pm.test('Kuis berhasil dibuat', function () { pm.response.to.have.status(201); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hapus Tugas",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/tugas/{{created_task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "tugas",
+                "{{created_task_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Kuis",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/{{created_kuis_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "{{created_kuis_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S3 - Kelola Deadline",
+      "item": [
+        {
+          "name": "Update Tugas + Deadline",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "judul",
+                  "value": "Website Portfolio (Update)",
+                  "type": "text"
+                },
+                {
+                  "key": "deadlineTugas",
+                  "value": "2026-06-10T23:59:00.000Z",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dosen/tugas/241",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "tugas",
+                "241"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cek Deadline Tugas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tugas/241",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas",
+                "241"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daftar Kuis per Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/mata-kuliah/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "mata-kuliah",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Kuis + Deadline",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "13"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S5 - Upload Tugas",
+      "item": [
+        {
+          "name": "Submit / Upload Jawaban Tugas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "catatan",
+                  "value": "Berikut terlampir jawaban tugas saya.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tugas/241/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas",
+                "241",
+                "submit"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.idPengumpulan) { pm.collectionVariables.set('created_submission_id', res.data.idPengumpulan); }",
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cek Status Pengumpulan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tugas/241/submission?nim=2026001",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas",
+                "241",
+                "submission"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Pengumpulan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tugas/submission/{{created_submission_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tugas",
+                "submission",
+                "{{created_submission_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit / Upload Jawaban Tugas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/13/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "13",
+                "submit"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        },
+        {
+          "name": "Cek Status Pengerjaan Kuis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/13/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "13",
+                "status"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S4 - Monitoring Progress",
+      "item": [
+        {
+          "name": "Get Materi + Status Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/materi/mata-kuliah/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "materi",
+                "mata-kuliah",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tandai Materi Sudah Diakses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/materi/25/access",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "materi",
+                "25",
+                "access"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Progress Summary Materi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/materi/mata-kuliah/13/progress",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "materi",
+                "mata-kuliah",
+                "13",
+                "progress"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard Mahasiswa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/mahasiswa",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "mahasiswa"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard Dosen",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Materi per Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/materi/mata-kuliah/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "materi",
+                "mata-kuliah",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Progress Summary Materi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/materi/mata-kuliah/1/progress",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "materi",
+                "mata-kuliah",
+                "1",
+                "progress"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Modul Ajar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/modul-ajar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "modul-ajar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat Modul Ajar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/modul-ajar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "modul-ajar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.idModulAjar) { pm.collectionVariables.set('created_modul_id', res.data.idModulAjar); }",
+                  "pm.test('Modul Ajar berhasil dibuat', function () { pm.response.to.have.status(201); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Modul Ajar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/modul-ajar/{{created_modul_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "modul-ajar",
+                "{{created_modul_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        },
+        {
+          "name": "Hapus Modul Ajar",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/modul-ajar/{{created_modul_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "modul-ajar",
+                "{{created_modul_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S6 - Presensi",
+      "item": [
+        {
+          "name": "Generate Sesi Presensi + Token QR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tanggal\": \"2026-05-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dosen/presensi/matkul/13/generate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "presensi",
+                "matkul",
+                "13",
+                "generate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daftar Hadir Terbaru",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/presensi/matkul/13/daftar-hadir",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "presensi",
+                "matkul",
+                "13",
+                "daftar-hadir"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daftar Hadir per Tanggal",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/presensi/daftar-hadir/13/2026-05-15",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "presensi",
+                "daftar-hadir",
+                "13",
+                "2026-05-15"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Semua Tanggal Presensi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dosen/presensi/dates/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "presensi",
+                "dates",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Status Kehadiran by NIM",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statusKehadiran\": \"Hadir\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dosen/presensi/nim/2026001/matkul/13/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dosen",
+                "presensi",
+                "nim",
+                "2026001",
+                "matkul",
+                "13",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Scan QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"LeMaS-1234567890-abc123\",\n  \"idMataKuliah\": 13\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/presensi/scan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "scan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Rekap Presensi Mahasiswa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/presensi/mahasiswa/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "mahasiswa",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Summary Presensi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/presensi/summary/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "summary",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Presensi by Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/presensi/mata-kuliah/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "mata-kuliah",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Rekap Presensi Mahasiswa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/presensi/mahasiswa/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "mahasiswa",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Summary Presensi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/presensi/summary/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "presensi",
+                "summary",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S7 - Penilaian",
+      "item": [
+        {
+          "name": "Get Daftar Tugas Unik per Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nilai/tugas-list/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "tugas-list",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get List Mahasiswa + Status Kumpul per Tugas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nilai/submissions/tugas/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "submissions",
+                "tugas",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Simpan Nilai Tugas Individu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"2026001\",\n  \"idMataKuliah\": 13,\n  \"nilaiTugas\": 88\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/nilai/submissions/nilai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "submissions",
+                "nilai"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Nilai per Mata Kuliah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nilai/mata-kuliah/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "mata-kuliah",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transkrip Nilai Mahasiswa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nilai/transkrip/mahasiswa",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "transkrip",
+                "mahasiswa"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Nilai (UTS/UAS/Akhir)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nilaiUTS\": 80,\n  \"nilaiUAS\": 85,\n  \"nilaiAkhir\": 83\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/nilai/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Hasil Kuis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/kuis/13/hasil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "kuis",
+                "13",
+                "hasil"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Nilai per Mata Kuliah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nilai/mata-kuliah/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "nilai",
+                "mata-kuliah",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "S8 - Diskusi (Forum)",
+      "item": [
+        {
+          "name": "Get Thread Forum per Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/mata-kuliah/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "mata-kuliah",
+                "13"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buat Thread Forum Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idMataKuliah\": 13,\n  \"judul\": \"Diskusi Pertemuan 1\",\n  \"isiForum\": \"Silakan bertanya mengenai materi HTML & CSS...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/thread",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "thread"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Thread Forum",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"judul\": \"Diskusi Pertemuan 1 (Update)\",\n  \"isiForum\": \"Isi diskusi diperbarui...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/thread/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "thread",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Thread Forum",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/thread/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "thread",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tambah Komentar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idForum\": 1,\n  \"isiKomentar\": \"Terima kasih materinya sangat membantu!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/comment",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "comment"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Komentar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isiKomentar\": \"Komentar diperbarui...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/comment/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "comment",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Komentar",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/comment/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "comment",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle Like Forum",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idForum\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/like",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "like"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Thread Forum per Matkul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/mata-kuliah/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "mata-kuliah",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Gambar Forum",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/upload-image",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forum",
+                "upload-image"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Endpoint Pendukung (Lainnya)",
+      "item": [
+        {
+          "name": "Get Mata Kuliah by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/mata-kuliah/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "mata-kuliah",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ubah Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"password123\",\n  \"newPassword\": \"newpassword123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Hitung Notifikasi Belum Dibaca",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifikasi/unread-count",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifikasi",
+                "unread-count"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

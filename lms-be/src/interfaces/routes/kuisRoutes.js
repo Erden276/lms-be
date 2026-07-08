@@ -246,7 +246,7 @@ router.post("/", async (req, res) => {
       ];
       if (relatedNomorInduk.length > 0) {
         const mahasiswas = await prisma.mahasiswa.findMany({
-          where: { nomorInduk: { in: relatedNomorInduk } },
+          where: { nim: { in: relatedNomorInduk } },
           select: { nim: true },
         });
         const relatedNIMs = mahasiswas.map((m) => m.nim);

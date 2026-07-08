@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import "../../../components/shared.css";
 import "./dashboard.css";
 import "./notifikasi.css";
 import Sidebar from "../../../components/Sidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const AVATAR_HERO =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBLlRblArhYvkrSWfEx3UWaIaP5bdg8OpReWzF-sc4sB_2K3sC4IYv7Q4-lWy6VUtGhc5esYpVi12_HYjLZdjx6ILoT60xad1GfsEtHStVQIigk44gnAXnpEAjWrPWVYNa_AKdaDPqXQwdlJDbcccdQ96CZrZ6btx50rBBy3LvfY-eINJ1MtiJWLJpWBAo2nnbaNr3i-_Yn3B_BsVkOxpG3hVSKt38J2-NxnAah9LFYcNLvZARv4lzr86P24cdV4haCMW80Nudw5Lku";
@@ -16,7 +17,11 @@ export default function Dashboard({ onNavigate, onLogout }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [avatarUrl, setAvatarUrl] = useState(AVATAR_HERO);
+  const storedUserStr = localStorage.getItem("user");
+  const storedUser = storedUserStr ? JSON.parse(storedUserStr) : {};
+  const initialAvatar = storedUser.fotoUrl ? `${API_BASE}${storedUser.fotoUrl}` : AVATAR_HERO;
+
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -28,10 +33,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
         }
         const now = new Date();
         const hariIni = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'][now.getDay()];
-        console.log('DEBUG - Frontend hariIni:', hariIni, '| getDay():', now.getDay(), '| Date:', now.toString());
         const res = await apiClient.get(`/api/dashboard/mahasiswa?hari=${hariIni}`);
-        console.log('Dashboard response:', res);
-        console.log('Full data:', JSON.stringify(res.data, null, 2));
         setDashboardData(res.data || res);
       } catch (error) {
         console.error("Gagal memuat dashboard", error);
@@ -47,19 +49,8 @@ export default function Dashboard({ onNavigate, onLogout }) {
     return () => clearInterval(interval); // Membersihkan interval saat komponen unmount
   }, []);
 
-  if (loading) {
-    return (
-      <div className="page-shell">
-        <main className="page-main">
-          <div className="page-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            Memuat dashboard...
-          </div>
-        </main>
-      </div>
-    );
+  if (!loading) {
   }
-  console.log('=== STATE dashboardData ===', JSON.stringify(dashboardData, null, 2));
-  console.log('jadwal:', dashboardData?.jadwal);
 
   return (
     <div className="page-shell">
@@ -80,14 +71,14 @@ export default function Dashboard({ onNavigate, onLogout }) {
         {/* Content */}
         <div className="page-content">
           <div className="db-grid">
-            {/* ── Left Column ── */}
+            {/* -- Left Column -- */}
             <div className="db-left">
               <div className="db-page-header">
                 <h1>Dashboard Mahasiswa</h1>
                 <p>Selamat datang kembali</p>
               </div>
 
-              {/* Hero Card — clickable to profile */}
+              {/* Hero Card - clickable to profile */}
               <div
                 className="db-hero-card"
                 style={{ cursor: "pointer" }}
@@ -97,23 +88,41 @@ export default function Dashboard({ onNavigate, onLogout }) {
                 <div className="db-hero-circle-1"></div>
                 <div className="db-hero-circle-2"></div>
                 <div className="db-hero-body">
-                  <div className="db-hero-avatar">
-                    <img alt="Profile" src={avatarUrl} onError={(e) => { e.target.src = AVATAR_HERO; }} />
+                  <div className={`db-hero-avatar ${loading ? 'skeleton-shimmer' : ''}`}>
+                    {!loading && <img alt="Profile" src={avatarUrl} onError={(e) => { e.target.src = AVATAR_HERO; }} />}
                   </div>
                   <div className="db-hero-info">
                     <span className="db-badge">Profil Mahasiswa</span>
-                    <h2 className="db-hero-name">Halo, {user?.nama || "Mahasiswa"}</h2>
-                    <p className="db-hero-sub">{user?.role || "S1 Informatika"}</p>
+                    {loading ? (
+                      <>
+                        <div className="skeleton-text skeleton-text--title" style={{ background: 'rgba(255,255,255,0.2)', width: '12rem', height: '1.75rem', marginTop: '0.5rem' }}></div>
+                        <div className="skeleton-text skeleton-text--medium" style={{ background: 'rgba(255,255,255,0.15)', width: '8rem', height: '1rem' }}></div>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="db-hero-name">Halo, {user?.nama || "Mahasiswa"}</h2>
+                        <p className="db-hero-sub">{user?.role || "S1 Informatika"}</p>
+                      </>
+                    )}
                   </div>
                   <div className="db-hero-stats">
-                    <div className="db-stat-box">
-                      <p className="db-stat-val">{dashboardData?.ipk?.toFixed(2) || '0.00'}</p>
-                      <p className="db-stat-lbl">IPK</p>
-                    </div>
-                    <div className="db-stat-box">
-                      <p className="db-stat-val">{dashboardData?.sks || '0'}</p>
-                      <p className="db-stat-lbl">SKS</p>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="db-stat-box skeleton-shimmer" style={{ width: '4.5rem', height: '3.5rem', border: 'none' }}></div>
+                        <div className="db-stat-box skeleton-shimmer" style={{ width: '4.5rem', height: '3.5rem', border: 'none' }}></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="db-stat-box">
+                          <p className="db-stat-val">{dashboardData?.ipk?.toFixed(2) || '0.00'}</p>
+                          <p className="db-stat-lbl">IPK</p>
+                        </div>
+                        <div className="db-stat-box">
+                          <p className="db-stat-val">{dashboardData?.sks || '0'}</p>
+                          <p className="db-stat-lbl">SKS</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -136,7 +145,17 @@ export default function Dashboard({ onNavigate, onLogout }) {
                 </div>
 
                 <div className="db-progress-list">
-                  {dashboardData?.progress && (
+                  {loading ? (
+                    <div className="db-progress-item">
+                      <div className="db-progress-row">
+                        <div style={{ width: '100%' }}>
+                          <div className="skeleton-text skeleton-text--medium"></div>
+                          <div className="skeleton-text skeleton-text--short"></div>
+                        </div>
+                      </div>
+                      <div className="db-bar-track skeleton-shimmer"></div>
+                    </div>
+                  ) : dashboardData?.progress ? (
                     <div
                       className="db-progress-item"
                       style={{ cursor: "pointer" }}
@@ -158,8 +177,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
                         ></div>
                       </div>
                     </div>
-                  )}
-                  {!dashboardData?.progress && (
+                  ) : (
                     <p style={{ padding: "1rem", color: "var(--slate-500)", textAlign: "center" }}>
                       Belum ada progres tugas.
                     </p>
@@ -168,7 +186,7 @@ export default function Dashboard({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* ── Right Column ── */}
+            {/* -- Right Column -- */}
             <div className="db-right">
               {/* Presensi Card */}
               <div className="db-presensi-card">
@@ -193,9 +211,11 @@ export default function Dashboard({ onNavigate, onLogout }) {
                   Pindai QR Kehadiran
                 </button>
                 <div className="db-schedule-row">
-                  <div>
+                  <div style={{ width: '100%' }}>
                     <p className="db-sched-lbl">Jadwal Hari Ini</p>
-                    {dashboardData?.jadwal?.length > 0 ? (
+                    {loading ? (
+                      <div className="skeleton-text skeleton-text--medium" style={{ marginTop: '0.5rem', height: '1rem' }}></div>
+                    ) : dashboardData?.jadwal?.length > 0 ? (
                       dashboardData.jadwal.map((j, idx) => (
                         <p key={idx} className="db-sched-time">{j.mataKuliah} ({j.hari}) - {j.waktu}</p>
                       ))
@@ -203,12 +223,14 @@ export default function Dashboard({ onNavigate, onLogout }) {
                       <p className="db-sched-time">Tidak ada jadwal hari ini</p>
                     )}
                   </div>
-                  <span className="db-pulse-dot"></span>
+                  {!loading && <span className="db-pulse-dot"></span>}
                 </div>
               </div>
 
-              {/* Class Card — clickable to mata kuliah */}
-              {dashboardData?.mataKuliah?.length > 0 ? (
+              {/* Class Card - clickable to mata kuliah */}
+              {loading ? (
+                <div className="skeleton-card" style={{ height: "180px" }}></div>
+              ) : dashboardData?.mataKuliah?.length > 0 ? (
                 <div
                   className="db-class-card"
                   style={{ cursor: "pointer" }}
@@ -254,7 +276,18 @@ export default function Dashboard({ onNavigate, onLogout }) {
                   <span className="material-symbols-outlined">forum</span>
                   <h3>Diskusi Terbaru</h3>
                 </div>
-                {dashboardData?.threads?.length > 0 ? (
+                {loading ? (
+                  <>
+                    <div className="db-disc-box" style={{ marginBottom: "0.5rem" }}>
+                      <div className="skeleton-text skeleton-text--short"></div>
+                      <div className="skeleton-text skeleton-text--medium"></div>
+                    </div>
+                    <div className="db-disc-box" style={{ marginBottom: "0.5rem" }}>
+                      <div className="skeleton-text skeleton-text--short"></div>
+                      <div className="skeleton-text skeleton-text--medium"></div>
+                    </div>
+                  </>
+                ) : dashboardData?.threads?.length > 0 ? (
                   dashboardData.threads.slice(0, 2).map((thread, idx) => (
                     <div
                       key={idx}

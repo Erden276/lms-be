@@ -56,7 +56,7 @@ router.post('/matkul/:idMataKuliah/generate', async (req, res) => {
     // Cek apakah sudah ada sesi untuk tanggal yang sama (gunakan UTC)
     const targetDateNormalized = normalizeDateToUTC(targetDate);
     const startOfDay = new Date(Date.UTC(targetDateNormalized.getUTCFullYear(), targetDateNormalized.getUTCMonth(), targetDateNormalized.getUTCDate(), 0, 0, 0, 0));
-    const endOfDay = new Date(Date.UTC(targetDateNormalized.getUTCFullYear(), targetDateNormalized.getUTCMonth(), targetDateNormalized.getUTCDate(), 23, 59, 59, 999));
+    const endOfDay = new Date(Date.UTC(targetDateNormalized.getUTCFullYear(), targetDateNormalized.getUTCMonth(), targetDateNormalized.getUTCDate() + 1, 0, 0, 0, 0));
 
     const existingSession = await prisma.presensi.findFirst({
       where: {

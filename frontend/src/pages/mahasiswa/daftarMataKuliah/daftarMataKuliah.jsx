@@ -5,6 +5,7 @@ import Sidebar from "../../../components/Sidebar";
 import { useSidebar } from "../../../components/useSidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 export default function DaftarMataKuliah({ onNavigate, onLogout }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
@@ -57,16 +58,6 @@ export default function DaftarMataKuliah({ onNavigate, onLogout }) {
     fetchCourses();
   }, [nim]);
 
-  if (loading) {
-    return (
-      <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
-        <main className="page-main" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          Memuat daftar mata kuliah...
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
       {/* ─── Sidebar ─── */}
@@ -100,9 +91,16 @@ export default function DaftarMataKuliah({ onNavigate, onLogout }) {
         {/* Course Grid */}
         <div className="dm-grid-wrap">
           <div className="dm-course-grid">
-            {courses.length > 0 ? courses.map((c) => (
-              <div key={c.id} className="dm-course-card">
-                <div className="dm-card-top">
+            {loading ? (
+              <>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+                <div className="skeleton-card" style={{ height: "290px" }}></div>
+              </>
+            ) : courses.length > 0 ?
+              courses.map((c) => (
+                <div key={c.id} className="dm-course-card">
+                  <div className="dm-card-top">
                   <div className="dm-course-icon">
                     <span className="material-symbols-outlined">{c.icon}</span>
                   </div>

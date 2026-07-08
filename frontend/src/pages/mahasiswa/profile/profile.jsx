@@ -18,10 +18,12 @@ export default function Profile({ onNavigate, onLogout }) {
   const [editMode, setEditMode] = useState(false);
   const [toast, setToast] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR);
-
+  const [loading, setLoading] = useState(true);
   const storedUserStr = localStorage.getItem("user");
   const storedUser = storedUserStr ? JSON.parse(storedUserStr) : {};
+
+  const initialAvatar = storedUser.fotoUrl ? `${API_BASE}${storedUser.fotoUrl}` : DEFAULT_AVATAR;
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
 
   const [formData, setFormData] = useState({
     email: storedUser.email || "",
@@ -48,6 +50,7 @@ export default function Profile({ onNavigate, onLogout }) {
   // Fetch profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       try {
         const res = await apiClient.get('/api/profile/me');
         if (res?.data) {
@@ -62,6 +65,8 @@ export default function Profile({ onNavigate, onLogout }) {
         }
       } catch (error) {
         console.error("Gagal memuat profil:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfile();
@@ -98,6 +103,22 @@ export default function Profile({ onNavigate, onLogout }) {
     }
     if (pwForm.newPw.length < 6) {
       showToast("error", "Kata sandi baru minimal 6 karakter.");
+      return;
+    }
+    if (!/[A-Z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf besar.");
+      return;
+    }
+    if (!/[a-z]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung huruf kecil.");
+      return;
+    }
+    if (!/[0-9]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung angka.");
+      return;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(pwForm.newPw)) {
+      showToast("error", "Kata sandi baru harus mengandung simbol.");
       return;
     }
     
@@ -375,91 +396,102 @@ export default function Profile({ onNavigate, onLogout }) {
         <Navbar role="Mahasiswa" onOpenSidebar={openSidebar} onNavigate={onNavigate} />
 
         <div className="page-content">
-          {/* Identity Card */}
-          <div className="prf-identity-card">
-            <div className="prf-avatar-wrap">
-              <img src={avatarUrl} alt="Foto Profil Mahasiswa" className="prf-avatar" onError={(e) => { e.target.src = DEFAULT_AVATAR; }} />
-              <button className="prf-avatar-edit" title="Ganti foto" onClick={() => setShowPhotoModal(true)}>
-                <span className="material-symbols-outlined">photo_camera</span>
-              </button>
-            </div>
-            <div className="prf-identity-info">
-              <h1 className="prf-name">{storedUser.nama || "Mahasiswa"}</h1>
-              <div className="prf-identity-meta">
-                <span className="prf-nim-badge">NIM: {storedUser.nomorInduk || "-"}</span>
-                <span className="prf-verified">
-                  <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#059669" }}>verified</span>
-                  Akun Terverifikasi
-                </span>
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className="skeleton-card" style={{ height: '140px', borderRadius: '1rem' }}></div>
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                <div className="skeleton-card" style={{ flex: '1 1 300px', height: '250px', borderRadius: '1rem' }}></div>
+                <div className="skeleton-card" style={{ flex: '1 1 300px', height: '250px', borderRadius: '1rem' }}></div>
               </div>
             </div>
-          </div>
-
-          {/* Data + Security Row */}
-          <div className="prf-main-row">
-            {/* Data Pribadi */}
-            <div className="prf-data-card">
-              <div className="prf-data-header">
-                <div className="prf-data-title">
-                  <span className="material-symbols-outlined" style={{ color: "var(--color-secondary)", fontSize: "1.25rem" }}>
-                    id_card
-                  </span>
-                  <h2>Data Pribadi</h2>
+          ) : (
+            <>
+              {/* Identity Card */}
+              <div className="prf-identity-card">
+                <div className="prf-avatar-wrap">
+                  <img src={avatarUrl} alt="Foto Profil Mahasiswa" className="prf-avatar" onError={(e) => { e.target.src = DEFAULT_AVATAR; }} />
+                  <button className="prf-avatar-edit" title="Ganti foto" onClick={() => setShowPhotoModal(true)}>
+                    <span className="material-symbols-outlined">photo_camera</span>
+                  </button>
+                </div>
+                <div className="prf-identity-info">
+                  <h1 className="prf-name">{storedUser.nama || "Mahasiswa"}</h1>
+                  <div className="prf-identity-meta">
+                    <span className="prf-nim-badge">NIM: {storedUser.nomorInduk || "-"}</span>
+                    <span className="prf-verified">
+                      <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#059669" }}>verified</span>
+                      Akun Terverifikasi
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="prf-data-grid">
-                <div className="prf-data-field">
-                  <p className="prf-field-label">EMAIL MAHASISWA</p>
-                  <p className="prf-field-value">{formData.email}</p>
-                </div>
-                <div className="prf-data-field">
-                  <p className="prf-field-label">NOMOR TELEPON</p>
-                  <p className="prf-field-value">{formData.telepon}</p>
-                </div>
-              </div>
-              <div className="prf-admin-notice">
-                <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#7c5800" }}>info</span>
-                <p>Untuk mengubah data pribadi, ajukan permintaan ke <strong>administrator akademik</strong>.</p>
-              </div>
+              {/* Data + Security Row */}
+              <div className="prf-main-row">
+                {/* Data Pribadi */}
+                <div className="prf-data-card">
+                  <div className="prf-data-header">
+                    <div className="prf-data-title">
+                      <span className="material-symbols-outlined" style={{ color: "var(--color-secondary)", fontSize: "1.25rem" }}>
+                        id_card
+                      </span>
+                      <h2>Data Pribadi</h2>
+                    </div>
+                  </div>
 
-              <div className="prf-data-field prf-fullwidth">
-                <p className="prf-field-label">PROGRAM STUDI</p>
-                <p className="prf-field-value prf-prodi">Teknik Informatika - Rekayasa Perangkat Lunak</p>
-              </div>
+                  <div className="prf-data-grid">
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">EMAIL MAHASISWA</p>
+                      <p className="prf-field-value">{formData.email}</p>
+                    </div>
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">NOMOR TELEPON</p>
+                      <p className="prf-field-value">{formData.telepon}</p>
+                    </div>
+                  </div>
+                  <div className="prf-admin-notice">
+                    <span className="material-symbols-outlined" style={{ fontSize: "1rem", color: "#7c5800" }}>info</span>
+                    <p>Untuk mengubah data pribadi, ajukan permintaan ke <strong>administrator akademik</strong>.</p>
+                  </div>
 
-              <div className="prf-data-grid prf-data-grid--3">
-                <div className="prf-data-field">
-                  <p className="prf-field-label">SEMESTER</p>
-                  <p className="prf-field-value">
-                    Semester 4 (Genap)
-                    <span className="prf-reguler-badge">REGULER</span>
+                  <div className="prf-data-field prf-fullwidth">
+                    <p className="prf-field-label">PROGRAM STUDI</p>
+                    <p className="prf-field-value prf-prodi">Teknik Informatika - Rekayasa Perangkat Lunak</p>
+                  </div>
+
+                  <div className="prf-data-grid prf-data-grid--3">
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">SEMESTER</p>
+                      <p className="prf-field-value">
+                        Semester 4 (Genap)
+                        <span className="prf-reguler-badge">REGULER</span>
+                      </p>
+                    </div>
+                    <div className="prf-data-field">
+                      <p className="prf-field-label">TAHUN AKADEMIK</p>
+                      <p className="prf-field-value">2023/2024</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keamanan */}
+                <div className="prf-security-card">
+                  <div className="prf-security-header">
+                    <span className="material-symbols-outlined prf-shield-icon">security</span>
+                    <h2>Keamanan</h2>
+                  </div>
+                  <p className="prf-security-desc">
+                    Jaga keamanan akun Anda dengan memperbarui kata sandi secara berkala.
+                    Pastikan menggunakan kombinasi karakter yang kuat.
                   </p>
-                </div>
-                <div className="prf-data-field">
-                  <p className="prf-field-label">TAHUN AKADEMIK</p>
-                  <p className="prf-field-value">2023/2024</p>
+                  <button className="prf-pw-btn" onClick={() => setShowPasswordModal(true)}>
+                    <span className="material-symbols-outlined">lock_reset</span>
+                    Ubah Kata Sandi
+                  </button>
                 </div>
               </div>
-            </div>
-
-            {/* Keamanan */}
-            <div className="prf-security-card">
-              <div className="prf-security-header">
-                <span className="material-symbols-outlined prf-shield-icon">security</span>
-                <h2>Keamanan</h2>
-              </div>
-              <p className="prf-security-desc">
-                Jaga keamanan akun Anda dengan memperbarui kata sandi secara berkala.
-                Pastikan menggunakan kombinasi karakter yang kuat.
-              </p>
-              <button className="prf-pw-btn" onClick={() => setShowPasswordModal(true)}>
-                <span className="material-symbols-outlined">lock_reset</span>
-                Ubah Kata Sandi
-              </button>
-            </div>
-          </div>
-
+            </>
+          )}
         </div>
       </main>
     </div>

@@ -24,10 +24,7 @@ export class MataKuliahController {
       
       if (req.user && req.user.role === 'MAHASISWA') {
         let nim = req.user?.nomorInduk;
-        const mahasiswa = await prisma.mahasiswa.findUnique({
-          where: { nomorInduk: nim }
-        });
-        const actualNim = mahasiswa ? mahasiswa.nim : nim;
+        const actualNim = nim;
         const result = await this.mataKuliahUseCase.getByNim(actualNim);
         return res.json(result);
       }
@@ -43,10 +40,7 @@ export class MataKuliahController {
     try {
       let nim = req.user?.nomorInduk;
       // Map nomorInduk to actual nim if possible
-      const mahasiswa = await prisma.mahasiswa.findUnique({
-        where: { nomorInduk: nim }
-      });
-      const actualNim = mahasiswa ? mahasiswa.nim : nim;
+      const actualNim = nim;
       
       const result = await this.mataKuliahUseCase.getByNim(actualNim);
       res.json(result);

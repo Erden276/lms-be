@@ -5,6 +5,7 @@ import Sidebar from "../../../components/Sidebar";
 import { useSidebar } from "../../../components/useSidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 export default function HasilKuis({ onNavigate, onLogout, idKuis }) {
   const { sidebarOpen, openSidebar, closeSidebar } = useSidebar();
@@ -40,17 +41,8 @@ export default function HasilKuis({ onNavigate, onLogout, idKuis }) {
     fetchResult();
   }, [idKuis]);
 
-  if (loading) {
-    return (
-      <div className="page-shell">
-        <main className="page-main">
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-            Memuat hasil kuis...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // Remove early LoadingSpinner return
+
 
   if (error) {
     return (
@@ -86,7 +78,14 @@ export default function HasilKuis({ onNavigate, onLogout, idKuis }) {
       <main className="page-main" style={{ backgroundColor: "var(--color-background)" }}>
         <Navbar role="Mahasiswa" onOpenSidebar={openSidebar} onNavigate={onNavigate} />
         <div className="page-content">
-          <div className="quiz-result-container">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-card" style={{ height: '350px', width: '100%' }}></div>
+              <div className="skeleton-card" style={{ height: '200px', width: '100%' }}></div>
+            </div>
+          ) : (
+            <>
+              <div className="quiz-result-container">
             <div className="quiz-result-card">
               <div className="quiz-result-icon">
                 <span className="material-symbols-outlined">{skor >= 70 ? "emoji_events" : "school"}</span>
@@ -246,6 +245,8 @@ export default function HasilKuis({ onNavigate, onLogout, idKuis }) {
               </button>
             </div>
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

@@ -13,7 +13,7 @@ async getDaftarKelompok(idMataKuliah) {
             membersArr.push({
                 nim: ang.nim,
                 name: ang.mahasiswa?.user?.nama || "Mahasiswa",
-                nomorInduk: ang.mahasiswa?.nomorInduk || ang.nim
+                nomorInduk: ang.nim
             });
             nilaiObj[ang.nim] = ang.nilaiTugas ? ang.nilaiTugas.toString() : "";
         });
@@ -66,7 +66,7 @@ async getAllKelompok(nipDosen) {
             membersArr.push({
                 nim: ang.nim,
                 name: ang.mahasiswa?.user?.nama || "Mahasiswa",
-                nomorInduk: ang.mahasiswa?.nomorInduk || ang.nim
+                nomorInduk: ang.nim
             });
             nilaiObj[ang.nim] = ang.nilaiTugas ? ang.nilaiTugas.toString() : "";
         });

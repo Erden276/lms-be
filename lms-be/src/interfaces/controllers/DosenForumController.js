@@ -20,7 +20,7 @@ async createThread(req, res) {
         const data = {
         ...req.body,
         nomorInduk: req.user.nomorInduk,
-        lampiran: req.file ? req.file.filename : null 
+        lampiran: req.file ? `/uploads/${req.file.filename}` : null 
     };
         const result = await this.dosenForumUseCase.createNewThread(data);
         res.status(201).json({ message: "Diskusi berhasil dibuat", data: result });

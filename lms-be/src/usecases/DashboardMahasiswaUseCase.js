@@ -7,11 +7,8 @@ export class DashboardMahasiswaUseCase {
 
   async getDashboardData(nomorInduk, hariDariClient) {
     try {
-      // Map nomorInduk (U001) ke nim asli (2026001) — dilakukan PALING ATAS
-      const mahasiswaData = await this.prisma.mahasiswa.findUnique({
-        where: { nomorInduk: nomorInduk },
-      });
-      const actualNim = mahasiswaData ? mahasiswaData.nim : nomorInduk;
+      // Map nomorInduk ke nim asli (karena sudah refactor, mereka sama)
+      const actualNim = nomorInduk;
 
       // Cari mata kuliah pakai nomorInduk (untuk Nilai) DAN actualNim (untuk Tugas/Presensi/Kelompok)
       const mataKuliah = await this.prisma.mataKuliah.findMany({
@@ -110,14 +107,12 @@ export class DashboardMahasiswaUseCase {
 
       const bobotNilai = (n) => {
         if (n >= 85) return 4.0;
-        if (n >= 80) return 3.7;
-        if (n >= 75) return 3.3;
+        if (n >= 80) return 3.75;
+        if (n >= 75) return 3.5;
         if (n >= 70) return 3.0;
-        if (n >= 65) return 2.7;
-        if (n >= 60) return 2.3;
-        if (n >= 55) return 2.0;
-        if (n >= 50) return 1.7;
-        if (n >= 45) return 1.0;
+        if (n >= 65) return 2.75;
+        if (n >= 60) return 2.0;
+        if (n >= 50) return 1.0;
         return 0;
       };
 

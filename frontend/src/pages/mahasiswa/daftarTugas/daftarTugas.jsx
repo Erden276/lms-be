@@ -5,6 +5,7 @@ import Sidebar from "../../../components/Sidebar";
 import { useSidebar } from "../../../components/useSidebar";
 import Navbar from "../../../components/Navbar";
 import { apiClient } from "../../../utils/apiClient";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -72,7 +73,11 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
     try {
       setLoading(true);
 
-      const coursesRes = await apiClient.get('/api/mata-kuliah');
+      const [coursesRes, tugasRes] = await Promise.all([
+        apiClient.get('/api/mata-kuliah'),
+        apiClient.get('/api/tugas')
+      ]);
+
       let courses = Array.isArray(coursesRes) ? coursesRes : (coursesRes.data || []);
       
       // Filter to active semester only (same as dashboard)
@@ -85,7 +90,6 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
       
       setCourses(courses);
 
-      const tugasRes = await apiClient.get('/api/tugas');
       const rawTugas = Array.isArray(tugasRes) ? tugasRes : (tugasRes.data || []);
       
       // Filter tugas hanya dari mata kuliah semester aktif
@@ -119,58 +123,66 @@ export default function DaftarTugas({ onNavigate, onLogout }) {
         };
       });
 
-const allKuis = [];
-      for (const course of courses) {
-        try {
-          const kuisRes = await apiClient.get(`/api/kuis/mata-kuliah/${course.idMataKuliah}`);
-          const kuisList = Array.isArray(kuisRes) ? kuisRes : (kuisRes.data || []);
-          for (const k of kuisList) {
-            try {
-              const statusRes = await apiClient.get(`/api/kuis/${k.id}/status`);
-              const sudahDikerjakan = statusRes?.sudahDikerjakan || false;
-              const deadlineKuis = k.deadlineKuis ? new Date(k.deadlineKuis) : null;
-              const now = new Date();
-              const kuisStatus = sudahDikerjakan ? "selesai" : "belum_dikerjakan";
-              allKuis.push({
-                id: k.id,
-                idMataKuliah: k.idMataKuliah || course.idMataKuliah,
-                course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
-                deadline: deadlineKuis,
-                deadlineLabel: formatDeadlineLabel(k.deadlineKuis, sudahDikerjakan),
-                deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
-                name: k.judul,
-                status: kuisStatus,
-                sudahKumpul: sudahDikerjakan,
-                action: sudahDikerjakan ? "lihat" : "kerjakan",
-                isQuiz: true,
-                jumlahSoal: k.jumlahSoal || 0,
-                jumlahPengerjaan: k.jumlahPengerjaan || 0,
-                totalMahasiswa: k.totalMahasiswa || 0
-              });
-            } catch (statusErr) {
-              console.error("Error fetching kuis status for kuis", k.id, statusErr);
-              allKuis.push({
-                id: k.id,
-                idMataKuliah: k.idMataKuliah || course.idMataKuliah,
-                course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
-                deadline: k.deadlineKuis ? new Date(k.deadlineKuis) : null,
-                deadlineLabel: formatDeadlineLabel(k.deadlineKuis, false),
-                deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
-                name: k.judul,
-                status: "belum_dikerjakan",
-                sudahKumpul: false,
-                action: "kerjakan",
-                isQuiz: true,
-                jumlahSoal: k.jumlahSoal || 0,
-                jumlahPengerjaan: k.jumlahPengerjaan || 0,
-                totalMahasiswa: k.totalMahasiswa || 0
-              });
-            }
+      // Fetch all quizzes and status of quizzes in parallel for each course
+      const kuisResults = await Promise.all(
+        courses.map(async (course) => {
+          try {
+            const kuisRes = await apiClient.get(`/api/kuis/mata-kuliah/${course.idMataKuliah}`);
+            const kuisList = Array.isArray(kuisRes) ? kuisRes : (kuisRes.data || []);
+            
+            const kuisWithStatus = await Promise.all(
+              kuisList.map(async (k) => {
+                try {
+                  const statusRes = await apiClient.get(`/api/kuis/${k.id}/status`);
+                  const sudahDikerjakan = statusRes?.sudahDikerjakan || false;
+                  const deadlineKuis = k.deadlineKuis ? new Date(k.deadlineKuis) : null;
+                  const kuisStatus = sudahDikerjakan ? "selesai" : "belum_dikerjakan";
+                  return {
+                    id: k.id,
+                    idMataKuliah: k.idMataKuliah || course.idMataKuliah,
+                    course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
+                    deadline: deadlineKuis,
+                    deadlineLabel: formatDeadlineLabel(k.deadlineKuis, sudahDikerjakan),
+                    deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
+                    name: k.judul,
+                    status: kuisStatus,
+                    sudahKumpul: sudahDikerjakan,
+                    action: sudahDikerjakan ? "lihat" : "kerjakan",
+                    isQuiz: true,
+                    jumlahSoal: k.jumlahSoal || 0,
+                    jumlahPengerjaan: k.jumlahPengerjaan || 0,
+                    totalMahasiswa: k.totalMahasiswa || 0
+                  };
+                } catch (statusErr) {
+                  console.error("Error fetching kuis status for kuis", k.id, statusErr);
+                  return {
+                    id: k.id,
+                    idMataKuliah: k.idMataKuliah || course.idMataKuliah,
+                    course: k.mataKuliah || course.namaMataKuliah || "Mata Kuliah",
+                    deadline: k.deadlineKuis ? new Date(k.deadlineKuis) : null,
+                    deadlineLabel: formatDeadlineLabel(k.deadlineKuis, false),
+                    deadlineUrgent: k.deadlineKuis ? (new Date(k.deadlineKuis) - new Date() < 24 * 60 * 60 * 1000) : false,
+                    name: k.judul,
+                    status: "belum_dikerjakan",
+                    sudahKumpul: false,
+                    action: "kerjakan",
+                    isQuiz: true,
+                    jumlahSoal: k.jumlahSoal || 0,
+                    jumlahPengerjaan: k.jumlahPengerjaan || 0,
+                    totalMahasiswa: k.totalMahasiswa || 0
+                  };
+                }
+              })
+            );
+            return kuisWithStatus;
+          } catch (e) {
+            console.error("Error fetching kuis for course", course.idMataKuliah, e);
+            return [];
           }
-        } catch (e) {
-          console.error("Error fetching kuis for course", course.idMataKuliah, e);
-        }
-      }
+        })
+      );
+
+      const allKuis = kuisResults.flat();
 
       setTasks([...tugasFormatted, ...allKuis]);
     } catch (error) {
@@ -207,6 +219,9 @@ const allKuis = [];
 
   const filtered = sortedTasks;
 
+  // Remove early LoadingSpinner return
+
+
   return (
     <div className="page-shell" style={{ backgroundColor: "var(--color-background)" }}>
       {/* Toast */}
@@ -239,8 +254,20 @@ const allKuis = [];
 
         {/* Page Content */}
         <div className="page-content">
-          {/* Page Header */}
-          <div className="dt-page-header">
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="skeleton-text skeleton-text--title" style={{ height: '2rem', width: '15rem' }}></div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <div className="skeleton-text" style={{ width: '80px', height: '2rem', borderRadius: '9999px' }}></div>
+                <div className="skeleton-text" style={{ width: '80px', height: '2rem', borderRadius: '9999px' }}></div>
+              </div>
+              <div className="skeleton-card" style={{ height: '140px', width: '100%' }}></div>
+              <div className="skeleton-card" style={{ height: '140px', width: '100%' }}></div>
+            </div>
+          ) : (
+            <>
+              {/* Page Header */}
+              <div className="dt-page-header">
             <h2 className="dt-title">Daftar Tugas</h2>
             <p className="dt-subtitle">Perhatikan deadline tugasnya yaa!!</p>
           </div>
@@ -294,12 +321,7 @@ const allKuis = [];
 
           {/* Task List */}
           <div className="dt-task-list">
-            {loading ? (
-              <div className="dt-empty">
-                <span className="material-symbols-outlined">hourglass_empty</span>
-                <p>Memuat tugas...</p>
-              </div>
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="dt-empty">
                 <span className="material-symbols-outlined">task_alt</span>
                 <p>Tidak ada tugas dalam kategori ini.</p>
@@ -436,6 +458,8 @@ const allKuis = [];
             )}
           </div>
 
+            </>
+          )}
         </div>
       </main>
     </div>

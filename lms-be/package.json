@@ -1,10 +1,10 @@
 {
   "name": "lms-be",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "npx prisma generate && node index.js",
     "dev": "nodemon index.js",
     "build": "npx prisma generate",
     "postinstall": "npx prisma generate",

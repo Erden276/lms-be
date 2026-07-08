@@ -8,7 +8,7 @@ async findAllByDosen(idMataKuliahList) {
         orderBy: { deadlineTugas: 'asc' }
     });
 
-    // Deduplicate tugas — grup berdasarkan judul + idMataKuliah + deadline
+    // Deduplicate tugas - grup berdasarkan judul + idMataKuliah + deadline
     // Dosen seharusnya melihat 1 baris per "tugas", bukan 1 baris per mahasiswa
     const tugasMap = new Map();
     for (const t of allTugas) {
@@ -65,9 +65,9 @@ async createTugas(data) {
         if (nims.length > 0) {
             const mhs = await prisma.mahasiswa.findMany({
                 where: { nim: { in: nims } },
-                select: { nomorInduk: true }
+                select: { nim: true }
             });
-            mhs.forEach(m => nomorIndukSet.add(m.nomorInduk));
+            mhs.forEach(m => nomorIndukSet.add(m.nim));
         }
     } catch (e) {}
 
@@ -81,9 +81,9 @@ async createTugas(data) {
         if (nims.length > 0) {
             const mhs = await prisma.mahasiswa.findMany({
                 where: { nim: { in: nims } },
-                select: { nomorInduk: true }
+                select: { nim: true }
             });
-            mhs.forEach(m => nomorIndukSet.add(m.nomorInduk));
+            mhs.forEach(m => nomorIndukSet.add(m.nim));
         }
     } catch (e) {}
 
@@ -103,9 +103,9 @@ async createTugas(data) {
             if (nims.length > 0) {
                 const mhs = await prisma.mahasiswa.findMany({
                     where: { nim: { in: nims } },
-                    select: { nomorInduk: true }
+                    select: { nim: true }
                 });
-                mhs.forEach(m => nomorIndukSet.add(m.nomorInduk));
+                mhs.forEach(m => nomorIndukSet.add(m.nim));
             }
         }
     } catch (e) {}
@@ -115,7 +115,7 @@ async createTugas(data) {
     const relatedNomorInduk = Array.from(nomorIndukSet);
     if (relatedNomorInduk.length > 0) {
         const mahasiswas = await prisma.mahasiswa.findMany({
-            where: { nomorInduk: { in: relatedNomorInduk } },
+            where: { nim: { in: relatedNomorInduk } },
             select: { nim: true }
         });
         mahasiswaNIMs = mahasiswas.map(m => m.nim);
@@ -126,7 +126,6 @@ async createTugas(data) {
         try {
             const allMahasiswa = await prisma.mahasiswa.findMany({ select: { nim: true } });
             mahasiswaNIMs = allMahasiswa.map(m => m.nim);
-            console.log(`[createTugas] Fallback: menggunakan ${mahasiswaNIMs.length} mahasiswa dari database`);
         } catch (e) {}
     }
 
@@ -134,7 +133,6 @@ async createTugas(data) {
         throw new Error('Tidak ada mahasiswa yang terdaftar di sistem. Pastikan ada data mahasiswa di database.');
     }
 
-    console.log(`[createTugas] Membuat tugas untuk ${mahasiswaNIMs.length} mahasiswa di mata kuliah ${idMataKuliah}`);
 
     // Helper untuk trim string
     const trimString = (str, maxLen) => str && str.length > maxLen ? str.substring(0, maxLen - 3) + '...' : str;
@@ -175,7 +173,6 @@ async createTugas(data) {
                 tipeRef: 'tugas'
             }))
         });
-        console.log(`Notifikasi Tugas dikirim ke ${mahasiswaNIMs.length} mahasiswa`);
     } catch (e) {
         console.error('Gagal mengirim notifikasi tugas:', e.message);
     }
@@ -232,9 +229,9 @@ async createKuis(data, quizData) {
             if (nims.length > 0) {
                 const mhs = await prisma.mahasiswa.findMany({
                     where: { nim: { in: nims } },
-                    select: { nomorInduk: true }
+                    select: { nim: true }
                 });
-                mhs.forEach(m => nomorIndukSet.add(m.nomorInduk));
+                mhs.forEach(m => nomorIndukSet.add(m.nim));
             }
         } catch (e) {}
 
@@ -248,9 +245,9 @@ async createKuis(data, quizData) {
             if (nims.length > 0) {
                 const mhs = await prisma.mahasiswa.findMany({
                     where: { nim: { in: nims } },
-                    select: { nomorInduk: true }
+                    select: { nim: true }
                 });
-                mhs.forEach(m => nomorIndukSet.add(m.nomorInduk));
+                mhs.forEach(m => nomorIndukSet.add(m.nim));
             }
         } catch (e) {}
 
@@ -258,7 +255,7 @@ async createKuis(data, quizData) {
         const relatedNomorInduk = Array.from(nomorIndukSet);
         if (relatedNomorInduk.length > 0) {
             const mahasiswas = await prisma.mahasiswa.findMany({
-                where: { nomorInduk: { in: relatedNomorInduk } },
+                where: { nim: { in: relatedNomorInduk } },
                 select: { nim: true }
             });
             const relatedNIMs = mahasiswas.map(m => m.nim);
@@ -273,7 +270,6 @@ async createKuis(data, quizData) {
                         tipeRef: 'kuis'
                     }))
                 });
-                console.log(`Notifikasi Kuis dikirim ke ${relatedNIMs.length} mahasiswa`);
             }
         } else {
             // Fallback: kirim ke semua mahasiswa
@@ -289,7 +285,6 @@ async createKuis(data, quizData) {
                         tipeRef: 'kuis'
                     }))
                 });
-                console.log(`Notifikasi Kuis dikirim ke ${allMahasiswa.length} mahasiswa (fallback)`);
             }
         }
     } catch (e) {

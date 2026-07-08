@@ -31,10 +31,11 @@ async createThread(req, res) {
     try {
         const nomorInduk = req.user.nomorInduk; // Dari middleware JWT
         const { idMataKuliah, judul, isiForum } = req.body;
+        const lampiran = req.file ? `/uploads/${req.file.filename}` : null;
 
         const newThread = await this.forumUseCase.createThread(
-        parseInt(idMataKuliah), nomorInduk, judul, isiForum
-    );
+            parseInt(idMataKuliah), nomorInduk, judul, isiForum, lampiran
+        );
         res.status(201).json({ status: 'success', data: newThread });
     } catch (error) {
         res.status(400).json({ status: 'error', message: error.message });

@@ -53,13 +53,13 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
   }, [storedUser.fotoUrl, API_BASE, defaultAvatar]);
 
   const DOSEN_NOTIFICATIONS = [
-    { id: 'd1', title: 'Jadwal UTS Semester Genap', desc: 'UTS akan dilaksanakan pada tanggal 2–6 Juni 2026. Pastikan materi sudah diunggah sebelum pelaksanaan.', time: '1 jam lalu', read: false, type: 'akademik' },
+    { id: 'd1', title: 'Jadwal UTS Semester Genap', desc: 'UTS akan dilaksanakan pada tanggal 2-6 Juni 2026. Pastikan materi sudah diunggah sebelum pelaksanaan.', time: '1 jam lalu', read: false, type: 'akademik' },
     { id: 'd2', title: 'Pengumuman Libur Nasional', desc: 'Perkuliahan diliburkan pada Kamis, 29 Mei 2026 dalam rangka Hari Raya Waisak. Jadwal dapat disesuaikan.', time: '3 jam lalu', read: false, type: 'akademik' },
-    { id: 'd3', title: 'Jadwal UAS Semester Genap', desc: 'UAS dijadwalkan pada tanggal 30 Juni – 4 Juli 2026. Dosen dimohon mengumpulkan soal maksimal 2 minggu sebelumnya.', time: '5 jam lalu', read: false, type: 'akademik' },
+    { id: 'd3', title: 'Jadwal UAS Semester Genap', desc: 'UAS dijadwalkan pada tanggal 30 Juni - 4 Juli 2026. Dosen dimohon mengumpulkan soal maksimal 2 minggu sebelumnya.', time: '5 jam lalu', read: false, type: 'akademik' },
     { id: 'd4', title: 'Batas Input Nilai UTS', desc: 'Batas akhir pengisian nilai UTS adalah 13 Juni 2026. Harap segera mengisi nilai setelah pelaksanaan ujian.', time: 'Kemarin', read: true, type: 'akademik' },
     { id: 'd5', title: 'Rapat Koordinasi Akademik', desc: 'Rapat koordinasi semester genap akan diadakan pada Jumat, 23 Mei 2026 pukul 09.00 WIB di Ruang Rapat Utama.', time: 'Kemarin', read: true, type: 'akademik' },
     { id: 'd6', title: 'Revisi Kalender Akademik', desc: 'Kalender akademik 2025/2026 telah diperbarui. Silakan unduh versi terbaru melalui portal akademik kampus.', time: '2 hari lalu', read: true, type: 'akademik' },
-    { id: 'd7', title: 'Pengisian KRS Mahasiswa', desc: 'Periode pengisian KRS semester ganjil 2026/2027 dibuka 1–15 Juli 2026. Dosen wali dimohon melakukan persetujuan tepat waktu.', time: '3 hari lalu', read: true, type: 'akademik' },
+    { id: 'd7', title: 'Pengisian KRS Mahasiswa', desc: 'Periode pengisian KRS semester ganjil 2026/2027 dibuka 1-15 Juli 2026. Dosen wali dimohon melakukan persetujuan tepat waktu.', time: '3 hari lalu', read: true, type: 'akademik' },
   ];
 
   useEffect(() => {
@@ -73,8 +73,10 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
 
     const fetchNotifications = async () => {
       try {
-        const res = await apiClient.get('/api/notifikasi');
-        console.log('Notifikasi response:', res);
+        const [res, unreadRes] = await Promise.all([
+          apiClient.get('/api/notifikasi'),
+          apiClient.get('/api/notifikasi/unread-count')
+        ]);
         const notifList = Array.isArray(res) ? res : (res.data || []);
         
         setNotifications(notifList.slice(0, 10).map(n => ({
@@ -86,7 +88,6 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
           type: n.tipe || 'info'
         })));
 
-        const unreadRes = await apiClient.get('/api/notifikasi/unread-count');
         setUnreadCount(unreadRes?.count || 0);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
@@ -151,62 +152,6 @@ export default function Navbar({ role, onOpenSidebar, onNavigate }) {
         <button className="navbar__hamburger" onClick={handleHamburgerClick}>
           <span className="material-symbols-outlined">menu</span>
         </button>
-        {!isDosen && <div className="navbar__search" style={{ position: "relative" }}>
-          <span className="material-symbols-outlined navbar__search-icon">search</span>
-          <input
-            className="navbar__search-input"
-            placeholder={placeholder}
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          {isSearchOpen && (
-            <div className="search-dropdown" style={{
-              position: "absolute",
-              top: "calc(100% + 0.5rem)",
-              left: 0,
-              width: "100%",
-              minWidth: "300px",
-              backgroundColor: "var(--color-surface)",
-              boxShadow: "var(--shadow-md)",
-              borderRadius: "var(--radius-md)",
-              border: "1px solid var(--color-border)",
-              zIndex: 50,
-              maxHeight: "350px",
-              overflowY: "auto",
-              display: "flex",
-              flexDirection: "column"
-            }}>
-              {searchResults.length > 0 ? (
-                searchResults.map(res => (
-                  <div 
-                    key={res.id} 
-                    className="search-item" 
-                    onClick={() => handleResultClick(res)}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      cursor: "pointer",
-                      borderBottom: "1px solid var(--color-border)",
-                      transition: "background-color 0.2s"
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--slate-50)"}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
-                      <span style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--blue-900)" }}>{res.title}</span>
-                      <span style={{ fontSize: "0.625rem", padding: "0.15rem 0.5rem", borderRadius: "1rem", backgroundColor: "var(--blue-50)", color: "var(--blue-700)", fontWeight: 700, textTransform: "uppercase" }}>{res.type}</span>
-                    </div>
-                    <p style={{ fontSize: "0.75rem", color: "var(--slate-500)", margin: 0 }}>{res.desc}</p>
-                  </div>
-                ))
-              ) : (
-                <div style={{ padding: "1rem", textAlign: "center", color: "var(--slate-500)", fontSize: "0.875rem" }}>
-                  Tidak ada hasil untuk "{searchQuery}"
-                </div>
-              )}
-            </div>
-          )}
-        </div>}
       </div>
       <div className="navbar__right">
         <button className="navbar__bell" onClick={() => setNotifOpen(!notifOpen)} style={{ position: "relative" }}>

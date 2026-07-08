@@ -9,7 +9,7 @@ function getStartOfDayUTC() {
 
 function getEndOfDayUTC() {
     const now = new Date();
-    const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999));
+    const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0));
     return d;
 }
 
@@ -36,7 +36,7 @@ export class PrismaPresensiDosenRepository {
 
         if (nomorIndukSet.size > 0) {
             const mahasiswaFromNilai = await prisma.mahasiswa.findMany({
-                where: { nomorInduk: { in: Array.from(nomorIndukSet) } },
+                where: { nim: { in: Array.from(nomorIndukSet) } },
                 include: { user: true }
             });
             mahasiswaFromNilai.forEach(m => mahasiswaMap.set(m.nim, m));
@@ -115,11 +115,11 @@ export class PrismaPresensiDosenRepository {
     async getDaftarHadirByTanggal(idMataKuliah, tanggal) {
         const targetDate = new Date(tanggal);
         const startOfDay = new Date(Date.UTC(targetDate.getUTCFullYear(), targetDate.getUTCMonth(), targetDate.getUTCDate(), 0, 0, 0, 0));
-        const endOfDay = new Date(Date.UTC(targetDate.getUTCFullYear(), targetDate.getUTCMonth(), targetDate.getUTCDate(), 23, 59, 59, 999));
+        const endOfDay = new Date(Date.UTC(targetDate.getUTCFullYear(), targetDate.getUTCMonth(), targetDate.getUTCDate() + 1, 0, 0, 0, 0));
         
         const allMahasiswa = await prisma.mahasiswa.findMany({ include: { user: true } });
         const presensiList = await prisma.presensi.findMany({
-            where: { idMataKuliah: parseInt(idMataKuliah), tanggalPertemuan: { gte: startOfDay, lte: endOfDay } }
+            where: { idMataKuliah: parseInt(idMataKuliah), tanggalPertemuan: { gte: startOfDay, lt: endOfDay } }
         });
         // Untuk setiap NIM, ambil yang statusnya "Hadir" jika ada, kalau tidak ambil yang terbaru
         const presensiMap = new Map();

@@ -1,0 +1,109 @@
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loading-spinner-container.full-page {
+  position: fixed;
+  inset: 0;
+  background: rgba(248, 250, 252, 0.85); /* slate-50 with transparency */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  height: 100vh;
+}
+
+.logo-loading-box {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+/* Orbit Rings */
+.orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid #d1d5db; /* thin grey ring */
+  box-sizing: border-box;
+}
+
+.orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.orbit-1 {
+  width: 100%;
+  height: 100%;
+  animation: spin-right 2.5s linear infinite;
+}
+
+.orbit-2 {
+  width: 80%;
+  height: 80%;
+  animation: spin-left 1.8s linear infinite;
+}
+
+.orbit-1::after {
+  width: 8px;
+  height: 8px;
+  background-color: #be7a00; /* LeMaS orange */
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.orbit-2::after {
+  width: 6px;
+  height: 6px;
+  background-color: #4b53bc; /* LeMaS blue */
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logo-loading-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.loading-spinner-message {
+  margin-top: 1.5rem;
+  font-size: 0.925rem;
+  color: #464653; /* --on-surface-variant */
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  letter-spacing: 0.03em;
+  animation: pulse-message 1.5s ease-in-out infinite;
+  text-align: center;
+}
+
+@keyframes spin-right {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-left {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}

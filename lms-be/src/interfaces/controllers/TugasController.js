@@ -14,8 +14,7 @@ export class TugasController {
       const nomorInduk = req.user?.nomorInduk;
       
       if (!nim && nomorInduk) {
-        const mhs = await prisma.mahasiswa.findUnique({ where: { nomorInduk } });
-        if (mhs) nim = mhs.nim;
+        nim = nomorInduk;
       }
       
       if (!nim) {

@@ -8,7 +8,7 @@ function getStartOfDayUTC() {
 
 function getEndOfDayUTC() {
     const now = new Date();
-    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999));
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0));
 }
 
 export class PrismaPresensiRepository {
@@ -271,10 +271,8 @@ export class PrismaPresensiRepository {
       throw new Error('Tidak ada mahasiswa yang terdaftar');
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = getStartOfDayUTC();
+    const tomorrow = getEndOfDayUTC();
 
     const existingSession = await prisma.presensi.findFirst({
       where: {
@@ -293,7 +291,7 @@ export class PrismaPresensiRepository {
     const createMany = semuaMahasiswa.map(m => ({
       nim: m.nim,
       idMataKuliah: idMataKuliah,
-      tanggalPertemuan: new Date(),
+      tanggalPertemuan: today,
       statusKehadiran: 'Alpha'
     }));
 

@@ -11,12 +11,6 @@ export class AuthUseCase {
     let user;
     if (identifier.includes('@')) {
       user = await this.userRepository.findByEmail(identifier);
-    } else if (identifier.match(/^U\d+$/)) {
-      user = await this.userRepository.findByNomorInduk(identifier);
-    } else if (identifier.match(/^\d{7}$/)) {
-      user = await this.userRepository.findByNim(identifier);
-    } else if (identifier.match(/^\d{18}$/)) {
-      user = await this.userRepository.findByNip(identifier);
     } else {
       user = await this.userRepository.findByNomorInduk(identifier);
     }

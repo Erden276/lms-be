@@ -19,13 +19,7 @@ export class PresensiController {
     try {
       let nim = req.user?.nomorInduk;
       
-      // Jika nomorInduk tidak cocok dengan NIM di tabel Presensi, cari NIM dari tabel Mahasiswa
-      const mahasiswa = await prisma.mahasiswa.findUnique({
-        where: { nomorInduk: nim }
-      });
-      if (mahasiswa) {
-        nim = mahasiswa.nim; // Gunakan nim yang sesuai untuk presensi
-      }
+      // nim sudah berupa actual nim (karena nomorInduk === nim)
       
       const { idMataKuliah, token } = req.body;
       const result = await this.presensiUseCase.scanKehadiran(nim, parseInt(idMataKuliah), token);
@@ -39,12 +33,7 @@ export class PresensiController {
   async getPresensiMahasiswa(req, res) {
     try {
       let nim = req.user?.nomorInduk || req.query.nim;
-      const mahasiswa = await prisma.mahasiswa.findUnique({
-        where: { nomorInduk: nim }
-      });
-      if (mahasiswa) {
-        nim = mahasiswa.nim;
-      }
+      // nim sudah berupa actual nim
       const { idMataKuliah } = req.params;
       const data = await this.presensiUseCase.getRiwayatKehadiran(nim, parseInt(idMataKuliah));
       res.status(200).json(data);
@@ -56,12 +45,7 @@ export class PresensiController {
   async getSummaryPresensi(req, res) {
     try {
       let nim = req.user?.nomorInduk || req.query.nim;
-      const mahasiswa = await prisma.mahasiswa.findUnique({
-        where: { nomorInduk: nim }
-      });
-      if (mahasiswa) {
-        nim = mahasiswa.nim;
-      }
+      // nim sudah berupa actual nim
       const { idMataKuliah } = req.params;
       const data = await this.presensiUseCase.getSummaryKehadiran(nim, parseInt(idMataKuliah));
       res.status(200).json(data);

@@ -51,8 +51,8 @@ async function main() {
       ni: "D001",
       nama: "Dr. Budi Santoso, M.Kom",
       email: "budi.santoso@kampus.ac.id",
-      nip: "198001012010011001",
-      nidn: "0401018001",
+      nip: "2025001",
+      nidn: "1001",
       bidang: "Rekayasa Perangkat Lunak",
       ruangKantor: "Gedung A Lt.3 R.301",
     },
@@ -60,8 +60,8 @@ async function main() {
       ni: "D002",
       nama: "Prof. Siti Rahayu, Ph.D",
       email: "siti.rahayu@kampus.ac.id",
-      nip: "197505152005012001",
-      nidn: "0515057501",
+      nip: "2025002",
+      nidn: "1002",
       bidang: "Kecerdasan Buatan",
       ruangKantor: "Gedung A Lt.3 R.302",
     },
@@ -69,8 +69,8 @@ async function main() {
       ni: "D003",
       nama: "Dr. Ahmad Fauzi, M.T",
       email: "ahmad.fauzi@kampus.ac.id",
-      nip: "198203102010011002",
-      nidn: "1003028201",
+      nip: "2025003",
+      nidn: "1003",
       bidang: "Jaringan Komputer",
       ruangKantor: "Gedung B Lt.2 R.205",
     },
@@ -78,8 +78,8 @@ async function main() {
       ni: "D004",
       nama: "Dr. Dewi Lestari, M.Sc",
       email: "dewi.lestari@kampus.ac.id",
-      nip: "198506202012012001",
-      nidn: "2006058501",
+      nip: "2025004",
+      nidn: "1004",
       bidang: "Basis Data",
       ruangKantor: "Gedung A Lt.4 R.401",
     },
@@ -87,8 +87,8 @@ async function main() {
       ni: "D005",
       nama: "Dr. Rudi Hermawan, S.Kom, M.Cs",
       email: "rudi.hermawan@kampus.ac.id",
-      nip: "197912252008011001",
-      nidn: "2512127901",
+      nip: "2025005",
+      nidn: "1005",
       bidang: "Sistem Informasi",
       ruangKantor: "Gedung B Lt.3 R.310",
     },
@@ -97,15 +97,14 @@ async function main() {
   for (const d of dosenList) {
     await prisma.user.create({
       data: {
-        nomorInduk: d.ni,
+        nomorInduk: d.nip,
         nama: d.nama,
         email: d.email,
         password: hashedPassword,
-        telepon: `0812${d.ni.slice(-3)}00001`,
+        telepon: `0812${d.nip.slice(-3)}00001`,
         roleId: 3,
         dosen: {
           create: {
-            nip: d.nip,
             nidn: d.nidn,
             bidang: d.bidang,
             ruangKantor: d.ruangKantor,
@@ -185,13 +184,13 @@ async function main() {
   for (const m of mahasiswaList) {
     await prisma.user.create({
       data: {
-        nomorInduk: m.ni,
+        nomorInduk: m.nim,
         nama: m.nama,
         email: m.email,
         password: hashedPassword,
-        telepon: `08123${m.ni}`,
+        telepon: `08123${m.nim}`,
         roleId: 2,
-        mahasiswa: { create: { nim: m.ni } },
+        mahasiswa: { create: {} },
       },
     });
   }
@@ -378,7 +377,7 @@ async function main() {
   for (const mk of createdMatkul) {
     for (const m of mahasiswaList) {
       presensiData.push({
-        nim: m.ni,
+        nim: m.nim,
         idMataKuliah: mk.idMataKuliah,
         tanggalPertemuan: lastWeek,
         waktuPresensi: new Date(
@@ -388,7 +387,7 @@ async function main() {
           statusOptions[Math.floor(Math.random() * statusOptions.length)],
       });
       presensiData.push({
-        nim: m.ni,
+        nim: m.nim,
         idMataKuliah: mk.idMataKuliah,
         tanggalPertemuan: today,
         statusKehadiran: "Alpha",
@@ -430,7 +429,7 @@ async function main() {
           nilaiAkhir = 65 + Math.floor(Math.random() * 30);
         }
         nilaiData.push({
-          nomorInduk: m.ni,
+          nomorInduk: m.nim,
           idMataKuliah: mk.idMataKuliah,
           nilaiTugas: Math.min(100, nilaiAkhir + Math.floor(Math.random() * 8)),
           nilaiKuis: Math.min(100, nilaiAkhir + Math.floor(Math.random() * 6)),
@@ -440,7 +439,7 @@ async function main() {
       } else {
         const base = 65 + Math.floor(Math.random() * 30);
         nilaiData.push({
-          nomorInduk: m.ni,
+          nomorInduk: m.nim,
           idMataKuliah: mk.idMataKuliah,
           nilaiTugas: base + Math.floor(Math.random() * 10),
           nilaiKuis: base + Math.floor(Math.random() * 8),
@@ -723,7 +722,7 @@ async function main() {
         );
         tugasData.push({
           idMataKuliah: mk.idMataKuliah,
-          nim: m.ni,
+          nim: m.nim,
           judul: tmpl.judul,
           detailTugas: tmpl.detail,
           deadlineTugas: deadlineDate,
@@ -798,7 +797,7 @@ async function main() {
         idMataKuliah: mk.idMataKuliah,
         judul: `Diskusi: ${matkulSemester4[i].nama} - Pertemuan 1`,
         isiForum: `Selamat datang di forum diskusi ${matkulSemester4[i].nama}. Silakan bertanya atau berdiskusi mengenai materi pertemuan pertama.`,
-        nomorInduk: dosenList[i].ni,
+        nomorInduk: dosenList[i].nip,
       },
     });
     forumCreated.push(forum);
@@ -811,13 +810,13 @@ async function main() {
   const komentarData = [];
   for (let i = 0; i < forumCreated.length; i++) {
     komentarData.push({
-      nomorInduk: mahasiswaList[(i * 2) % 10].ni,
+      nomorInduk: mahasiswaList[(i * 2) % 10].nim,
       idForum: forumCreated[i].idForumDiskusi,
       isiKomentar:
         "Terima kasih Pak/Bu, materinya sangat bermanfaat. Apakah ada referensi tambahan?",
     });
     komentarData.push({
-      nomorInduk: mahasiswaList[(i * 2 + 1) % 10].ni,
+      nomorInduk: mahasiswaList[(i * 2 + 1) % 10].nim,
       idForum: forumCreated[i].idForumDiskusi,
       isiKomentar:
         "Saya ingin bertanya mengenai topik yang dibahas di slide ke-3.",
@@ -833,7 +832,7 @@ async function main() {
   for (let i = 0; i < forumCreated.length; i++) {
     for (let j = 0; j < 3; j++) {
       likeData.push({
-        nomorInduk: mahasiswaList[(i + j) % 10].ni,
+        nomorInduk: mahasiswaList[(i + j) % 10].nim,
         idForum: forumCreated[i].idForumDiskusi,
       });
     }
@@ -980,8 +979,8 @@ async function main() {
   console.log("  - IPK Andi (2026001) ~3.73 berdasarkan nilai sebenarnya");
   console.log("");
   console.log("Akun Login:");
-  console.log("  Dosen    -> D001 / password123");
-  console.log("  Mahasiswa -> 2026001 / password123");
+  console.log("  Dosen    -> 2025001 (NIP) / password123");
+  console.log("  Mahasiswa -> 2026001 (NIM) / password123");
   console.log("");
 }
 

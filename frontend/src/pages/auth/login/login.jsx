@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./login.css";
 import { apiClient } from "../../../utils/apiClient";
 import logoImg from "../../../assets/logo.png";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 function Login({ onLogin, onFaq }) {
   const [role, setRole] = useState("Mahasiswa");
@@ -11,6 +12,8 @@ function Login({ onLogin, onFaq }) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null); // 'privasi' | 'syarat' | null
+
+
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +66,10 @@ function Login({ onLogin, onFaq }) {
           heading: "Hak Pengguna",
           body: "Pengguna berhak mengajukan permintaan koreksi atau pembaruan data pribadi melalui administrator akademik kampus. Akun yang tidak aktif akan dinonaktifkan sesuai kebijakan institusi.",
         },
+        {
+          heading: "Akses Perangkat (Kamera)",
+          body: "Akses kamera yang diminta oleh browser hanya digunakan sementara secara langsung (real-time) untuk keperluan pemindaian QR Code pada fitur presensi. LeMaS tidak menyimpan, merekam, atau membagikan tangkapan gambar/video dari perangkat pengguna kepada pihak mana pun.",
+        },
       ],
     },
     syarat: {
@@ -89,6 +96,14 @@ function Login({ onLogin, onFaq }) {
           heading: "Sanksi Pelanggaran",
           body: "Pelanggaran terhadap syarat penggunaan dapat mengakibatkan peringatan, pembatasan fitur, hingga penonaktifan akun secara permanen oleh administrator, sesuai dengan tingkat pelanggaran yang dilakukan.",
         },
+        {
+          heading: "Integritas Akademik & Anti-Plagiarisme",
+          body: "Setiap pengguna diwajibkan menjunjung tinggi kejujuran akademik. Tindakan plagiarisme dalam pengumpulan tugas, kecurangan dalam pengerjaan kuis online, maupun pemalsuan presensi dikategorikan sebagai pelanggaran berat dan dapat dikenakan sanksi akademik yang tegas.",
+        },
+        {
+          heading: "Ketersediaan Layanan",
+          body: "Kami berkomitmen untuk menjaga ketersediaan platform LeMaS sebaik mungkin. Namun, platform mungkin mengalami jeda layanan sementara untuk keperluan pemeliharaan (maintenance) atau kendala teknis yang tidak terduga. Pengumuman terkait gangguan layanan akan diinformasikan melalui kanal komunikasi resmi kampus.",
+        },
       ],
     },
   };
@@ -102,11 +117,13 @@ function Login({ onLogin, onFaq }) {
 
       <div className="login-container">
         {/* Login Card */}
-        <div className="login-card">
+        <div className="login-card animate-fade-in-up">
           {/* Logo & Branding */}
           <div className="brand-header">
-            <div className="logo-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
-              <img src={logoImg} alt="LeMaS Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+            <div className="logo-container-wrapper">
+              <div className="logo-box">
+                <img src={logoImg} alt="LeMaS Logo" className="logo-img" />
+              </div>
             </div>
             <h2 className="welcome-text">LeMaS</h2>
             <p className="welcome-subtext">
@@ -226,8 +243,8 @@ function Login({ onLogin, onFaq }) {
 
         {/* Modal Privasi / Syarat */}
         {modal && (
-          <div className="lm-modal-overlay" onClick={() => setModal(null)}>
-            <div className="lm-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="lm-modal-overlay animate-fade-in" onClick={() => setModal(null)}>
+            <div className="lm-modal animate-scale-in" onClick={(e) => e.stopPropagation()}>
               <div className="lm-modal-header">
                 <div className="lm-modal-title">
                   <span className="material-symbols-outlined lm-modal-icon">{MODAL_CONTENT[modal].icon}</span>

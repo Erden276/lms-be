@@ -1,10 +1,13 @@
-# LAPORAN KOMPREHENSIF IMPLEMENTASI DAN RENCANA PENGUJIAN LE-MAS (LEARNING MANAGEMENT SYSTEM)
-
-Dokumen ini disusun untuk memberikan panduan lengkap mengenai instalasi sistem, rencana pengujian fungsionalitas backend menggunakan Postman (berdasarkan *Sequence Diagram*), rencana pengujian kegunaan (*Usability*) untuk pengguna non-teknis (berdasarkan *DFD Level 1*), serta *Traceability Matrix* (Matriks Penyelarasan) yang menghubungkan seluruh komponen tersebut secara 1-to-1.
-
----
+<h1 align="center">STANDAR DOKUMENTASI & RENCANA PENGUJIAN (TEST PLAN)</h1>
+<p align="center"><b>Panduan Terintegrasi: DFD Level 1, Sequence Diagram, dan Testing</b></p>
+<p align="center"><i>Proyek: LE-MAS (LEARNING MANAGEMENT SYSTEM)</i></p>
 
 ## 1. STANDAR INSTALLATION MANUAL
+---
+
+Mahasiswa wajib mendetailkan proses setup aplikasi agar dapat dijalankan oleh penguji atau pengguna lain.
+
+*(Berikut adalah detail instalasi untuk aplikasi LeMaS:)*
 
 ### 1.1 System Requirements (Spesifikasi Sistem)
 Untuk menjalankan aplikasi LeMaS dengan optimal, sistem Anda disarankan memenuhi kriteria minimum berikut:
@@ -32,17 +35,17 @@ Aplikasi LeMaS terbagi menjadi dua bagian: **Backend (Express.js + Prisma)** dan
 Buat file bernama `.env` di dalam root direktori backend (`lms-be/`) dan masukkan konfigurasi berikut:
 ```env
 PORT_APP="3000"
-DATABASE_URL="postgresql://postgres:firman2652006@localhost:5432/lemes?schema=public"
-JWT_SECRET="bG1zLWJlDQo="
+DATABASE_URL="postgresql://postgres:password_anda@localhost:5432/lemes?schema=public"
+JWT_SECRET="masukkan_rahasia_jwt_anda_disini"
 FRONTEND_URL="http://localhost:5173"
 ```
 > [!NOTE]
-> Ganti user `postgres`, kata sandi `firman2652006`, host `localhost:5432`, dan nama database `lemes` sesuai dengan kredensial PostgreSQL lokal di komputer Anda.
+> Ganti kata sandi `password_anda`, host `localhost:5432`, dan nama database `lemes` sesuai dengan kredensial PostgreSQL lokal di komputer Anda.
 
 #### B. Konfigurasi Frontend (`frontend/.env`)
 Buat file bernama `.env` di dalam root direktori frontend (`frontend/`) dan masukkan konfigurasi berikut:
 ```env
-VITE_GEMINI_API_KEY="AIzaSyCOVK_aDSnREpKHfUh4JGZFDh0wFN8Lk9k"
+VITE_GEMINI_API_KEY="masukkan_api_key_gemini_anda_disini"
 VITE_API_URL="http://localhost:3000"
 ```
 
@@ -92,17 +95,16 @@ Prisma ORM digunakan untuk melakukan deployment dan sinkronisasi skema database 
     ```
     Server development frontend akan berjalan aktif di alamat **`http://localhost:5173`**. Silakan buka alamat tersebut di browser Anda.
 
----
----
-
 ## 2. BACKEND TEST PLAN (Berdasarkan Sequence Diagram)
+---
 
-Pengujian backend dilakukan secara ketat dengan menggunakan Postman untuk menjamin keandalan API. Rencana pengujian ini disusun berdasarkan aturan keterlacakan (*Traceability*) dari *Sequence Diagram* yang telah dirancang.
+Pengujian backend dilakukan menggunakan Postman dengan aturan **Traceability** sebagai berikut:
 
-### 2.1 Aturan Traceability (Keterlacakan)
-*   **1 Sequence Diagram = 1 Folder Collection:** Setiap file *Sequence Diagram* (S1 s.d S9) dipetakan menjadi tepat satu folder collection di dalam Postman.
-*   **Semua Method di Diagram Wajib Diuji:** Setiap panah interaksi *request* yang dikirimkan oleh aktor (Dosen/Mahasiswa) ke sistem di dalam *Sequence Diagram* harus memiliki satu *request endpoint* yang setara di Postman.
-*   **Validasi Return Value di Tab "Tests":** Setiap pesan balik (*return/response*) yang digambarkan pada *Sequence Diagram* harus divalidasi kebenaran strukturnya di Postman menggunakan penulisan test script pada tab **Tests** untuk memeriksa status code dan response body.
+| Komponen Desain | Implementasi Testing |
+| :--- | :--- |
+| **1 Sequence Diagram** | Setara dengan 1 folder Collection atau alur proses di Postman. |
+| **Semua Method di Diagram** | Setiap pemanggilan method (call) dalam diagram harus diuji endpoint-nya. |
+| **Return Value** | Hasil balik di diagram divalidasi pada bagian "Tests" di Postman (Response Body). |
 
 ### 2.2 Penulisan Script Validasi Otomatis (Tests) di Postman
 
@@ -138,12 +140,17 @@ pm.test("Kelompok berhasil dihapus secara permanen", function () {
 });
 ```
 
----
----
-
 ## 3. USABILITY TEST PLAN (Berdasarkan DFD Level 1)
+---
 
-Pengujian kegunaan (*Usability*) dirancang untuk mengevaluasi interaksi pengguna non-teknis (Dosen dan Mahasiswa) terhadap antarmuka (*interface*) LeMaS, guna memastikan seluruh alur bisnis yang didefinisikan pada **DFD Level 1 (S1 s.d S9)** dapat diselesaikan dengan mudah dan tanpa hambatan.
+Pengujian ini ditujukan untuk user non-teknis guna memvalidasi alur bisnis yang didefinisikan pada DFD Level 1.
+*   **Skenario Uji:** Setiap proses di DFD Level 1 (misal: Proses 1.0 Registrasi) diturunkan menjadi 1 *Task* untuk pengguna.
+*   **Target Peserta:** Minimal 3-5 orang yang merepresentasikan end-user (bukan developer).
+*   **Metrik:**
+    *   *Completion Rate*: Apakah user berhasil menyelesaikan alur sesuai DFD?
+    *   *Error Rate*: Berapa kali user mengalami kendala navigasi?
+
+*(Berikut adalah rincian skenario dan metrik pengujian yang telah disesuaikan untuk aplikasi LeMaS:)*
 
 ### 3.1 Skenario Uji (User Task Scenarios)
 Setiap proses utama pada DFD Level 1 diturunkan menjadi skenario tugas dunia nyata yang harus diselesaikan oleh peserta uji:
@@ -177,26 +184,39 @@ Untuk mengukur keberhasilan tingkat kegunaan antarmuka aplikasi, metrik berikut 
 2.  **Error Rate (Tingkat Kesalahan):** Jumlah kesalahan navigasi, mis-klik, atau kegagalan aksi yang dilakukan pengguna selama mencoba menyelesaikan satu skenario (Target: **< 2 kali per skenario**).
 3.  **System Usability Scale (SUS Score):** Skor kuisioner subjektif berisi 10 pertanyaan standar yang diisi peserta pasca-pengujian (Target: **Skor > 75** dengan kategori *Good/Excellent*).
 
----
----
-
 ## 4. MATRIKS PENYELARASAN (Traceability Matrix)
+---
 
-Matriks penyelarasan di bawah ini menyajikan pemetaan lurus (**1-to-1 traceability**) yang menghubungkan setiap proses pada **DFD Level 1** dengan rancangan **Sequence Diagram**, implementasi **Method Backend (Postman)** yang diuji, serta **Skenario Usability** bagi pengguna non-teknis.
-
-| ID DFD 1 | Nama Sequence Diagram | Method Backend (Postman / API Endpoint) | Skenario Usability (User Task Scenario) |
+| ID DFD 1 | Nama Sequence Diagram | Method Backend (Postman) | Skenario Usability |
 | :--- | :--- | :--- | :--- |
 | **1.0** | `S1 - Kelola Tugas` | `GET /api/dosen/tugas`<br>`POST /api/dosen/tugas`<br>`PUT /api/dosen/tugas/:id`<br>`DELETE /api/dosen/tugas/:id`<br>`GET /api/kuis`<br>`POST /api/kuis`<br>`PUT /api/kuis/:id`<br>`DELETE /api/kuis/:id` | **Dosen** mengelola (membuat, mengubah, menghapus) penugasan reguler serta menyusun soal kuis online interaktif untuk kelas perkuliahan. |
 | **2.0** | `S2 - Kelola Anggota` | `POST /api/kelompok`<br>`POST /api/kelompok/:id/members`<br>`DELETE /api/kelompok/:id/members/:nim`<br>`DELETE /api/kelompok/:id` *(Hapus Kelompok)* | **Dosen** membuat kelompok belajar baru di kelas, menginput mahasiswa ke dalam kelompok, dan menghapus kelompok secara permanen (*cascade delete*). |
 | **3.0** | `S3 - Kelola Deadline` | `PUT /api/dosen/tugas/:id` *(Update deadline)*<br>`GET /api/tugas/:id` *(Validasi waktu)* | **Dosen** memperpanjang batas waktu pengerjaan tugas/kuis online, dan **Mahasiswa** memverifikasi tombol pengerjaan tugas yang kembali terbuka secara dinamis. |
-| **4.0** | `S4 - Monitoring Progress` | `POST /api/progress/materi`<br>`GET /api/progress/summary`<br>`GET /api/progress/dosen` | **Mahasiswa** membuka/mengunduh modul ajar materi kuliah. Sistem mencatat progress membaca, dan menampilkan diagram persentase progress belajar di dashboard. |
-| **5.0** | `S5 - Upload Tugas` | `POST /api/tugas/:id/submit` *(Upload Jawaban)*<br>`POST /api/kuis/:id/submit` *(Submit Kuis)* | **Mahasiswa** mengunggah file dokumen jawaban tugas (PDF/Word/Zip) atau menyelesaikan kuis online pilihan ganda langsung dari antarmuka halaman kuis. |
-| **6.0** | `S6 - Presensi` | `POST /api/presensi/buka-sesi` *(Generate QR)*<br>`POST /api/presensi/scan` *(Pindai QR)*<br>`PATCH /api/presensi/manual` *(Ubah Status)* | **Dosen** mengaktifkan sesi presensi (QR Code muncul), **Mahasiswa** memindai QR Code untuk absen otomatis, dan Dosen mengubah kehadiran manual jika sakit/izin. |
-| **7.0** | `S7 - Penilaian` | `POST /api/nilai/submissions/nilai`<br>`GET /api/nilai/transkrip/mahasiswa`<br>`GET /api/kuis/:id/hasil` *(🔒 Read-only)* | **Dosen** menginput nilai tugas mahasiswa, memantau rekap skor kuis otomatis (permanen), dan **Mahasiswa** mencetak/mengunduh transkrip nilai akademik PDF. |
+| **4.0** | `S4 - Monitoring Progress` | `GET /api/materi/mata-kuliah/:idMataKuliah`<br>`POST /api/materi/:idModulAjar/access`<br>`GET /api/materi/mata-kuliah/:idMataKuliah/progress`<br>`GET /api/modul-ajar`<br>`POST /api/modul-ajar`<br>`PUT /api/modul-ajar/:id`<br>`DELETE /api/modul-ajar/:id` | **Mahasiswa** membuka/mengunduh modul ajar materi kuliah. Sistem mencatat progress membaca, dan menampilkan diagram persentase progress belajar di dashboard. |
+| **5.0** | `S5 - Upload Tugas` | `POST /api/tugas/:idTugas/submit` *(Upload Jawaban)*<br>`POST /api/kuis/:idKuis/submit` *(Submit Kuis)* | **Mahasiswa** mengunggah file dokumen jawaban tugas (PDF/Word/Zip) atau menyelesaikan kuis online pilihan ganda langsung dari antarmuka halaman kuis. |
+| **6.0** | `S6 - Presensi` | `POST /api/dosen/presensi/matkul/:idMataKuliah/generate` *(Generate QR)*<br>`POST /api/presensi/scan` *(Pindai QR)*<br>`PUT /api/dosen/presensi/nim/:nim/matkul/:idMataKuliah/status` *(Ubah Status)* | **Dosen** mengaktifkan sesi presensi (QR Code muncul), **Mahasiswa** memindai QR Code untuk absen otomatis, dan Dosen mengubah kehadiran manual jika sakit/izin. |
+| **7.0** | `S7 - Penilaian` | `POST /api/nilai/submissions/nilai`<br>`GET /api/nilai/transkrip/mahasiswa`<br>`GET /api/kuis/:idKuis/hasil` *(🔒 Read-only)* | **Dosen** menginput nilai tugas mahasiswa, memantau rekap skor kuis otomatis (permanen), dan **Mahasiswa** mencetak/mengunduh transkrip nilai akademik PDF. |
 | **8.0** | `S8 - Diskusi` | `POST /api/forum/thread`<br>`POST /api/forum/comment`<br>`POST /api/forum/like` | **Dosen & Mahasiswa** membuat topik diskusi perkuliahan baru, menanggapi forum kelas dengan memberikan komentar, serta menyukai (*like*) topik bahasan. |
 | **9.0** | `S9 - Log-in dan Log-out` | `POST /api/auth/login`<br>`POST /api/auth/logout` | **Dosen & Mahasiswa** masuk ke platform LeMaS dengan memasukkan Nomor Induk dan password menggunakan otentikasi JWT token, dan menghapus token saat keluar. |
 
 ---
 
 > [!TIP]
-> Dokumen berformat Markdown ini dirancang secara struktural agar siap disalin secara langsung (*copy-paste*) ke dalam platform AI pembuat dokumen (seperti ChatGPT, Claude, atau Word AI) untuk secara otomatis dikonversi menjadi dokumen resmi berformat Microsoft Word (.docx) lengkap dengan kop surat dan format penomoran akademis standar.
+> **Prompt untuk AI (ChatGPT/Claude/Gemini):**
+> Anda dapat menyalin prompt di bawah ini beserta seluruh isi dokumen markdown ini ke AI lain untuk dibuatkan dokumen Word yang rapi:
+
+---
+
+**[COPY MULAI DARI SINI UNTUK PROMPT AI]**
+
+Tolong bertindak sebagai Technical Writer profesional. Saya memiliki draf dokumen teknis berformat Markdown yang berisi "Standar Dokumentasi & Rencana Pengujian (Test Plan) Panduan Terintegrasi: DFD Level 1, Sequence Diagram, dan Testing". 
+
+Tugas Anda adalah:
+1. Mengubah struktur dan isi teks ini menjadi format dokumen resmi yang sangat rapi.
+2. Tolong buatkan ini agar siap disalin ke Microsoft Word. Gunakan heading yang jelas (H1, H2, H3).
+3. Buatkan bagian tabel dengan format tabel yang bersih dan proporsional (terutama untuk "Backend Test Plan" dan "Matriks Penyelarasan").
+4. Tambahkan bagian pengantar singkat di awal dokumen sebagai kata pengantar dokumen spesifikasi.
+5. Gunakan bahasa Indonesia baku yang sesuai dengan standar akademik/laporan teknis kampus.
+
+Berikut adalah draf Markdown-nya:
+*(...paste isi markdown mulai dari "1. STANDAR INSTALLATION MANUAL" sampai "MATRIKS PENYELARASAN" di sini...)*

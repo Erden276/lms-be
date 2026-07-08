@@ -51,6 +51,22 @@ const FAQ_DATA = {
           </>
         ),
       },
+      {
+        icon: "manage_accounts",
+        question: "Bagaimana cara memperbarui Profil dan Foto/Avatar saya?",
+        answer: (
+          <>
+            <p>Untuk memperbarui data diri dan mengganti foto profil:</p>
+            <ol>
+              <li>Buka menu <strong>Profil</strong> dari sidebar sebelah kiri.</li>
+              <li>Klik tab <strong>Edit Profil</strong>.</li>
+              <li>Untuk mengganti foto, klik tombol <strong>Unggah Foto</strong> atau ikon kamera pada area avatar, lalu pilih file gambar dari perangkat Anda.</li>
+              <li>Anda juga dapat memperbarui informasi kontak seperti Email, Nomor Telepon, atau Alamat.</li>
+              <li>Setelah selesai, klik <strong>Simpan Perubahan</strong>.</li>
+            </ol>
+          </>
+        ),
+      },
     ],
   },
   mahasiswa: {
@@ -71,6 +87,27 @@ const FAQ_DATA = {
               <li>Klik <strong>Kirim</strong> untuk mengonfirmasi pengumpulan.</li>
             </ol>
             <p>Jika sudah pernah mengumpulkan, nama file sebelumnya akan tampil sebagai <strong>link biru</strong> yang bisa diklik untuk membuka file. Kamu bisa memperbarui pengumpulan selama deadline belum lewat.</p>
+          </>
+        ),
+      },
+      {
+        icon: "download",
+        question: "Bagaimana cara mengakses dan mengunduh materi perkuliahan?",
+        answer: (
+          <>
+            <ol>
+              <li>Masuk ke menu <strong>Mata Kuliah</strong> di sidebar.</li>
+              <li>Pilih mata kuliah yang ingin Anda pelajari.</li>
+              <li>Daftar materi akan tampil di panel sebelah kanan. Pilih materi yang diinginkan.</li>
+              <li>
+                Klik tombol aksi yang sesuai pada materi aktif:
+                <ul>
+                  <li><strong>Unduh Modul</strong> untuk menyimpan file PDF/Presentasi/Dokumen ke perangkat Anda.</li>
+                  <li><strong>Buka Link</strong> untuk membuka tautan materi eksternal di tab baru.</li>
+                  <li><strong>Putar Video</strong> untuk memutar video pembelajaran langsung di aplikasi.</li>
+                </ul>
+              </li>
+            </ol>
           </>
         ),
       },
@@ -155,8 +192,9 @@ const FAQ_DATA = {
               <li>Masuk ke menu <strong>Materi</strong>.</li>
               <li>Pilih mata kuliah yang ingin ditambahkan materi.</li>
               <li>Klik tombol <strong>Tambah Materi</strong>.</li>
-              <li>Isi judul, deskripsi, dan unggah file (PDF, PPT, dll).</li>
-              <li>Klik <strong>Simpan</strong>.</li>
+              <li>Pilih <strong>Tipe Materi</strong> (PDF, Video, Link, Presentasi, Dokumen, atau Spreadsheet).</li>
+              <li>Isi judul materi, deskripsi (opsional), lalu unggah file materi Anda (untuk tipe dokumen/file) atau masukkan URL (untuk tipe Link/Video).</li>
+              <li>Klik <strong>Simpan</strong>. Seluruh materi bertipe dokumen otomatis dapat diunduh oleh mahasiswa.</li>
             </ol>
           </>
         ),
@@ -240,6 +278,38 @@ const FAQ_DATA = {
           </>
         ),
       },
+      {
+        icon: "assignment_add",
+        question: "Bagaimana cara membuat Tugas atau Kuis baru?",
+        answer: (
+          <>
+            <ol>
+              <li>Masuk ke menu <strong>Tugas & Kuis</strong> dari sidebar.</li>
+              <li>Klik tombol <strong>Buat Baru</strong> di pojok kanan atas.</li>
+              <li>Pilih <strong>Tipe</strong> yang ingin dibuat: <em>Tugas (Pengumpulan File)</em> atau <em>Kuis (Pilihan Ganda)</em>.</li>
+              <li>Pilih mata kuliah, isi Judul, Deskripsi/Instruksi, dan tentukan <strong>Tenggat Waktu (Deadline)</strong>.</li>
+              <li>Jika membuat kuis, Anda akan diminta untuk memasukkan daftar pertanyaan dan pilihan jawabannya.</li>
+              <li>Klik <strong>Simpan dan Publikasikan</strong> agar mahasiswa dapat mulai mengerjakannya.</li>
+            </ol>
+          </>
+        ),
+      },
+      {
+        icon: "group_add",
+        question: "Bagaimana cara membuat Kelompok Kelas?",
+        answer: (
+          <>
+            <p>Untuk membuat kelompok belajar mahasiswa:</p>
+            <ol>
+              <li>Masuk ke menu <strong>Kelompok</strong>.</li>
+              <li>Pilih mata kuliah yang ingin diatur kelompoknya.</li>
+              <li>Klik tombol <strong>Buat Kelompok</strong>.</li>
+              <li>Anda dapat memilih <strong>Pembagian Otomatis</strong> (sistem akan mengacak mahasiswa ke dalam kelompok secara merata) atau <strong>Pembagian Manual</strong> (memilih sendiri anggota untuk setiap kelompok).</li>
+              <li>Beri nama kelompok (misal: Kelompok 1, Kelompok 2) dan simpan.</li>
+            </ol>
+          </>
+        ),
+      },
     ],
   },
   teknis: {
@@ -296,7 +366,7 @@ export default function FAQ() {
 
   return (
     <main className="faq-main">
-      <div className="faq-container">
+      <div className="faq-container animate-fade-in-up">
         {/* Header */}
         <div className="faq-header">
           <div className="faq-badge">
@@ -337,7 +407,11 @@ export default function FAQ() {
                 const key = `${catKey}-${i}`;
                 const isOpen = openIndex === key;
                 return (
-                  <div key={key} className={`faq-item ${isOpen ? "open" : ""}`}>
+                  <div 
+                    key={key} 
+                    className={`faq-item animate-fade-in-up ${isOpen ? "open" : ""}`}
+                    style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
+                  >
                     <button className="faq-question" onClick={() => toggle(key)}>
                       <span className="faq-q-left">
                         <span className="faq-q-icon">

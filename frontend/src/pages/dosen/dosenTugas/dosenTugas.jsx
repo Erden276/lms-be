@@ -49,6 +49,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteTipe, setDeleteTipe] = useState(null);
   const [filter, setFilter] = useState("Semua");
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -93,7 +95,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await apiClient.get('/api/dosen/tugas');
       const raw = res.data || res;
@@ -123,6 +126,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -137,6 +142,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       showToast("Judul dan deadline wajib diisi.", "error");
       return;
     }
+    setIsSubmitting(true);
+    showToast("Menyimpan data...", "info");
     try {
       if (form.type === "Kuis") {
         // Buat kuis via /api/kuis
@@ -182,9 +189,11 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       setQuizQuestions(0);
       setView("list");
       showToast("Berhasil dibuat!");
-      fetchTasks();
+      fetchTasks(false);
     } catch (error) {
       showToast("Gagal membuat: " + (error.message || ""), "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -256,6 +265,8 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       showToast("Judul dan deadline wajib diisi.", "error");
       return;
     }
+    setIsSubmitting(true);
+    showToast("Memperbarui data...", "info");
     try {
       if (form.type === "Kuis") {
         // Update kuis dengan soal-soal baru
@@ -292,9 +303,11 @@ export default function DosenTugas({ onNavigate, onLogout }) {
       setQuizQuestions(0);
       setView("list");
       showToast(form.type === "Kuis" ? "Kuis berhasil diperbarui!" : "Tugas berhasil diperbarui!");
-      fetchTasks();
+      fetchTasks(false);
     } catch (error) {
       showToast("Gagal memperbarui " + (form.type === "Kuis" ? "kuis" : "tugas"), "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -304,20 +317,27 @@ export default function DosenTugas({ onNavigate, onLogout }) {
   };
   const handleDelete = async () => {
     if (!deleteId) return;
-    try {
-      if (deleteTipe === 'Kuis') {
-        await apiClient.delete(`/api/kuis/${deleteId}`);
-        showToast("Kuis dihapus.");
-      } else {
-        await apiClient.delete(`/api/dosen/tugas/${deleteId}`);
-        showToast("Tugas dihapus.");
-      }
-      fetchTasks();
-    } catch (error) {
-      showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
-    }
+    const currentId = deleteId;
+    const currentTipe = deleteTipe;
+    
+    // Optimistic delete
     setDeleteId(null);
     setDeleteTipe(null);
+    setTasks(prev => prev.filter(t => t.id !== currentId));
+    
+    try {
+      if (currentTipe === 'Kuis') {
+        await apiClient.delete(`/api/kuis/${currentId}`);
+        showToast("Kuis dihapus.");
+      } else {
+        await apiClient.delete(`/api/dosen/tugas/${currentId}`);
+        showToast("Tugas dihapus.");
+      }
+      fetchTasks(false);
+    } catch (error) {
+      showToast("Gagal menghapus: " + (error.message || error.error || ""), "error");
+      fetchTasks(false);
+    }
   };
 
   const handleViewSubmissions = (task) => {
@@ -836,9 +856,18 @@ export default function DosenTugas({ onNavigate, onLogout }) {
             >
               Batal
             </button>
-            <button type="submit" className="dt-btn-submit">
-              <span className="material-symbols-outlined">save</span>
-              {submitLabel}
+            <button type="submit" className="dt-btn-submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <span className="material-symbols-outlined" style={{ animation: "spin 1s linear infinite" }}>autorenew</span>
+                  Menyimpan...
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined">save</span>
+                  {submitLabel}
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -979,30 +1008,58 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                     color: "#2f9696",
                   },
                 ].map((s) => (
-                  <div key={s.label} className="dt-stat-mini">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ color: s.color }}
-                    >
-                      {s.icon}
-                    </span>
-                    <div>
-                      <p
-                        className="dt-stat-mini-val"
-                        style={{ color: s.color }}
-                      >
-                        {s.value}
-                      </p>
-                      <p className="dt-stat-mini-lbl">{s.label}</p>
+                  loading ? (
+                    <div key={s.label} className="dt-stat-mini skeleton-card" style={{ border: 'none', height: '4.5rem', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
+                      <div className="skeleton-circle" style={{ width: '40px', height: '40px' }}></div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className="skeleton-text" style={{ width: '30px', height: '24px', margin: 0 }}></div>
+                        <div className="skeleton-text" style={{ width: '60px', height: '14px', margin: 0 }}></div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div key={s.label} className="dt-stat-mini">
+                      <span className="material-symbols-outlined" style={{ color: s.color }}>{s.icon}</span>
+                      <div>
+                        <p className="dt-stat-mini-val" style={{ color: s.color }}>
+                          {s.value}
+                        </p>
+                        <p className="dt-stat-mini-lbl">{s.label}</p>
+                      </div>
+                    </div>
+                  )
                 ))}
               </div>
 
               {/* Task Cards */}
               <div className="dt-task-grid">
-                {filtered.map((task) => {
-                  const dl = daysLeft(task.deadline);
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="dt-task-card skeleton-card" style={{ padding: '1.5rem', minHeight: '280px', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <div className="skeleton-text" style={{ width: '80px', height: '24px', borderRadius: '12px' }}></div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <div className="skeleton-circle" style={{ width: '32px', height: '32px' }}></div>
+                          <div className="skeleton-circle" style={{ width: '32px', height: '32px' }}></div>
+                        </div>
+                      </div>
+                      <div className="skeleton-text skeleton-text--medium" style={{ height: '20px', marginBottom: '12px' }}></div>
+                      <div className="skeleton-text skeleton-text--short" style={{ marginBottom: '16px' }}></div>
+                      <div className="skeleton-text" style={{ width: '100%', height: '40px', marginBottom: '16px' }}></div>
+                      <div className="skeleton-text" style={{ width: '100%', height: '8px', marginBottom: '24px' }}></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
+                        <div className="skeleton-text" style={{ width: '120px', height: '32px' }}></div>
+                        <div className="skeleton-text" style={{ width: '100px', height: '32px', borderRadius: '16px' }}></div>
+                      </div>
+                    </div>
+                  ))
+                ) : filtered.length === 0 ? (
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--slate-500)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '3rem', color: 'var(--slate-300)', marginBottom: '1rem' }}>assignment</span>
+                    <p>Belum ada tugas.</p>
+                  </div>
+                ) : (
+                  filtered.map((task) => {
+                    const dl = daysLeft(task.deadline);
                   const progress = task.tipe === 'Kuis' 
                     ? (task.totalMahasiswa > 0 ? Math.round((task.jumlahPengerjaan / task.totalMahasiswa) * 100) : 0)
                     : (task.total > 0 ? Math.round((task.submitted / task.total) * 100) : 0);
@@ -1143,7 +1200,7 @@ export default function DosenTugas({ onNavigate, onLogout }) {
                       </div>
                     </div>
                   );
-                })}
+                }))}
               </div>
             </>
           )}

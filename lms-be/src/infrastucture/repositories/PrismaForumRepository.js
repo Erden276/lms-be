@@ -68,7 +68,8 @@ export class PrismaForumRepository {
         idMataKuliah: data.idMataKuliah,
         nomorInduk: data.nomorInduk, // ID si pembuat diskusi
         judul: data.judul,
-        isiForum: data.isiForum
+        isiForum: data.isiForum,
+        lampiran: data.lampiran || null
       },
       // Kembalikan juga data user-nya agar frontend bisa langsung merender nama pembuat
       include: {

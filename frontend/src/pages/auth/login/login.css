@@ -81,9 +81,32 @@
   background: transparent;
 }
 
+.logo-container-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 0.75rem;
+}
+
 .logo-box {
-  display: inline-block;
-  margin-bottom: 1.5rem;
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  padding: 8px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(75, 83, 188, 0.08);
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
 
 .logo-text {
@@ -377,12 +400,6 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  animation: modalIn 0.25s ease;
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .lm-modal-header {
