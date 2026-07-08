@@ -2,7 +2,7 @@
 
 **Nama:** Muhammad Daffa  
 **Mata Kuliah:** Implementasi Perancangan Perangkat Lunak  
-**Dosen:** Muhammad Shiddiq Azis  
+**Dosen:** Muhammad Shiddiq Azis, S.T., MBA  
 **Proyek:** LeMaS — Learning Management System  
 **Repository:** <https://github.com/Erden276/lms-be>  
 **Frontend (Vercel):** `https://learning-management-system-nu-six.vercel.app`  
