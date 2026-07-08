@@ -241,13 +241,13 @@ Namun, **Bug #1 (upload file .exe)** adalah celah keamanan yang harus diperbaiki
 
 ## Langkah 6 – Push ke GitHub
 
-Setelah file ini selesai, lakukan commit dengan format:
+Lakukan commit dengan format:
 
 ```
 docs: add testing metrics report
 ```
 
-Kemudian push ke repository:
+Push ke repository:
 
 ```bash
 git add docs/testing-metrics/testing-report.md
